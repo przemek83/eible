@@ -14,7 +14,7 @@ ExportXlsx::ExportXlsx(const QString& filePath) : filePath_(filePath)
 
 bool ExportXlsx::exportView(const QAbstractItemView* view)
 {
-    Q_ASSERT(nullptr != view);
+    Q_ASSERT(view != nullptr);
 
     // QuaZip has problems with opening file from resources. Workaround it...
     QFile::copy(QStringLiteral(":/template.xlsx"), QStringLiteral("template.xlsx"));
