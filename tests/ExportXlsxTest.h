@@ -11,6 +11,8 @@ class ExportXlsxTest: public QObject
 private Q_SLOTS:
     void testExportingEmptyTable();
 
+    void testExportingSimpleTable();
+
 private:
     QByteArray retrieveFileFromZip(const QString& zipFilePath,
                                    const QString& fileName) const;

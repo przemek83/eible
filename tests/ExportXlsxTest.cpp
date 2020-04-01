@@ -12,29 +12,29 @@
 
 namespace
 {
-std::string tableSheetData = R"(
-<sheetData>
-    <row r="1" spans="1:1" x14ac:dyDescent="0.25">
-        <c r="A1" t="str" s="6"><v>Text</v></c>
-        <c r="B1" t="str" s="6"><v>Numeric</v></c>
-        <c r="C1" t="str" s="6"><v>Date</v></c>
-    </row>
-    <row r="2" spans="1:1" x14ac:dyDescent="0.25">
-        <c r="A2" t="str"><v>Item 0,0</v></c>
-        <c r="B2" s="4"><v>10</v></c>
-        <c r="C2" s="3"><v>43891</v></c>
-    </row>
-    <row r="3" spans="1:1" x14ac:dyDescent="0.25">
-        <c r="A3" t="str"><v>Item 0,1</v></c>
-        <c r="B3" s="4"><v>11</v></c>
-        <c r="C3" s="3"><v>43892</v></c>
-    </row>
-    <row r="4" spans="1:1" x14ac:dyDescent="0.25">
-        <c r="A4" t="str"><v>Item 0,2</v></c>
-        <c r="B4" s="4"><v>12</v></c>
-        <c r="C4" s="3"><v>43893</v></c>
-    </row>
-</sheetData>)";
+std::string tableSheetData =
+    R"(<sheetData>)"
+    R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)"
+    R"(<c r="A1" t="str" s="6"><v>Text</v></c>)"
+    R"(<c r="B1" t="str" s="6"><v>Numeric</v></c>)"
+    R"(<c r="C1" t="str" s="6"><v>Date</v></c>)"
+    R"(</row>)"
+    R"(<row r="2" spans="1:1" x14ac:dyDescent="0.25">)"
+    R"(<c r="A2" t="str"><v>Item 0,0</v></c>)"
+    R"(<c r="B2" s="4"><v>10</v></c>)"
+    R"(<c r="C2" s="3"><v>43891</v></c>)"
+    R"(</row>)"
+    R"(<row r="3" spans="1:1" x14ac:dyDescent="0.25">)"
+    R"(<c r="A3" t="str"><v>Item 0,1</v></c>)"
+    R"(<c r="B3" s="4"><v>11</v></c>)"
+    R"(<c r="C3" s="3"><v>43892</v></c>)"
+    R"(</row>)"
+    R"(<row r="4" spans="1:1" x14ac:dyDescent="0.25">)"
+    R"(<c r="A4" t="str"><v>Item 0,2</v></c>)"
+    R"(<c r="B4" s="4"><v>12</v></c>)"
+    R"(<c r="C4" s="3"><v>43893</v></c>)"
+    R"(</row>)"
+    R"(</sheetData>)";
 
 std::string emptySheetData = R"(</sheetData>)";
 }
@@ -98,6 +98,24 @@ void ExportXlsxTest::testExportingEmptyTable()
         retrieveFileFromZip(testFilePath, "xl/worksheets/sheet1.xml");
     const QByteArray expected =
         Utilities::composeXlsxSheet(QString::fromStdString(emptySheetData));
+
+    QCOMPARE(computeHash(actual), computeHash(expected));
+}
+
+void ExportXlsxTest::testExportingSimpleTable()
+{
+    QTableWidget tableWidget;
+    initTable(tableWidget);
+
+    const QString testFilePath(QCoreApplication::applicationDirPath() +
+                               "/test1.xlsx");
+    ExportXlsx exportXlsx(testFilePath);
+    exportXlsx.exportView(&tableWidget);
+
+    const QByteArray actual =
+        retrieveFileFromZip(testFilePath, "xl/worksheets/sheet1.xml");
+    const QByteArray expected =
+        Utilities::composeXlsxSheet(QString::fromStdString(tableSheetData));
 
     QCOMPARE(computeHash(actual), computeHash(expected));
 }
