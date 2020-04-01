@@ -78,7 +78,7 @@ install(TARGETS ${PROJECT_NAME}
 
 add_subdirectory(examples)
 
-#enable_testing()
-#add_subdirectory(tests)
+enable_testing()
+add_subdirectory(tests)
 
 

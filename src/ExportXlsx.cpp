@@ -104,13 +104,10 @@ const QString& ExportXlsx::getCellTypeTag(QVariant& cell)
 
 QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
 {
-    QByteArray rowsContent;
-    rowsContent.append("<sheetData>");
-
     QStringList columnNames = Utilities::generateExcelColumnNames(Utilities::MAX_EXCEL_COLUMNS);
     auto proxyModel = qobject_cast<QAbstractItemModel*>(view->model());
 
-    Q_ASSERT(nullptr != proxyModel);
+    Q_ASSERT(proxyModel != nullptr);
 
     bool multiSelection =
         (QAbstractItemView::MultiSelection == view->selectionMode());
@@ -118,6 +115,12 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
 
     int proxyColumnCount = proxyModel->columnCount();
     int proxyRowCount = proxyModel->rowCount();
+
+    if (proxyColumnCount == 0)
+        return "</sheetData>";
+
+    QByteArray rowsContent;
+    rowsContent.append("<sheetData>");
 
     //Add headers using string type.
     rowsContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
