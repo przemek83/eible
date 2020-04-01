@@ -15,9 +15,7 @@ void initTable(QTableWidget& tableWidget)
     const int rowCount {3};
     tableWidget.setRowCount(rowCount);
     tableWidget.setColumnCount(columnCount);
-    tableWidget.setHorizontalHeaderLabels({"Text column",
-                                           "Numeric column",
-                                           "Date column"});
+    tableWidget.setHorizontalHeaderLabels({"Text", "Numeric", "Date"});
     for (int column = 0; column < columnCount; ++column)
         for (int row = 0; row < rowCount; ++row)
         {
@@ -32,7 +30,8 @@ void initTable(QTableWidget& tableWidget)
                     item->setData(Qt::DisplayRole, 10 * column + row);
                     break;
                 case 2:
-                    item->setData(Qt::DisplayRole, QDate(2020, 1 + column, 1 + row));
+                    item->setData(Qt::DisplayRole,
+                                  QDate(2020, 1 + column, 1 + row));
                     break;
             }
             tableWidget.setItem(row, column, item);
@@ -46,7 +45,7 @@ static bool exportFile()
 
     QString file {QCoreApplication::applicationDirPath() + "/ExportedFile.xlsx"};
     ExportXlsx exportXlsx(file);
-    QObject::connect(&exportXlsx, &ExportXlsx::updateProgress, &exportXlsx,
+    QObject::connect(&exportXlsx, &ExportXlsx::updateProgress, &tableWidget,
                      [&tableWidget](int progress)
     {
         std::cout << "Progress: " << progress << "/" << tableWidget.rowCount()
