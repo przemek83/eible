@@ -48,5 +48,11 @@ int getMaxExcelColumns()
     return MAX_EXCEL_COLUMNS;
 }
 
+QString getXlsxTemplateName()
+{
+    const QString templateFileName {"template.xlsx"};
+    return templateFileName;
+}
+
 
 } // namespace Utilities
