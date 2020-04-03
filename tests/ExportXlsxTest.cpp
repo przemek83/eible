@@ -10,9 +10,9 @@
 
 #include "Utilities.h"
 
-namespace
-{
-std::string tableSheetData =
+QString ExportXlsxTest::zipWorkSheetPath_ {"xl/worksheets/sheet1.xml"};
+
+QString ExportXlsxTest::tableSheetData_ =
     R"(<sheetData>)"
     R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)"
     R"(<c r="A1" t="str" s="6"><v>Text</v></c>)"
@@ -36,7 +36,7 @@ std::string tableSheetData =
     R"(</row>)"
     R"(</sheetData>)";
 
-std::string headersOnlySheetData =
+QString ExportXlsxTest::headersOnlySheetData_ =
     R"(<sheetData>)"
     R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)"
     R"(<c r="A1" t="str" s="6"><v>Text</v></c>)"
@@ -45,10 +45,9 @@ std::string headersOnlySheetData =
     R"(</row>)"
     R"(</sheetData>)";
 
-std::string emptySheetData = R"(</sheetData>)";
+QString ExportXlsxTest::emptySheetData_ = R"(</sheetData>)";
 
-QStringList headers {"Text", "Numeric", "Date"};
-}
+QStringList ExportXlsxTest::headers_ {"Text", "Numeric", "Date"};
 
 QByteArray ExportXlsxTest::retrieveFileFromZip(const QString& zipFilePath,
                                                const QString& fileName) const
@@ -67,7 +66,7 @@ void ExportXlsxTest::initTable(QTableWidget& tableWidget) const
     const int rowCount {3};
     tableWidget.setRowCount(rowCount);
     tableWidget.setColumnCount(columnCount);
-    tableWidget.setHorizontalHeaderLabels(headers);
+    tableWidget.setHorizontalHeaderLabels(headers_);
     for (int column = 0; column < columnCount; ++column)
         for (int row = 0; row < rowCount; ++row)
         {
@@ -90,58 +89,47 @@ void ExportXlsxTest::initTable(QTableWidget& tableWidget) const
         }
 }
 
+void ExportXlsxTest::compareWorkSheets(const QString& testFilePath,
+                                       const QString& sheetData) const
+{
+    const QByteArray actual = retrieveFileFromZip(testFilePath, zipWorkSheetPath_);
+    const QByteArray expected = Utilities::composeXlsxSheet(sheetData);
+    QCOMPARE(actual, expected);
+}
+
+void ExportXlsxTest::exportZip(const QTableWidget& tableWidget,
+                               const QString& testFilePath) const
+{
+    ExportXlsx exportXlsx(testFilePath);
+    exportXlsx.exportView(&tableWidget);
+}
+
 void ExportXlsxTest::testExportingEmptyTable()
 {
     QTableWidget tableWidget;
-    const QString testFilePath(QCoreApplication::applicationDirPath() +
-                               "/test1.xlsx");
-    ExportXlsx exportXlsx(testFilePath);
-    exportXlsx.exportView(&tableWidget);
-
-    const QByteArray actual =
-        retrieveFileFromZip(testFilePath, "xl/worksheets/sheet1.xml");
-    const QByteArray expected =
-        Utilities::composeXlsxSheet(QString::fromStdString(emptySheetData));
-
-    QCOMPARE(actual, expected);
+    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
+    exportZip(tableWidget, testFilePath);
+    compareWorkSheets(testFilePath, emptySheetData_);
 }
 
 void ExportXlsxTest::testExportingHeadersOnly()
 {
     QTableWidget tableWidget;
-    const QString testFilePath(QCoreApplication::applicationDirPath() +
-                               "/test1.xlsx");
     const int columnCount {3};
     const int rowCount {0};
     tableWidget.setRowCount(rowCount);
     tableWidget.setColumnCount(columnCount);
-    tableWidget.setHorizontalHeaderLabels(headers);
-
-    ExportXlsx exportXlsx(testFilePath);
-    exportXlsx.exportView(&tableWidget);
-
-    const QByteArray actual =
-        retrieveFileFromZip(testFilePath, "xl/worksheets/sheet1.xml");
-    const QByteArray expected =
-        Utilities::composeXlsxSheet(QString::fromStdString(headersOnlySheetData));
-
-    QCOMPARE(actual, expected);
+    tableWidget.setHorizontalHeaderLabels(headers_);
+    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
+    exportZip(tableWidget, testFilePath);
+    compareWorkSheets(testFilePath, headersOnlySheetData_);
 }
 
 void ExportXlsxTest::testExportingSimpleTable()
 {
     QTableWidget tableWidget;
     initTable(tableWidget);
-
-    const QString testFilePath(QCoreApplication::applicationDirPath() +
-                               "/test1.xlsx");
-    ExportXlsx exportXlsx(testFilePath);
-    exportXlsx.exportView(&tableWidget);
-
-    const QByteArray actual =
-        retrieveFileFromZip(testFilePath, "xl/worksheets/sheet1.xml");
-    const QByteArray expected =
-        Utilities::composeXlsxSheet(QString::fromStdString(tableSheetData));
-
-    QCOMPARE(actual, expected);
+    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
+    exportZip(tableWidget, testFilePath);
+    compareWorkSheets(testFilePath, tableSheetData_);
 }

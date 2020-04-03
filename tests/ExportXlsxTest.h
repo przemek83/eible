@@ -20,6 +20,18 @@ private:
                                    const QString& fileName) const;
 
     void initTable(QTableWidget& tableWidget) const;
+
+    void compareWorkSheets(const QString& testFilePath,
+                           const QString& sheetData) const;
+
+    void exportZip(const QTableWidget& tableWidget,
+                   const QString& testFile) const;
+
+    static QString zipWorkSheetPath_;
+    static QString tableSheetData_;
+    static QString headersOnlySheetData_;
+    static QString emptySheetData_;
+    static QStringList headers_;
 };
 
 #endif // EXPORTXLSXTEST
