@@ -5,7 +5,7 @@
 #include <quazip5/quazipfile.h>
 #include <QVariant>
 
-#include "Utilities.h"
+#include "EibleUtilities.h"
 
 ExportXlsx::ExportXlsx(const QString& filePath) : filePath_(filePath)
 {
@@ -83,7 +83,7 @@ const QString& ExportXlsx::getCellTypeTag(QVariant& cell)
         case QVariant::DateTime:
         {
             static const QString dateTag(QStringLiteral("s=\"3\""));
-            cell = QVariant(-1 * cell.toDate().daysTo(Utilities::getStartOfExcelWorld()));
+            cell = QVariant(-1 * cell.toDate().daysTo(EibleUtilities::getStartOfExcelWorld()));
             return dateTag;
         }
 
@@ -104,7 +104,8 @@ const QString& ExportXlsx::getCellTypeTag(QVariant& cell)
 
 QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
 {
-    QStringList columnNames = Utilities::generateExcelColumnNames(Utilities::MAX_EXCEL_COLUMNS);
+    QStringList columnNames =
+        EibleUtilities::generateExcelColumnNames(EibleUtilities::getMaxExcelColumns());
     auto proxyModel = qobject_cast<QAbstractItemModel*>(view->model());
 
     Q_ASSERT(proxyModel != nullptr);

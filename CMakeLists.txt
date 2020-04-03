@@ -38,8 +38,8 @@ add_custom_target(generated_qrc DEPENDS ${RESOURCES})
 
 add_library(${PROJECT_NAME} SHARED
   src/eible_global.h
-  src/Utilities.cpp
-  src/Utilities.h
+  src/EibleUtilities.cpp
+  src/EibleUtilities.h
   src/ExportXlsx.cpp
   src/ExportXlsx.h
   qrc_resources.cpp

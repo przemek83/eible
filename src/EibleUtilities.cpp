@@ -1,6 +1,6 @@
-#include "Utilities.h"
+#include "EibleUtilities.h"
 
-namespace Utilities
+namespace EibleUtilities
 {
 const QDate& getStartOfExcelWorld()
 {
@@ -40,6 +40,12 @@ QStringList generateExcelColumnNames(int columnsNumber)
     }
 
     return columnNames;
+}
+
+int getMaxExcelColumns()
+{
+    constexpr int MAX_EXCEL_COLUMNS {600};
+    return MAX_EXCEL_COLUMNS;
 }
 
 
