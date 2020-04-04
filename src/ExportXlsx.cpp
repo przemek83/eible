@@ -1,6 +1,7 @@
 #include "ExportXlsx.h"
 
 #include <QAbstractItemView>
+#include <QCoreApplication>
 #include <QFile>
 #include <quazip5/quazipfile.h>
 #include <QVariant>
@@ -161,6 +162,7 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
         rowsContent.append("</row>");
 
         Q_EMIT updateProgress(i + 1);
+        QCoreApplication::processEvents();
     }
 
     //Close XML tag for data.
