@@ -37,18 +37,11 @@ bool ExportXlsx::exportView(const QAbstractItemView* view)
 
         QuaZipFile inZipFile(&inZip);
         if (!inZipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-//            LOG(LogTypes::IMPORT_EXPORT,
-//                "Can not open file " + inZipFile.getFileName() + ".");
             return false;
-        }
 
         QuaZipFile outZipFile(&outZip);
         if (!outZipFile.open(QIODevice::WriteOnly, QuaZipNewInfo(file)))
-        {
-//            LOG(LogTypes::IMPORT_EXPORT, "Can not open file " + inZipFile.getFileName() + ".");
             return false;
-        }
 
         //Modify sheet1 by inserting data from view, copy rest of files.
         if (file.endsWith(QLatin1String("sheet1.xml")))
@@ -106,7 +99,7 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
 {
     QStringList columnNames =
         EibleUtilities::generateExcelColumnNames(EibleUtilities::getMaxExcelColumns());
-    auto proxyModel = qobject_cast<QAbstractItemModel*>(view->model());
+    auto proxyModel = view->model();
 
     Q_ASSERT(proxyModel != nullptr);
 
@@ -114,8 +107,8 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
         (QAbstractItemView::MultiSelection == view->selectionMode());
     QItemSelectionModel* selectionModel = view->selectionModel();
 
-    int proxyColumnCount = proxyModel->columnCount();
-    int proxyRowCount = proxyModel->rowCount();
+    const int proxyColumnCount = proxyModel->columnCount();
+    const int proxyRowCount = proxyModel->rowCount();
 
     if (proxyColumnCount == 0)
         return "</sheetData>";
@@ -128,18 +121,15 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
     for (int j = 0; j < proxyColumnCount; ++j)
     {
         QString header = proxyModel->headerData(j, Qt::Horizontal).toString();
-        QString clearedHeader(header.replace(QRegExp(QStringLiteral("[<>&\"']")), QStringLiteral(" ")).replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
+        QString clearedHeader(header.replace(QRegExp(QStringLiteral("[<>&\"']")),
+                                             QStringLiteral(" ")).replace(QStringLiteral("\r\n"),
+                                                                          QStringLiteral(" ")));
         rowsContent.append("<c r=\"" + columnNames.at(j));
         rowsContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader + "</v></c>");
     }
     rowsContent.append("</row>");
 
     int skippedRows = 0;
-
-//    const QString barTitle =
-//        Constants::getProgressBarTitle(Constants::BarTitle::SAVING);
-//    ProgressBarCounter bar(barTitle, proxyModel->rowCount(), nullptr);
-//    bar.showDetached();
 
     //For each row.
     for (int i = 0; i < proxyRowCount; ++i)
