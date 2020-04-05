@@ -1,6 +1,7 @@
 #include "TestTableModel.h"
 
 #include <QDate>
+#include <QDebug>
 
 TestTableModel::TestTableModel(int columnCount, int rowCount)
     : QAbstractTableModel(), columnCount_(columnCount), rowCount_(rowCount)
@@ -8,21 +9,20 @@ TestTableModel::TestTableModel(int columnCount, int rowCount)
     data_.resize(columnCount);
     for (int column = 0; column < columnCount; ++column)
     {
-        data_[column].resize(rowCount);
-        for (int row = 0; row < rowCount; ++row)
+        const int columnIndex {column % 3};
+        for (int row = 0; row < std::min(rowCount, MAX_DATA_ROWS); ++row)
         {
-            switch (column % 3)
+            switch (columnIndex)
             {
                 case 0:
-                    data_[column][row] =
-                        QString("Item %1, %2").arg(column).arg(row);
+                    data_[column].append(QString("Item %1, %2").arg(column).arg(row));
                     break;
                 case 1:
-                    data_[column][row] = column + row;
+                    data_[column].append(column + row);
                     break;
                 case 2:
                     const QDate date(2020, 1, 1);
-                    data_[column][row] = date.addDays(column + row);
+                    data_[column].append(date.addDays(column + row));
                     break;
             }
         }
