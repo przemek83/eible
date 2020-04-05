@@ -4,7 +4,6 @@
 #include <QCryptographicHash>
 #include <QSignalSpy>
 #include <QTest>
-#include <QTableWidget>
 #include <quazip5/quazip.h>
 #include <quazip5/quazipfile.h>
 
@@ -20,19 +19,19 @@ QString ExportXlsxTest::tableSheetData_ =
     R"(<c r="C1" t="str" s="6"><v>Date</v></c>)"
     R"(</row>)"
     R"(<row r="2" spans="1:1" x14ac:dyDescent="0.25">)"
-    R"(<c r="A2" t="str"><v>Item 0,0</v></c>)"
-    R"(<c r="B2" s="4"><v>10</v></c>)"
-    R"(<c r="C2" s="3"><v>43891</v></c>)"
+    R"(<c r="A2" t="str"><v>Item 0, 0</v></c>)"
+    R"(<c r="B2" s="4"><v>1</v></c>)"
+    R"(<c r="C2" s="3"><v>43833</v></c>)"
     R"(</row>)"
     R"(<row r="3" spans="1:1" x14ac:dyDescent="0.25">)"
-    R"(<c r="A3" t="str"><v>Item 0,1</v></c>)"
-    R"(<c r="B3" s="4"><v>11</v></c>)"
-    R"(<c r="C3" s="3"><v>43892</v></c>)"
+    R"(<c r="A3" t="str"><v>Item 0, 1</v></c>)"
+    R"(<c r="B3" s="4"><v>2</v></c>)"
+    R"(<c r="C3" s="3"><v>43834</v></c>)"
     R"(</row>)"
     R"(<row r="4" spans="1:1" x14ac:dyDescent="0.25">)"
-    R"(<c r="A4" t="str"><v>Item 0,2</v></c>)"
-    R"(<c r="B4" s="4"><v>12</v></c>)"
-    R"(<c r="C4" s="3"><v>43893</v></c>)"
+    R"(<c r="A4" t="str"><v>Item 0, 2</v></c>)"
+    R"(<c r="B4" s="4"><v>3</v></c>)"
+    R"(<c r="C4" s="3"><v>43835</v></c>)"
     R"(</row>)"
     R"(</sheetData>)";
 
@@ -60,35 +59,6 @@ QByteArray ExportXlsxTest::retrieveFileFromZip(const QString& zipFilePath,
     return inZipFile.readAll();
 }
 
-void ExportXlsxTest::initTable(QTableWidget& tableWidget) const
-{
-    const int columnCount {3};
-    const int rowCount {3};
-    tableWidget.setRowCount(rowCount);
-    tableWidget.setColumnCount(columnCount);
-    tableWidget.setHorizontalHeaderLabels(headers_);
-    for (int column = 0; column < columnCount; ++column)
-        for (int row = 0; row < rowCount; ++row)
-        {
-            auto item = new QTableWidgetItem("Item " + QString::number(column) +
-                                             "," + QString::number(row));
-            switch (column)
-            {
-                case 0:
-                    item->setData(Qt::DisplayRole, item->text());
-                    break;
-                case 1:
-                    item->setData(Qt::DisplayRole, 10 * column + row);
-                    break;
-                case 2:
-                    item->setData(Qt::DisplayRole,
-                                  QDate(2020, 1 + column, 1 + row));
-                    break;
-            }
-            tableWidget.setItem(row, column, item);
-        }
-}
-
 void ExportXlsxTest::compareWorkSheets(const QString& testFilePath,
                                        const QString& sheetData) const
 {
@@ -102,6 +72,39 @@ void ExportXlsxTest::exportZip(const QTableWidget& tableWidget,
 {
     ExportXlsx exportXlsx(testFilePath);
     exportXlsx.exportView(&tableWidget);
+}
+
+void ExportXlsxTest::initTable(QTableWidget& tableWidget, int columnCount, int rowCount) const
+{
+    tableWidget.setRowCount(rowCount);
+    tableWidget.setColumnCount(columnCount);
+    tableWidget.setHorizontalHeaderLabels(headers_);
+    const QDate date(2020, 1, 1);
+    for (int column = 0; column < columnCount; ++column)
+        for (int row = 0; row < rowCount; ++row)
+        {
+            auto item = new QTableWidgetItem();
+            switch (column % 3)
+            {
+                case 0:
+                    item->setData(Qt::DisplayRole,
+                                  QString("Item %1, %2").arg(column).arg(row));
+                    break;
+                case 1:
+                    item->setData(Qt::DisplayRole, column + row);
+                    break;
+                case 2:
+
+                    item->setData(Qt::DisplayRole, date.addDays(column + row));
+                    break;
+            }
+            tableWidget.setItem(row, column, item);
+        }
+}
+
+void ExportXlsxTest::initTestCase()
+{
+    initTable(tableWidgetForBenchmarking_, 100, 100000);
 }
 
 void ExportXlsxTest::testExportingEmptyTable()
@@ -128,8 +131,17 @@ void ExportXlsxTest::testExportingHeadersOnly()
 void ExportXlsxTest::testExportingSimpleTable()
 {
     QTableWidget tableWidget;
-    initTable(tableWidget);
+    initTable(tableWidget, 3, 3);
     const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
     exportZip(tableWidget, testFilePath);
     compareWorkSheets(testFilePath, tableSheetData_);
+}
+
+void ExportXlsxTest::benchmark()
+{
+    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
+    QBENCHMARK
+    {
+        exportZip(tableWidgetForBenchmarking_, testFilePath);
+    }
 }
