@@ -3,10 +3,12 @@
 #include <ExportXlsx.h>
 #include <QCryptographicHash>
 #include <QSignalSpy>
+#include <QTableView>
 #include <QTest>
 #include <quazip5/quazip.h>
 #include <quazip5/quazipfile.h>
 
+#include "TestTableModel.h"
 #include "Utilities.h"
 
 QString ExportXlsxTest::zipWorkSheetPath_ {"xl/worksheets/sheet1.xml"};
@@ -67,81 +69,69 @@ void ExportXlsxTest::compareWorkSheets(const QString& testFilePath,
     QCOMPARE(actual, expected);
 }
 
-void ExportXlsxTest::exportZip(const QTableWidget& tableWidget,
+void ExportXlsxTest::exportZip(const QAbstractItemView* view,
                                const QString& testFilePath) const
 {
     ExportXlsx exportXlsx(testFilePath);
-    exportXlsx.exportView(&tableWidget);
+    exportXlsx.exportView(view);
 }
 
-void ExportXlsxTest::initTable(QTableWidget& tableWidget, int columnCount, int rowCount) const
+QString ExportXlsxTest::getTestFilePath() const
 {
-    tableWidget.setRowCount(rowCount);
-    tableWidget.setColumnCount(columnCount);
-    tableWidget.setHorizontalHeaderLabels(headers_);
-    const QDate date(2020, 1, 1);
-    for (int column = 0; column < columnCount; ++column)
-        for (int row = 0; row < rowCount; ++row)
-        {
-            auto item = new QTableWidgetItem();
-            switch (column % 3)
-            {
-                case 0:
-                    item->setData(Qt::DisplayRole,
-                                  QString("Item %1, %2").arg(column).arg(row));
-                    break;
-                case 1:
-                    item->setData(Qt::DisplayRole, column + row);
-                    break;
-                case 2:
-
-                    item->setData(Qt::DisplayRole, date.addDays(column + row));
-                    break;
-            }
-            tableWidget.setItem(row, column, item);
-        }
+    return QCoreApplication::applicationDirPath() + "/test1.xlsx";
 }
 
 void ExportXlsxTest::initTestCase()
 {
-    initTable(tableWidgetForBenchmarking_, 100, 100000);
 }
 
 void ExportXlsxTest::testExportingEmptyTable()
 {
-    QTableWidget tableWidget;
-    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
-    exportZip(tableWidget, testFilePath);
+    TestTableModel model(0, 0);
+    QTableView view;
+    view.setModel(&model);
+    const QString testFilePath {getTestFilePath()};
+    exportZip(&view, testFilePath);
     compareWorkSheets(testFilePath, emptySheetData_);
 }
 
 void ExportXlsxTest::testExportingHeadersOnly()
 {
-    QTableWidget tableWidget;
-    const int columnCount {3};
-    const int rowCount {0};
-    tableWidget.setRowCount(rowCount);
-    tableWidget.setColumnCount(columnCount);
-    tableWidget.setHorizontalHeaderLabels(headers_);
-    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
-    exportZip(tableWidget, testFilePath);
+    TestTableModel model(3, 0);
+    QTableView view;
+    view.setModel(&model);
+    const QString testFilePath {getTestFilePath()};
+    exportZip(&view, testFilePath);
     compareWorkSheets(testFilePath, headersOnlySheetData_);
 }
 
 void ExportXlsxTest::testExportingSimpleTable()
 {
-    QTableWidget tableWidget;
-    initTable(tableWidget, 3, 3);
-    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
-    exportZip(tableWidget, testFilePath);
+    TestTableModel model(3, 3);
+    QTableView view;
+    view.setModel(&model);
+    const QString testFilePath {getTestFilePath()};
+    exportZip(&view, testFilePath);
     compareWorkSheets(testFilePath, tableSheetData_);
 }
 
-void ExportXlsxTest::benchmark()
+void ExportXlsxTest::Benchmark_data()
 {
-    const QString testFilePath(QCoreApplication::applicationDirPath() + "/test1.xlsx");
+    tableModelForBenchmarking_ = new TestTableModel(100, 100000);
+}
+
+void ExportXlsxTest::Benchmark()
+{
+    QTableView view;
+    view.setModel(tableModelForBenchmarking_);
+    const QString testFilePath {getTestFilePath()};
     QBENCHMARK
     {
-        exportZip(tableWidgetForBenchmarking_, testFilePath);
+        exportZip(&view, testFilePath);
     }
+}
+
+void ExportXlsxTest::cleanupTestCase()
+{
+    delete tableModelForBenchmarking_;
 }

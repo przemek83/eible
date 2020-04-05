@@ -2,9 +2,9 @@
 #define EXPORTXLSXTEST
 
 #include <QObject>
-#include <QTableWidget>
 
-class QTableWidget;
+class QAbstractItemView;
+class TestTableModel;
 
 class ExportXlsxTest: public QObject
 {
@@ -18,26 +18,30 @@ private Q_SLOTS:
 
     void testExportingSimpleTable();
 
-    void benchmark();
+    void Benchmark_data();
+
+    void Benchmark();
+
+    void cleanupTestCase();
 
 private:
     QByteArray retrieveFileFromZip(const QString& zipFilePath,
                                    const QString& fileName) const;
 
-    void initTable(QTableWidget& tableWidget, int columnCount, int rowCount) const;
-
     void compareWorkSheets(const QString& testFilePath,
                            const QString& sheetData) const;
 
-    void exportZip(const QTableWidget& tableWidget,
+    void exportZip(const QAbstractItemView* view,
                    const QString& testFile) const;
+
+    QString getTestFilePath() const;
 
     static QString zipWorkSheetPath_;
     static QString tableSheetData_;
     static QString headersOnlySheetData_;
     static QString emptySheetData_;
     static QStringList headers_;
-    QTableWidget tableWidgetForBenchmarking_;
+    TestTableModel* tableModelForBenchmarking_ {nullptr};
 };
 
 #endif // EXPORTXLSXTEST

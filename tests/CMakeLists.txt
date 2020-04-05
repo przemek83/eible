@@ -6,6 +6,8 @@ set(${PROJECT_NAME}_SOURCES
     ExportXlsxTest.h
     Utilities.cpp
     Utilities.h
+    TestTableModel.cpp
+    TestTableModel.h
     )
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
