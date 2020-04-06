@@ -55,7 +55,7 @@ static bool exportFile()
 
     std::cout << "Exporting " << file.toStdString() << "." << std::endl;
     QFile outFile(file);
-    bool success = exportXlsx.exportView(&tableWidget, &outFile);
+    bool success = exportXlsx.exportView(tableWidget, outFile);
     if (success)
         std::cout << "Exporting successful." << std::endl;
     else

@@ -8,22 +8,17 @@
 
 #include "EibleUtilities.h"
 
-bool ExportXlsx::exportView(const QAbstractItemView* view, QIODevice* ioDevice)
+bool ExportXlsx::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {
-    Q_ASSERT(view != nullptr);
-
-    // QuaZip has problems with opening file from resources. Workaround it...
-    QFile::copy(QStringLiteral(":/") + EibleUtilities::getXlsxTemplateName(), EibleUtilities::getXlsxTemplateName());
-
-    //Open xlsx template.
-    QuaZip inZip(EibleUtilities::getXlsxTemplateName());
+    QFile xlsxTemplate(QStringLiteral(":/") + EibleUtilities::getXlsxTemplateName());
+    QuaZip inZip(&xlsxTemplate);
     inZip.open(QuaZip::mdUnzip);
 
     //Files list in template.
     QStringList fileList = inZip.getFileNameList();
 
     //Create out xlsx.
-    QuaZip outZip(ioDevice);
+    QuaZip outZip(&ioDevice);
     outZip.open(QuaZip::mdCreate);
 
     //For each file in template.
@@ -91,17 +86,17 @@ const QString& ExportXlsx::getCellTypeTag(QVariant& cell)
     }
 }
 
-QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView* view)
+QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView& view)
 {
     QStringList columnNames =
         EibleUtilities::generateExcelColumnNames(EibleUtilities::getMaxExcelColumns());
-    auto proxyModel = view->model();
+    auto proxyModel = view.model();
 
     Q_ASSERT(proxyModel != nullptr);
 
     bool multiSelection =
-        (QAbstractItemView::MultiSelection == view->selectionMode());
-    QItemSelectionModel* selectionModel = view->selectionModel();
+        (QAbstractItemView::MultiSelection == view.selectionMode());
+    QItemSelectionModel* selectionModel = view.selectionModel();
 
     const int proxyColumnCount = proxyModel->columnCount();
     const int proxyRowCount = proxyModel->rowCount();

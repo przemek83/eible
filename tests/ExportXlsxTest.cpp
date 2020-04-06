@@ -89,12 +89,12 @@ void ExportXlsxTest::compareWorkSheets(QBuffer& exportedZip,
     QCOMPARE(actual, expected);
 }
 
-void ExportXlsxTest::exportZip(const QAbstractItemView* view,
+void ExportXlsxTest::exportZip(const QAbstractItemView& view,
                                QBuffer& exportedZip) const
 {
     exportedZip.open(QIODevice::WriteOnly);
     ExportXlsx exportXlsx;
-    exportXlsx.exportView(view, &exportedZip);
+    exportXlsx.exportView(view, exportedZip);
 }
 
 void ExportXlsxTest::initTestCase()
@@ -109,7 +109,7 @@ void ExportXlsxTest::testExportingEmptyTable()
 
     QByteArray exportedZipBuffer;
     QBuffer exportedZip(&exportedZipBuffer);
-    exportZip(&view, exportedZip);
+    exportZip(view, exportedZip);
 
     compareWorkSheets(exportedZip, emptySheetData_);
 }
@@ -122,7 +122,7 @@ void ExportXlsxTest::testExportingHeadersOnly()
 
     QByteArray exportedZipBuffer;
     QBuffer exportedZip(&exportedZipBuffer);
-    exportZip(&view, exportedZip);
+    exportZip(view, exportedZip);
 
     compareWorkSheets(exportedZip, headersOnlySheetData_);
 }
@@ -135,7 +135,7 @@ void ExportXlsxTest::testExportingSimpleTable()
 
     QByteArray exportedZipBuffer;
     QBuffer exportedZip(&exportedZipBuffer);
-    exportZip(&view, exportedZip);
+    exportZip(view, exportedZip);
 
     compareWorkSheets(exportedZip, tableSheetData_);
 }
@@ -152,7 +152,7 @@ void ExportXlsxTest::testExportingViewWithMultiSelection()
 
     QByteArray exportedZipBuffer;
     QBuffer exportedZip(&exportedZipBuffer);
-    exportZip(&view, exportedZip);
+    exportZip(view, exportedZip);
 
     compareWorkSheets(exportedZip, multiSelectionTableSheetData_);
 }
@@ -170,7 +170,7 @@ void ExportXlsxTest::Benchmark()
     {
         QByteArray exportedZipBuffer;
         QBuffer buffer(&exportedZipBuffer);
-        exportZip(&view, buffer);
+        exportZip(view, buffer);
     }
 }
 

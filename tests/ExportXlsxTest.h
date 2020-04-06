@@ -34,7 +34,7 @@ private:
     void compareWorkSheets(QBuffer& exportedZip,
                            const QString& sheetData) const;
 
-    void exportZip(const QAbstractItemView* view,
+    void exportZip(const QAbstractItemView& view,
                    QBuffer& exportedZip) const;
 
     static QString zipWorkSheetPath_;

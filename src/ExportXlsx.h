@@ -21,12 +21,12 @@ public:
     ExportXlsx& operator=(ExportXlsx&& other) = delete;
     ExportXlsx(ExportXlsx&& other) = delete;
 
-    bool exportView(const QAbstractItemView* view, QIODevice* ioDevice);
+    bool exportView(const QAbstractItemView& view, QIODevice& ioDevice);
 
 private:
     const QString& getCellTypeTag(QVariant& cell);
 
-    QByteArray gatherSheetContent(const QAbstractItemView* view);
+    QByteArray gatherSheetContent(const QAbstractItemView& view);
 
 Q_SIGNALS:
     void updateProgress(int progress);
