@@ -18,6 +18,8 @@ private Q_SLOTS:
 
     void testExportingSimpleTable();
 
+    void testExportingViewWithMultiSelection();
+
     void Benchmark_data();
 
     void Benchmark();
@@ -38,6 +40,7 @@ private:
 
     static QString zipWorkSheetPath_;
     static QString tableSheetData_;
+    static QString multiSelectionTableSheetData_;
     static QString headersOnlySheetData_;
     static QString emptySheetData_;
     static QStringList headers_;
