@@ -6,6 +6,7 @@
 #include "eible_global.h"
 
 class QAbstractItemView;
+class QIODevice;
 
 class EIBLE_EXPORT ExportXlsx : public QObject
 {
@@ -13,7 +14,7 @@ class EIBLE_EXPORT ExportXlsx : public QObject
 public:
     explicit ExportXlsx(const QString& filePath);
 
-    bool exportView(const QAbstractItemView* view);
+    bool exportView(const QAbstractItemView* view, QIODevice* ioDevice);
 
 private:
     const QString& getCellTypeTag(QVariant& cell);

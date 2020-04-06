@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDate>
 #include <QDebug>
+#include <QFile>
 #include <QTableWidget>
 #include <QTimer>
 
@@ -53,7 +54,8 @@ static bool exportFile()
     });
 
     std::cout << "Exporting " << file.toStdString() << "." << std::endl;
-    bool success = exportXlsx.exportView(&tableWidget);
+    QFile outFile(file);
+    bool success = exportXlsx.exportView(&tableWidget, &outFile);
     if (success)
         std::cout << "Exporting successful." << std::endl;
     else

@@ -13,7 +13,7 @@ ExportXlsx::ExportXlsx(const QString& filePath) : filePath_(filePath)
 
 }
 
-bool ExportXlsx::exportView(const QAbstractItemView* view)
+bool ExportXlsx::exportView(const QAbstractItemView* view, QIODevice* ioDevice)
 {
     Q_ASSERT(view != nullptr);
 
@@ -28,7 +28,7 @@ bool ExportXlsx::exportView(const QAbstractItemView* view)
     QStringList fileList = inZip.getFileNameList();
 
     //Create out xlsx.
-    QuaZip outZip(filePath_);
+    QuaZip outZip(ioDevice);
     outZip.open(QuaZip::mdCreate);
 
     //For each file in template.

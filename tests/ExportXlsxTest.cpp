@@ -92,7 +92,8 @@ void ExportXlsxTest::exportZip(const QAbstractItemView* view,
                                const QString& testFilePath) const
 {
     ExportXlsx exportXlsx(testFilePath);
-    exportXlsx.exportView(view);
+    QFile outFile(testFilePath);
+    exportXlsx.exportView(view, &outFile);
 }
 
 QString ExportXlsxTest::getTestFilePath() const
