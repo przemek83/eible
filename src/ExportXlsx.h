@@ -12,7 +12,14 @@ class EIBLE_EXPORT ExportXlsx : public QObject
 {
     Q_OBJECT
 public:
-    explicit ExportXlsx(const QString& filePath);
+    ExportXlsx() = default;
+    ~ExportXlsx() override = default;
+
+    ExportXlsx& operator=(const ExportXlsx& other) = delete;
+    ExportXlsx(const ExportXlsx& other) = delete;
+
+    ExportXlsx& operator=(ExportXlsx&& other) = delete;
+    ExportXlsx(ExportXlsx&& other) = delete;
 
     bool exportView(const QAbstractItemView* view, QIODevice* ioDevice);
 
@@ -20,8 +27,6 @@ private:
     const QString& getCellTypeTag(QVariant& cell);
 
     QByteArray gatherSheetContent(const QAbstractItemView* view);
-
-    const QString filePath_;
 
 Q_SIGNALS:
     void updateProgress(int progress);

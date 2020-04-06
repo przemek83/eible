@@ -8,11 +8,6 @@
 
 #include "EibleUtilities.h"
 
-ExportXlsx::ExportXlsx(const QString& filePath) : filePath_(filePath)
-{
-
-}
-
 bool ExportXlsx::exportView(const QAbstractItemView* view, QIODevice* ioDevice)
 {
     Q_ASSERT(view != nullptr);

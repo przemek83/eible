@@ -1,6 +1,7 @@
 #include "ExportXlsxTest.h"
 
 #include <ExportXlsx.h>
+#include <QBuffer>
 #include <QCryptographicHash>
 #include <QSignalSpy>
 #include <QTableView>
@@ -69,10 +70,10 @@ QString ExportXlsxTest::emptySheetData_ = R"(</sheetData>)";
 
 QStringList ExportXlsxTest::headers_ {"Text", "Numeric", "Date"};
 
-QByteArray ExportXlsxTest::retrieveFileFromZip(const QString& zipFilePath,
+QByteArray ExportXlsxTest::retrieveFileFromZip(QBuffer& exportedZip,
                                                const QString& fileName) const
 {
-    QuaZip inZip(zipFilePath);
+    QuaZip inZip(&exportedZip);
     inZip.open(QuaZip::mdUnzip);
     inZip.setCurrentFile(fileName);
     QuaZipFile inZipFile(&inZip);
@@ -80,25 +81,20 @@ QByteArray ExportXlsxTest::retrieveFileFromZip(const QString& zipFilePath,
     return inZipFile.readAll();
 }
 
-void ExportXlsxTest::compareWorkSheets(const QString& testFilePath,
+void ExportXlsxTest::compareWorkSheets(QBuffer& exportedZip,
                                        const QString& sheetData) const
 {
-    const QByteArray actual = retrieveFileFromZip(testFilePath, zipWorkSheetPath_);
+    const QByteArray actual = retrieveFileFromZip(exportedZip, zipWorkSheetPath_);
     const QByteArray expected = Utilities::composeXlsxSheet(sheetData);
     QCOMPARE(actual, expected);
 }
 
 void ExportXlsxTest::exportZip(const QAbstractItemView* view,
-                               const QString& testFilePath) const
+                               QBuffer& exportedZip) const
 {
-    ExportXlsx exportXlsx(testFilePath);
-    QFile outFile(testFilePath);
-    exportXlsx.exportView(view, &outFile);
-}
-
-QString ExportXlsxTest::getTestFilePath() const
-{
-    return QCoreApplication::applicationDirPath() + "/test1.xlsx";
+    exportedZip.open(QIODevice::WriteOnly);
+    ExportXlsx exportXlsx;
+    exportXlsx.exportView(view, &exportedZip);
 }
 
 void ExportXlsxTest::initTestCase()
@@ -110,9 +106,12 @@ void ExportXlsxTest::testExportingEmptyTable()
     TestTableModel model(0, 0);
     QTableView view;
     view.setModel(&model);
-    const QString testFilePath {getTestFilePath()};
-    exportZip(&view, testFilePath);
-    compareWorkSheets(testFilePath, emptySheetData_);
+
+    QByteArray exportedZipBuffer;
+    QBuffer exportedZip(&exportedZipBuffer);
+    exportZip(&view, exportedZip);
+
+    compareWorkSheets(exportedZip, emptySheetData_);
 }
 
 void ExportXlsxTest::testExportingHeadersOnly()
@@ -120,9 +119,12 @@ void ExportXlsxTest::testExportingHeadersOnly()
     TestTableModel model(3, 0);
     QTableView view;
     view.setModel(&model);
-    const QString testFilePath {getTestFilePath()};
-    exportZip(&view, testFilePath);
-    compareWorkSheets(testFilePath, headersOnlySheetData_);
+
+    QByteArray exportedZipBuffer;
+    QBuffer exportedZip(&exportedZipBuffer);
+    exportZip(&view, exportedZip);
+
+    compareWorkSheets(exportedZip, headersOnlySheetData_);
 }
 
 void ExportXlsxTest::testExportingSimpleTable()
@@ -130,9 +132,12 @@ void ExportXlsxTest::testExportingSimpleTable()
     TestTableModel model(3, 3);
     QTableView view;
     view.setModel(&model);
-    const QString testFilePath {getTestFilePath()};
-    exportZip(&view, testFilePath);
-    compareWorkSheets(testFilePath, tableSheetData_);
+
+    QByteArray exportedZipBuffer;
+    QBuffer exportedZip(&exportedZipBuffer);
+    exportZip(&view, exportedZip);
+
+    compareWorkSheets(exportedZip, tableSheetData_);
 }
 
 void ExportXlsxTest::testExportingViewWithMultiSelection()
@@ -144,9 +149,12 @@ void ExportXlsxTest::testExportingViewWithMultiSelection()
     view.setSelectionMode(QAbstractItemView::MultiSelection);
     view.selectionModel()->select(model.index(0, 0), QItemSelectionModel::Select);
     view.selectionModel()->select(model.index(2, 0), QItemSelectionModel::Select);
-    const QString testFilePath {getTestFilePath()};
-    exportZip(&view, testFilePath);
-    compareWorkSheets(testFilePath, multiSelectionTableSheetData_);
+
+    QByteArray exportedZipBuffer;
+    QBuffer exportedZip(&exportedZipBuffer);
+    exportZip(&view, exportedZip);
+
+    compareWorkSheets(exportedZip, multiSelectionTableSheetData_);
 }
 
 void ExportXlsxTest::Benchmark_data()
@@ -158,10 +166,11 @@ void ExportXlsxTest::Benchmark()
 {
     QTableView view;
     view.setModel(tableModelForBenchmarking_);
-    const QString testFilePath {getTestFilePath()};
     QBENCHMARK
     {
-        exportZip(&view, testFilePath);
+        QByteArray exportedZipBuffer;
+        QBuffer buffer(&exportedZipBuffer);
+        exportZip(&view, buffer);
     }
 }
 

@@ -5,6 +5,7 @@
 
 class QAbstractItemView;
 class TestTableModel;
+class QBuffer;
 
 class ExportXlsxTest: public QObject
 {
@@ -27,16 +28,14 @@ private Q_SLOTS:
     void cleanupTestCase();
 
 private:
-    QByteArray retrieveFileFromZip(const QString& zipFilePath,
+    QByteArray retrieveFileFromZip(QBuffer& exportedZip,
                                    const QString& fileName) const;
 
-    void compareWorkSheets(const QString& testFilePath,
+    void compareWorkSheets(QBuffer& exportedZip,
                            const QString& sheetData) const;
 
     void exportZip(const QAbstractItemView* view,
-                   const QString& testFile) const;
-
-    QString getTestFilePath() const;
+                   QBuffer& exportedZip) const;
 
     static QString zipWorkSheetPath_;
     static QString tableSheetData_;

@@ -45,7 +45,7 @@ static bool exportFile()
     initTable(tableWidget);
 
     QString file {QCoreApplication::applicationDirPath() + "/ExportedFile.xlsx"};
-    ExportXlsx exportXlsx(file);
+    ExportXlsx exportXlsx;
     QObject::connect(&exportXlsx, &ExportXlsx::updateProgress, &tableWidget,
                      [&tableWidget](int progress)
     {
