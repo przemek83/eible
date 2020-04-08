@@ -28,10 +28,10 @@ include_directories(${CMAKE_BINARY_DIR}/quazip/install/include)
 link_directories(${CMAKE_BINARY_DIR}/zlib/install/bin)
 link_directories(${CMAKE_BINARY_DIR}/quazip/install/lib)
 
-# copy dlls for easy launch
-file(GLOB_RECURSE DLLS "${CMAKE_BINARY_DIR}/*.dll" )
-file(COPY ${DLLS} DESTINATION ${CMAKE_BINARY_DIR}/examples)
-file(COPY ${DLLS} DESTINATION ${CMAKE_BINARY_DIR}/tests)
+# copy shared libs for easy launch
+file(GLOB_RECURSE SHARED_LIBS "${CMAKE_BINARY_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}*" )
+file(COPY ${SHARED_LIBS} DESTINATION ${CMAKE_BINARY_DIR}/examples)
+file(COPY ${SHARED_LIBS} DESTINATION ${CMAKE_BINARY_DIR}/tests)
 
 qt5_add_resources(RESOURCES resources.qrc)
 add_custom_target(generated_qrc DEPENDS ${RESOURCES})
@@ -65,13 +65,13 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE EIBLE_LIBRARY)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
-                           ${CMAKE_BINARY_DIR}/libeible.dll
-                           ${CMAKE_BINARY_DIR}/examples/libeible.dll)
+                           ${CMAKE_BINARY_DIR}/libeible${CMAKE_SHARED_LIBRARY_SUFFIX}
+                           ${CMAKE_BINARY_DIR}/examples/libeible${CMAKE_SHARED_LIBRARY_SUFFIX})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
-                           ${CMAKE_BINARY_DIR}/libeible.dll
-                           ${CMAKE_BINARY_DIR}/tests/libeible.dll)
+                           ${CMAKE_BINARY_DIR}/libeible${CMAKE_SHARED_LIBRARY_SUFFIX}
+                           ${CMAKE_BINARY_DIR}/tests/libeible${CMAKE_SHARED_LIBRARY_SUFFIX})
 
 install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
