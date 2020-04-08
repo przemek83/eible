@@ -28,10 +28,12 @@ include_directories(${CMAKE_BINARY_DIR}/quazip/install/include)
 link_directories(${CMAKE_BINARY_DIR}/zlib/install/bin)
 link_directories(${CMAKE_BINARY_DIR}/quazip/install/lib)
 
-# copy shared libs for easy launch
-file(GLOB_RECURSE SHARED_LIBS "${CMAKE_BINARY_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}*" )
-file(COPY ${SHARED_LIBS} DESTINATION ${CMAKE_BINARY_DIR}/examples)
-file(COPY ${SHARED_LIBS} DESTINATION ${CMAKE_BINARY_DIR}/tests)
+if (WIN32)
+    # copy shared libs for easy launch
+    file(GLOB_RECURSE SHARED_LIBS "${CMAKE_BINARY_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}*" )
+    file(COPY ${SHARED_LIBS} DESTINATION ${CMAKE_BINARY_DIR}/examples)
+    file(COPY ${SHARED_LIBS} DESTINATION ${CMAKE_BINARY_DIR}/tests)
+endif()
 
 qt5_add_resources(RESOURCES resources.qrc)
 add_custom_target(generated_qrc DEPENDS ${RESOURCES})
@@ -63,15 +65,19 @@ target_link_libraries(${PROJECT_NAME} PRIVATE debug quazip5d)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE EIBLE_LIBRARY)
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy
-                           ${CMAKE_BINARY_DIR}/libeible${CMAKE_SHARED_LIBRARY_SUFFIX}
-                           ${CMAKE_BINARY_DIR}/examples/libeible${CMAKE_SHARED_LIBRARY_SUFFIX})
+if (WIN32)
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_BINARY_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
+                ${CMAKE_BINARY_DIR}/examples/)
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy
-                           ${CMAKE_BINARY_DIR}/libeible${CMAKE_SHARED_LIBRARY_SUFFIX}
-                           ${CMAKE_BINARY_DIR}/tests/libeible${CMAKE_SHARED_LIBRARY_SUFFIX})
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_BINARY_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
+                ${CMAKE_BINARY_DIR}/tests/)
+endif()
 
 install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
