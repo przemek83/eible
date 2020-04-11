@@ -5,6 +5,7 @@
 
 #include "eible_global.h"
 
+class QAbstractItemModel;
 class QAbstractItemView;
 class QIODevice;
 
@@ -28,6 +29,10 @@ private:
 
     QByteArray gatherSheetContent(const QAbstractItemView& view);
 
+    void addHeaders(QByteArray& rowsContent,
+                    const QAbstractItemModel& proxyModel,
+                    const QStringList &columnNames) const;
+    
 Q_SIGNALS:
     void updateProgress(int progress);
 };
