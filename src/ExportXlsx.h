@@ -25,7 +25,7 @@ public:
     bool exportView(const QAbstractItemView& view, QIODevice& ioDevice);
 
 private:
-    const QString& getCellTypeTag(QVariant& cell);
+    const QByteArray& getCellTypeTag(QVariant& cell);
 
     QByteArray gatherSheetContent(const QAbstractItemView& view);
 

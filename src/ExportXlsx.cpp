@@ -1,27 +1,29 @@
 #include "ExportXlsx.h"
 
+#include <quazip5/quazipfile.h>
+
 #include <QAbstractItemView>
 #include <QCoreApplication>
 #include <QFile>
-#include <quazip5/quazipfile.h>
 #include <QVariant>
 
 #include "EibleUtilities.h"
 
 bool ExportXlsx::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {
-    QFile xlsxTemplate(QStringLiteral(":/") + EibleUtilities::getXlsxTemplateName());
+    QFile xlsxTemplate(QStringLiteral(":/") +
+                       EibleUtilities::getXlsxTemplateName());
     QuaZip inZip(&xlsxTemplate);
     inZip.open(QuaZip::mdUnzip);
 
-    //Files list in template.
+    // Files list in template.
     QStringList fileList = inZip.getFileNameList();
 
-    //Create out xlsx.
+    // Create out xlsx.
     QuaZip outZip(&ioDevice);
     outZip.open(QuaZip::mdCreate);
 
-    //For each file in template.
+    // For each file in template.
     for (const QString& file : fileList)
     {
         inZip.setCurrentFile(file);
@@ -34,12 +36,12 @@ bool ExportXlsx::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
         if (!outZipFile.open(QIODevice::WriteOnly, QuaZipNewInfo(file)))
             return false;
 
-        //Modify sheet1 by inserting data from view, copy rest of files.
+        // Modify sheet1 by inserting data from view, copy rest of files.
         if (file.endsWith(QLatin1String("sheet1.xml")))
         {
             const QByteArray rowsContent = gatherSheetContent(view);
 
-            //Replace empty tag by gathered data.
+            // Replace empty tag by gathered data.
             QByteArray content = inZipFile.readAll();
             content.replace("<sheetData/>", rowsContent);
 
@@ -59,46 +61,50 @@ bool ExportXlsx::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
     return true;
 }
 
-const QString& ExportXlsx::getCellTypeTag(QVariant& cell)
+const QByteArray& ExportXlsx::getCellTypeTag(QVariant& cell)
 {
     switch (cell.type())
     {
         case QVariant::Date:
         case QVariant::DateTime:
         {
-            static const QString dateTag(QStringLiteral("s=\"3\""));
-            cell = QVariant(-1 * cell.toDate().daysTo(EibleUtilities::getStartOfExcelWorld()));
+            static const QByteArray dateTag{"s=\"3\""};
+            cell = QVariant(-1 * cell.toDate().daysTo(
+                                     EibleUtilities::getStartOfExcelWorld()));
             return dateTag;
         }
 
         case QVariant::Int:
         case QVariant::Double:
         {
-            static const QString numericTag(QStringLiteral("s=\"4\""));
+            static const QByteArray numericTag{"s=\"4\""};
             return numericTag;
         }
 
         default:
         {
-            static const QString stringTag{QStringLiteral("t=\"str\"")};
+            static const QByteArray stringTag{"t=\"str\""};
             return stringTag;
         }
     }
 }
 
 void ExportXlsx::addHeaders(QByteArray& rowsContent,
-                            const QAbstractItemModel &proxyModel,
+                            const QAbstractItemModel& proxyModel,
                             const QStringList& columnNames) const
 {
     rowsContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
     for (int j = 0; j < proxyModel.columnCount(); ++j)
     {
         QString header = proxyModel.headerData(j, Qt::Horizontal).toString();
-        QString clearedHeader(header.replace(QRegExp(QStringLiteral("[<>&\"']")),
-                                             QStringLiteral(" ")).replace(QStringLiteral("\r\n"),
-                                                                          QStringLiteral(" ")));
+        QString clearedHeader(
+            header
+                .replace(QRegExp(QStringLiteral("[<>&\"']")),
+                         QStringLiteral(" "))
+                .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
         rowsContent.append("<c r=\"" + columnNames.at(j));
-        rowsContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader + "</v></c>");
+        rowsContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader +
+                           "</v></c>");
     }
     rowsContent.append("</row>");
 }
@@ -109,13 +115,12 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView& view)
     Q_ASSERT(proxyModel != nullptr);
 
     const int proxyColumnCount = proxyModel->columnCount();
-    if (proxyColumnCount == 0)
-        return "</sheetData>";
+    if (proxyColumnCount == 0) return QByteArrayLiteral("</sheetData>");
 
     const QStringList columnNames =
         EibleUtilities::generateExcelColumnNames(proxyColumnCount);
 
-    QByteArray rowsContent {"<sheetData>"};
+    QByteArray rowsContent{QByteArrayLiteral("<sheetData>")};
     addHeaders(rowsContent, *proxyModel, columnNames);
 
     const bool multiSelection =
@@ -125,8 +130,7 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView& view)
     const int proxyRowCount = proxyModel->rowCount();
     int skippedRows = 0;
 
-    const QByteArray cellPrefix {"<c r=\""};
-    //For each row.
+    // For each row.
     for (int i = 0; i < proxyRowCount; ++i)
     {
         if (multiSelection &&
@@ -136,36 +140,36 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView& view)
             continue;
         }
 
-        //Create new row.
-        const QString rowNumber(QString::fromLatin1(QByteArray::number(i - skippedRows + 2)));
-        rowsContent.append("<row r=\"" + rowNumber);
+        // Create new row.
+        const QByteArray rowNumber{QByteArray::number(i - skippedRows + 2)};
+        rowsContent.append(QByteArrayLiteral("<row r=\""));
+        rowsContent.append(rowNumber);
         rowsContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
 
-        //For each column.
+        // For each column.
         for (int j = 0; j < proxyColumnCount; ++j)
         {
             QVariant cell = proxyModel->index(i, j).data();
-            if (cell.isNull())
-                continue;
+            if (cell.isNull()) continue;
 
-            //Create cell.
-            rowsContent.append(cellPrefix);
+            // Create cell.
+            rowsContent.append(QByteArrayLiteral("<c r=\""));
             rowsContent.append(columnNames.at(j));
             rowsContent.append(rowNumber);
-            rowsContent.append("\" ");
+            rowsContent.append(QByteArrayLiteral("\" "));
             rowsContent.append(getCellTypeTag(cell));
-            rowsContent.append("><v>");
+            rowsContent.append(QByteArrayLiteral("><v>"));
             rowsContent.append(cell.toByteArray());
-            rowsContent.append("</v></c>");
+            rowsContent.append(QByteArrayLiteral("</v></c>"));
         }
-        rowsContent.append("</row>");
+        rowsContent.append(QByteArrayLiteral("</row>"));
 
         Q_EMIT updateProgress(i + 1);
         QCoreApplication::processEvents();
     }
 
-    //Close XML tag for data.
-    rowsContent.append("</sheetData>");
+    // Close XML tag for data.
+    rowsContent.append(QByteArrayLiteral("</sheetData>"));
 
     return rowsContent;
 }
