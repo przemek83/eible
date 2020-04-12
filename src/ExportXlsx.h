@@ -31,10 +31,10 @@ private:
 
     void addHeaders(QByteArray& rowsContent,
                     const QAbstractItemModel& proxyModel,
-                    const QStringList &columnNames) const;
-    
+                    const QStringList& columnNames) const;
+
 Q_SIGNALS:
     void updateProgress(int progress);
 };
 
-#endif // EXPORTXLSX_H
+#endif  // EXPORTXLSX_H

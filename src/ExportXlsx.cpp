@@ -115,7 +115,8 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView& view)
     Q_ASSERT(proxyModel != nullptr);
 
     const int proxyColumnCount = proxyModel->columnCount();
-    if (proxyColumnCount == 0) return QByteArrayLiteral("</sheetData>");
+    if (proxyColumnCount == 0)
+        return QByteArrayLiteral("</sheetData>");
 
     const QStringList columnNames =
         EibleUtilities::generateExcelColumnNames(proxyColumnCount);
@@ -150,7 +151,8 @@ QByteArray ExportXlsx::gatherSheetContent(const QAbstractItemView& view)
         for (int j = 0; j < proxyColumnCount; ++j)
         {
             QVariant cell = proxyModel->index(i, j).data();
-            if (cell.isNull()) continue;
+            if (cell.isNull())
+                continue;
 
             // Create cell.
             rowsContent.append(QByteArrayLiteral("<c r=\""));

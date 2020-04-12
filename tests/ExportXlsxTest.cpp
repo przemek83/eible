@@ -1,18 +1,19 @@
 #include "ExportXlsxTest.h"
 
 #include <ExportXlsx.h>
+#include <quazip5/quazip.h>
+#include <quazip5/quazipfile.h>
+
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QSignalSpy>
 #include <QTableView>
 #include <QTest>
-#include <quazip5/quazip.h>
-#include <quazip5/quazipfile.h>
 
 #include "TestTableModel.h"
 #include "Utilities.h"
 
-QString ExportXlsxTest::zipWorkSheetPath_ {"xl/worksheets/sheet1.xml"};
+QString ExportXlsxTest::zipWorkSheetPath_{"xl/worksheets/sheet1.xml"};
 
 QString ExportXlsxTest::tableSheetData_ =
     R"(<sheetData>)"
@@ -68,7 +69,7 @@ QString ExportXlsxTest::headersOnlySheetData_ =
 
 QString ExportXlsxTest::emptySheetData_ = R"(</sheetData>)";
 
-QStringList ExportXlsxTest::headers_ {"Text", "Numeric", "Date"};
+QStringList ExportXlsxTest::headers_{"Text", "Numeric", "Date"};
 
 QByteArray ExportXlsxTest::retrieveFileFromZip(QBuffer& exportedZip,
                                                const QString& fileName) const
@@ -84,7 +85,8 @@ QByteArray ExportXlsxTest::retrieveFileFromZip(QBuffer& exportedZip,
 void ExportXlsxTest::compareWorkSheets(QBuffer& exportedZip,
                                        const QString& sheetData) const
 {
-    const QByteArray actual = retrieveFileFromZip(exportedZip, zipWorkSheetPath_);
+    const QByteArray actual =
+        retrieveFileFromZip(exportedZip, zipWorkSheetPath_);
     const QByteArray expected = Utilities::composeXlsxSheet(sheetData);
     QCOMPARE(actual, expected);
 }
@@ -97,9 +99,7 @@ void ExportXlsxTest::exportZip(const QAbstractItemView& view,
     exportXlsx.exportView(view, exportedZip);
 }
 
-void ExportXlsxTest::initTestCase()
-{
-}
+void ExportXlsxTest::initTestCase() {}
 
 void ExportXlsxTest::testExportingEmptyTable()
 {
@@ -147,8 +147,10 @@ void ExportXlsxTest::testExportingViewWithMultiSelection()
     view.setModel(&model);
     view.setSelectionBehavior(QAbstractItemView::SelectRows);
     view.setSelectionMode(QAbstractItemView::MultiSelection);
-    view.selectionModel()->select(model.index(0, 0), QItemSelectionModel::Select);
-    view.selectionModel()->select(model.index(2, 0), QItemSelectionModel::Select);
+    view.selectionModel()->select(model.index(0, 0),
+                                  QItemSelectionModel::Select);
+    view.selectionModel()->select(model.index(2, 0),
+                                  QItemSelectionModel::Select);
 
     QByteArray exportedZipBuffer;
     QBuffer exportedZip(&exportedZipBuffer);
@@ -164,6 +166,9 @@ void ExportXlsxTest::Benchmark_data()
 
 void ExportXlsxTest::Benchmark()
 {
+    //  20,444 msecs per iteration (total: 20,444, iterations: 1)
+    //  13,653 msecs per iteration (total: 13,653, iterations: 1)
+
     QTableView view;
     view.setModel(tableModelForBenchmarking_);
     QBENCHMARK
@@ -174,7 +179,4 @@ void ExportXlsxTest::Benchmark()
     }
 }
 
-void ExportXlsxTest::cleanupTestCase()
-{
-    delete tableModelForBenchmarking_;
-}
+void ExportXlsxTest::cleanupTestCase() { delete tableModelForBenchmarking_; }

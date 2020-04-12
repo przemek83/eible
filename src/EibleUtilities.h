@@ -14,6 +14,6 @@ QStringList EIBLE_EXPORT generateExcelColumnNames(int columnsNumber);
 int EIBLE_EXPORT getMaxExcelColumns();
 
 QString EIBLE_EXPORT getXlsxTemplateName();
-}
+}  // namespace EibleUtilities
 
-#endif // TOOLS_H
+#endif  // TOOLS_H

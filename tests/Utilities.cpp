@@ -24,7 +24,7 @@ std::string sheetTopPart =
 std::string sheetBottomPart =
     R"(<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" )"
     R"(footer="0.3"/></worksheet>)";
-}
+}  // namespace
 namespace Utilities
 {
 QByteArray composeXlsxSheet(const QString& sheetData)
@@ -35,4 +35,4 @@ QByteArray composeXlsxSheet(const QString& sheetData)
     sheet.append(QString::fromStdString(sheetBottomPart));
     return sheet.toUtf8();
 }
-};
+};  // namespace Utilities

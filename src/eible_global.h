@@ -4,9 +4,9 @@
 #include <QtCore/qglobal.h>
 
 #if defined(EIBLE_LIBRARY)
-#  define EIBLE_EXPORT Q_DECL_EXPORT
+#define EIBLE_EXPORT Q_DECL_EXPORT
 #else
-#  define EIBLE_EXPORT Q_DECL_IMPORT
+#define EIBLE_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // EIBLE_GLOBAL_H
+#endif  // EIBLE_GLOBAL_H

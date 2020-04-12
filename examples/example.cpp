@@ -12,8 +12,8 @@
 
 void initTable(QTableWidget& tableWidget)
 {
-    const int columnCount {3};
-    const int rowCount {3};
+    const int columnCount{3};
+    const int rowCount{3};
     tableWidget.setRowCount(rowCount);
     tableWidget.setColumnCount(columnCount);
     tableWidget.setHorizontalHeaderLabels({"Text", "Numeric", "Date"});
@@ -44,14 +44,14 @@ static bool exportFile()
     QTableWidget tableWidget;
     initTable(tableWidget);
 
-    QString file {QCoreApplication::applicationDirPath() + "/ExportedFile.xlsx"};
+    QString file{QCoreApplication::applicationDirPath() + "/ExportedFile.xlsx"};
     ExportXlsx exportXlsx;
     QObject::connect(&exportXlsx, &ExportXlsx::updateProgress, &tableWidget,
-                     [&tableWidget](int progress)
-    {
-        std::cout << "Progress: " << progress << "/" << tableWidget.rowCount()
-                  << "." << std::endl;
-    });
+                     [&tableWidget](int progress) {
+                         std::cout << "Progress: " << progress << "/"
+                                   << tableWidget.rowCount() << "."
+                                   << std::endl;
+                     });
 
     std::cout << "Exporting " << file.toStdString() << "." << std::endl;
     QFile outFile(file);
@@ -67,8 +67,7 @@ static bool exportFile()
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
-    QTimer::singleShot(0, []()
-    {
+    QTimer::singleShot(0, []() {
         QApplication::exit(exportFile() ? EXIT_SUCCESS : EXIT_FAILURE);
     });
     return a.exec();

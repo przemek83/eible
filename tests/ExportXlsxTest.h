@@ -7,7 +7,7 @@ class QAbstractItemView;
 class TestTableModel;
 class QBuffer;
 
-class ExportXlsxTest: public QObject
+class ExportXlsxTest : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
@@ -34,8 +34,7 @@ private:
     void compareWorkSheets(QBuffer& exportedZip,
                            const QString& sheetData) const;
 
-    void exportZip(const QAbstractItemView& view,
-                   QBuffer& exportedZip) const;
+    void exportZip(const QAbstractItemView& view, QBuffer& exportedZip) const;
 
     static QString zipWorkSheetPath_;
     static QString tableSheetData_;
@@ -43,7 +42,7 @@ private:
     static QString headersOnlySheetData_;
     static QString emptySheetData_;
     static QStringList headers_;
-    TestTableModel* tableModelForBenchmarking_ {nullptr};
+    TestTableModel* tableModelForBenchmarking_{nullptr};
 };
 
-#endif // EXPORTXLSXTEST
+#endif  // EXPORTXLSXTEST

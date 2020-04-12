@@ -8,4 +8,4 @@ namespace Utilities
 QByteArray composeXlsxSheet(const QString& sheetData);
 };
 
-#endif // UTILITIES_H
+#endif  // UTILITIES_H
