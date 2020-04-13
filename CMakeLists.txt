@@ -44,6 +44,8 @@ add_library(${PROJECT_NAME} SHARED
   src/EibleUtilities.h
   src/ExportXlsx.cpp
   src/ExportXlsx.h
+  src/Export.cpp
+  src/Export.h
   qrc_resources.cpp
 )
 

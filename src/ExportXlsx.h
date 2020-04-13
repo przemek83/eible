@@ -1,7 +1,7 @@
 #ifndef EXPORTXLSX_H
 #define EXPORTXLSX_H
 
-#include <QObject>
+#include "Export.h"
 
 #include "eible_global.h"
 
@@ -9,7 +9,7 @@ class QAbstractItemModel;
 class QAbstractItemView;
 class QIODevice;
 
-class EIBLE_EXPORT ExportXlsx : public QObject
+class EIBLE_EXPORT ExportXlsx : public Export
 {
     Q_OBJECT
 public:
@@ -22,7 +22,8 @@ public:
     ExportXlsx& operator=(ExportXlsx&& other) = delete;
     ExportXlsx(ExportXlsx&& other) = delete;
 
-    bool exportView(const QAbstractItemView& view, QIODevice& ioDevice);
+    bool exportView(const QAbstractItemView& view,
+                    QIODevice& ioDevice) override;
 
 private:
     const QByteArray& getCellTypeTag(QVariant& cell);
