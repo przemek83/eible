@@ -9,24 +9,30 @@
 
 QString ExportDsvTest::tableDataTsv_ =
     "Text\tNumeric\tDate\nItem 0, 0\t1.00\t2020-01-03\nItem 0, "
-    "1\t2.00\t2020-01-04\nItem 0, 2\t3.00\t2020-01-05\n";
+    "1\t2.00\t2020-01-04\nItem 0, 2\t3.00\t2020-01-05";
 QString ExportDsvTest::tableDataCsv_ =
-    "Text;Numeric;Date\n\"Item 0, 0\";1.00;2020-01-03\n\"Item 0, "
-    "1\";2.00;2020-01-04\n\"Item 0, 2\";3.00;2020-01-05\n";
+    "Text;Numeric;Date\nItem 0, 0;1.00;2020-01-03\nItem 0, "
+    "1;2.00;2020-01-04\nItem 0, 2;3.00;2020-01-05";
 QString ExportDsvTest::multiSelectionTableDataTsv_ =
     "Text\tNumeric\tDate\nItem 0, 0\t1.00\t2020-01-03\nItem 0, "
-    "2\t3.00\t2020-01-05\n";
+    "2\t3.00\t2020-01-05";
 QString ExportDsvTest::multiSelectionTableDataCsv_ =
-    "Text;Numeric;Date\n\"Item 0, 0\";1.00;2020-01-03\n\"Item 0, "
-    "2\";3.00;2020-01-05\n";
-QString ExportDsvTest::headersOnlyDataTsv_ = "Text\tNumeric\tDate\n";
-QString ExportDsvTest::headersOnlyDataCsv_ = "Text;Numeric;Date\n";
+    "Text;Numeric;Date\nItem 0, 0;1.00;2020-01-03\nItem 0, "
+    "2;3.00;2020-01-05";
+QString ExportDsvTest::headersOnlyDataTsv_ = "Text\tNumeric\tDate";
+QString ExportDsvTest::headersOnlyDataCsv_ = "Text;Numeric;Date";
+QString ExportDsvTest::separatorInStringFieldDataTsv_ =
+    "Text\tNumeric\tDate\n\"Other\titem\"\t1.00\t2020-01-03\nItem 0, "
+    "1\t2.00\t2020-01-04";
+QString ExportDsvTest::separatorInStringFieldDataCsv_ =
+    "Text;Numeric;Date\n\"Other;item\";1.00;2020-01-03\nItem 0, "
+    "1;2.00;2020-01-04";
 QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
 
 void ExportDsvTest::initTestCase() {}
 
-void ExportDsvTest::checkExportingEmptyTable(char separator)
+void ExportDsvTest::checkEmptyTable(char separator)
 {
     TestTableModel model(0, 0);
     QTableView view;
@@ -42,18 +48,11 @@ void ExportDsvTest::checkExportingEmptyTable(char separator)
     QCOMPARE(exportedByteArray, emptyData_);
 }
 
-void ExportDsvTest::testExportingEmptyTableTsv()
-{
-    checkExportingEmptyTable('\t');
-}
+void ExportDsvTest::testEmptyTableTsv() { checkEmptyTable('\t'); }
 
-void ExportDsvTest::testExportingEmptyTableCsv()
-{
-    checkExportingEmptyTable(';');
-}
+void ExportDsvTest::testEmptyTableCsv() { checkEmptyTable(';'); }
 
-void ExportDsvTest::checkExportingHeadersOnly(char separator,
-                                              const QString& expected)
+void ExportDsvTest::checkHeadersOnly(char separator, const QString& expected)
 {
     TestTableModel model(3, 0);
     QTableView view;
@@ -69,18 +68,17 @@ void ExportDsvTest::checkExportingHeadersOnly(char separator,
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testExportingHeadersOnlyTsv()
+void ExportDsvTest::testHeadersOnlyTsv()
 {
-    checkExportingHeadersOnly('\t', headersOnlyDataTsv_);
+    checkHeadersOnly('\t', headersOnlyDataTsv_);
 }
 
-void ExportDsvTest::testExportingHeadersOnlyCsv()
+void ExportDsvTest::testHeadersOnlyCsv()
 {
-    checkExportingHeadersOnly(';', headersOnlyDataCsv_);
+    checkHeadersOnly(';', headersOnlyDataCsv_);
 }
 
-void ExportDsvTest::checkExportingSimpleTable(char separator,
-                                              const QString& expected)
+void ExportDsvTest::checkSimpleTable(char separator, const QString& expected)
 {
     TestTableModel model(3, 3);
     QTableView view;
@@ -96,18 +94,18 @@ void ExportDsvTest::checkExportingSimpleTable(char separator,
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testExportingSimpleTableTsv()
+void ExportDsvTest::testSimpleTableTsv()
 {
-    checkExportingSimpleTable('\t', tableDataTsv_);
+    checkSimpleTable('\t', tableDataTsv_);
 }
 
-void ExportDsvTest::testExportingSimpleTableCsv()
+void ExportDsvTest::testSimpleTableCsv()
 {
-    checkExportingSimpleTable(';', tableDataCsv_);
+    checkSimpleTable(';', tableDataCsv_);
 }
 
-void ExportDsvTest::checkExportingViewWithMultiSelection(
-    char separator, const QString& expected)
+void ExportDsvTest::checkViewWithMultiSelection(char separator,
+                                                const QString& expected)
 {
     TestTableModel model(3, 3);
     QTableView view;
@@ -129,14 +127,42 @@ void ExportDsvTest::checkExportingViewWithMultiSelection(
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testExportingViewWithMultiSelectionTsv()
+void ExportDsvTest::testViewWithMultiSelectionTsv()
 {
-    checkExportingViewWithMultiSelection('\t', multiSelectionTableDataTsv_);
+    checkViewWithMultiSelection('\t', multiSelectionTableDataTsv_);
 }
 
-void ExportDsvTest::testExportingViewWithMultiSelectionCsv()
+void ExportDsvTest::testViewWithMultiSelectionCsv()
 {
-    checkExportingViewWithMultiSelection(';', multiSelectionTableDataCsv_);
+    checkViewWithMultiSelection(';', multiSelectionTableDataCsv_);
+}
+
+void ExportDsvTest::checkViewWithSeparatorInStringField(char separator,
+                                                        const QString& expected)
+{
+    TestTableModel model(3, 2);
+    QTableView view;
+    view.setModel(&model);
+    model.setData(model.index(0, 0), "Other" + QString(separator) + "item");
+
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
+
+    ExportDsv exportDsv(separator);
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, expected);
+}
+
+void ExportDsvTest::testViewWithSeparatorInStringFieldTsv()
+{
+    checkViewWithSeparatorInStringField('\t', separatorInStringFieldDataTsv_);
+}
+
+void ExportDsvTest::testViewWithSeparatorInStringFieldCsv()
+{
+    checkViewWithSeparatorInStringField(';', separatorInStringFieldDataCsv_);
 }
 
 void ExportDsvTest::Benchmark_data()
@@ -146,7 +172,7 @@ void ExportDsvTest::Benchmark_data()
 
 void ExportDsvTest::Benchmark()
 {
-    //    QSKIP("Skip benchmark.");
+    // QSKIP("Skip benchmark.");
     QTableView view;
     view.setModel(tableModelForBenchmarking_);
     QBENCHMARK

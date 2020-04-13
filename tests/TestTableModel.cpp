@@ -48,3 +48,10 @@ QVariant TestTableModel::headerData(
     const QStringList headers{"Text", "Numeric", "Date"};
     return headers[section % 3];
 }
+
+bool TestTableModel::setData(const QModelIndex& index, const QVariant& value,
+                             [[maybe_unused]] int role)
+{
+    data_[index.column()][index.row() % MAX_DATA_ROWS] = value;
+    return true;
+}

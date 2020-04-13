@@ -31,7 +31,6 @@ bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
         if (j != proxyColumnCount - 1)
             destinationArray.append(separator_);
     }
-    destinationArray.append("\n");
 
     //    const QString barTitle =
     //        Constants::getProgressBarTitle(Constants::BarTitle::SAVING);
@@ -49,6 +48,7 @@ bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
             !selectionModel->isSelected(proxyModel->index(i, 0)))
             continue;
 
+        destinationArray.append("\n");
         for (int j = 0; j < proxyColumnCount; ++j)
         {
             QVariant actualField = proxyModel->index(i, j).data();
@@ -59,7 +59,6 @@ bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
             if (j != proxyColumnCount - 1)
                 destinationArray.append(separator_);
         }
-        destinationArray.append("\n");
         //        bar.updateProgress(i + 1);
     }
 
@@ -80,8 +79,6 @@ QString doubleToStringUsingLocale(double value, int precision)
     return locale.toString(value, 'f', precision);
 }
 
-// QString getDefaultDateFormat() { return QStringLiteral("d/M/yyyy"); }
-
 void ExportDsv::variantToString(const QVariant& variant,
                                 QByteArray& destinationArray,
                                 char separator) const
@@ -99,29 +96,18 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QVariant::Date:
         case QVariant::DateTime:
         {
-            //            static const QString
-            //            defDateFormat(getDefaultDateFormat());
             destinationArray.append(variant.toDate().toString(Qt::ISODate));
             break;
         }
 
         case QVariant::String:
         {
-            QString tmpString(variant.toString());
-            if (separator == '\t')
-            {
-                // Simplification -> change tabs and new lines into spaces.
-                tmpString = tmpString.replace(
-                    QRegExp("[" + QString(separator) + "\n" + "]"),
-                    QStringLiteral(" "));
-                destinationArray.append(tmpString);
-            }
+            QString value{variant.toString()};
+            value.replace('"', QStringLiteral("\"\""));
+            if (value.contains(separator))
+                destinationArray.append("\"" + value + "\"");
             else
-            {
-                tmpString.replace('"', QStringLiteral("\"\""));
-                destinationArray.append("\"" + tmpString + "\"");
-            }
-
+                destinationArray.append(value);
             break;
         }
 

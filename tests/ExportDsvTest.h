@@ -11,17 +11,20 @@ class ExportDsvTest : public QObject
 private Q_SLOTS:
     void initTestCase();
 
-    void testExportingEmptyTableTsv();
-    void testExportingEmptyTableCsv();
+    void testEmptyTableTsv();
+    void testEmptyTableCsv();
 
-    void testExportingHeadersOnlyTsv();
-    void testExportingHeadersOnlyCsv();
+    void testHeadersOnlyTsv();
+    void testHeadersOnlyCsv();
 
-    void testExportingSimpleTableTsv();
-    void testExportingSimpleTableCsv();
+    void testSimpleTableTsv();
+    void testSimpleTableCsv();
 
-    void testExportingViewWithMultiSelectionTsv();
-    void testExportingViewWithMultiSelectionCsv();
+    void testViewWithMultiSelectionTsv();
+    void testViewWithMultiSelectionCsv();
+
+    void testViewWithSeparatorInStringFieldTsv();
+    void testViewWithSeparatorInStringFieldCsv();
 
     void Benchmark_data();
 
@@ -30,11 +33,12 @@ private Q_SLOTS:
     void cleanupTestCase();
 
 private:
-    void checkExportingEmptyTable(char separator);
-    void checkExportingHeadersOnly(char separator, const QString& expected);
-    void checkExportingSimpleTable(char separator, const QString& expected);
-    void checkExportingViewWithMultiSelection(char separator,
-                                              const QString& expected);
+    void checkEmptyTable(char separator);
+    void checkHeadersOnly(char separator, const QString& expected);
+    void checkSimpleTable(char separator, const QString& expected);
+    void checkViewWithMultiSelection(char separator, const QString& expected);
+    void checkViewWithSeparatorInStringField(char separator,
+                                             const QString& expected);
 
     static QString tableDataTsv_;
     static QString tableDataCsv_;
@@ -42,6 +46,8 @@ private:
     static QString multiSelectionTableDataCsv_;
     static QString headersOnlyDataTsv_;
     static QString headersOnlyDataCsv_;
+    static QString separatorInStringFieldDataTsv_;
+    static QString separatorInStringFieldDataCsv_;
     static QString emptyData_;
     static QStringList headers_;
     TestTableModel* tableModelForBenchmarking_{nullptr};

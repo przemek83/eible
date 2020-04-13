@@ -27,6 +27,9 @@ public:
         int section, [[maybe_unused]] Qt::Orientation orientation,
         [[maybe_unused]] int role = Qt::DisplayRole) const override;
 
+    bool setData(const QModelIndex& index, const QVariant& value,
+                 int role = Qt::EditRole) override;
+
 private:
     const int columnCount_;
     const int rowCount_;
