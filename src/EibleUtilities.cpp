@@ -2,7 +2,7 @@
 
 namespace EibleUtilities
 {
-const QDate& getStartOfExcelWorld()
+QDate getStartOfExcelWorld()
 {
     static const QDate startOfTheExcelWorld(1899, 12, 30);
     return startOfTheExcelWorld;
