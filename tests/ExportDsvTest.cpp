@@ -7,15 +7,15 @@
 
 #include "TestTableModel.h"
 
-QString ExportDsvTest::tableSheetData_ = R"()";
-QString ExportDsvTest::multiSelectionTableSheetData_ = R"()";
-QString ExportDsvTest::headersOnlySheetData_ = R"()";
-QString ExportDsvTest::emptySheetData_ = "";
+QString ExportDsvTest::tableData_ = R"()";
+QString ExportDsvTest::multiSelectionTableData_ = R"()";
+QString ExportDsvTest::headersOnlyData_ = R"()";
+QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
 
 void ExportDsvTest::initTestCase() {}
 
-void ExportDsvTest::testExportingEmptyTable()
+void ExportDsvTest::checkExportingEmptyTable(char separator)
 {
     TestTableModel model(0, 0);
     QTableView view;
@@ -25,10 +25,20 @@ void ExportDsvTest::testExportingEmptyTable()
     QBuffer exportedBuffer(&exportedByteArray);
     exportedBuffer.open(QIODevice::WriteOnly);
 
-    ExportDsv exportDsv('\t');
+    ExportDsv exportDsv(separator);
     exportDsv.exportView(view, exportedBuffer);
 
-    QCOMPARE(exportedByteArray, emptySheetData_);
+    QCOMPARE(exportedByteArray, emptyData_);
+}
+
+void ExportDsvTest::testExportingEmptyTableTsv()
+{
+    checkExportingEmptyTable('\t');
+}
+
+void ExportDsvTest::testExportingEmptyTableCsv()
+{
+    checkExportingEmptyTable(';');
 }
 
 void ExportDsvTest::testExportingHeadersOnly()

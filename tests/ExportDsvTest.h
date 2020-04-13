@@ -9,7 +9,8 @@ class ExportDsvTest : public QObject
 private Q_SLOTS:
     void initTestCase();
 
-    void testExportingEmptyTable();
+    void testExportingEmptyTableTsv();
+    void testExportingEmptyTableCsv();
 
     void testExportingHeadersOnly();
 
@@ -24,10 +25,12 @@ private Q_SLOTS:
     //    void cleanupTestCase();
 
 private:
-    static QString tableSheetData_;
-    static QString multiSelectionTableSheetData_;
-    static QString headersOnlySheetData_;
-    static QString emptySheetData_;
+    void checkExportingEmptyTable(char separator);
+
+    static QString tableData_;
+    static QString multiSelectionTableData_;
+    static QString headersOnlyData_;
+    static QString emptyData_;
     static QStringList headers_;
 };
 
