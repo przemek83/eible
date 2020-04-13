@@ -15,7 +15,8 @@ private Q_SLOTS:
     void testExportingHeadersOnlyTsv();
     void testExportingHeadersOnlyCsv();
 
-    void testExportingSimpleTable();
+    void testExportingSimpleTableTsv();
+    void testExportingSimpleTableCsv();
 
     void testExportingViewWithMultiSelection();
 
@@ -27,10 +28,11 @@ private Q_SLOTS:
 
 private:
     void checkExportingEmptyTable(char separator);
-
     void checkExportingHeadersOnly(char separator, const QString& expected);
+    void checkExportingSimpleTable(char separator, const QString& expected);
 
-    static QString tableData_;
+    static QString tableDataTsv_;
+    static QString tableDataCsv_;
     static QString multiSelectionTableData_;
     static QString headersOnlyDataTsv_;
     static QString headersOnlyDataCsv_;

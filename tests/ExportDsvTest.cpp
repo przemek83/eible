@@ -7,7 +7,12 @@
 
 #include "TestTableModel.h"
 
-QString ExportDsvTest::tableData_ = R"()";
+QString ExportDsvTest::tableDataTsv_ =
+    "Text\tNumeric\tDate\nItem 0, 0\t1.00\t2020-01-03\nItem 0, "
+    "1\t2.00\t2020-01-04\nItem 0, 2\t3.00\t2020-01-05\n";
+QString ExportDsvTest::tableDataCsv_ =
+    "Text;Numeric;Date\n\"Item 0, 0\";1.00;2020-01-03\n\"Item 0, "
+    "1\";2.00;2020-01-04\n\"Item 0, 2\";3.00;2020-01-05\n";
 QString ExportDsvTest::multiSelectionTableData_ = R"()";
 QString ExportDsvTest::headersOnlyDataTsv_ = "Text\tNumeric\tDate\n";
 QString ExportDsvTest::headersOnlyDataCsv_ = "Text;Numeric;Date\n";
@@ -69,17 +74,31 @@ void ExportDsvTest::testExportingHeadersOnlyCsv()
     checkExportingHeadersOnly(';', headersOnlyDataCsv_);
 }
 
-void ExportDsvTest::testExportingSimpleTable()
+void ExportDsvTest::checkExportingSimpleTable(char separator,
+                                              const QString& expected)
 {
     TestTableModel model(3, 3);
     QTableView view;
     view.setModel(&model);
 
-    //    QByteArray exportedZipBuffer;
-    //    QBuffer exportedZip(&exportedZipBuffer);
-    //    exportZip(view, exportedZip);
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
 
-    //    compareWorkSheets(exportedZip, tableSheetData_);
+    ExportDsv exportDsv(separator);
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, expected);
+}
+
+void ExportDsvTest::testExportingSimpleTableTsv()
+{
+    checkExportingSimpleTable('\t', tableDataTsv_);
+}
+
+void ExportDsvTest::testExportingSimpleTableCsv()
+{
+    checkExportingSimpleTable(';', tableDataCsv_);
 }
 
 void ExportDsvTest::testExportingViewWithMultiSelection()
