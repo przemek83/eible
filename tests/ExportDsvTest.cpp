@@ -138,3 +138,26 @@ void ExportDsvTest::testExportingViewWithMultiSelectionCsv()
 {
     checkExportingViewWithMultiSelection(';', multiSelectionTableDataCsv_);
 }
+
+void ExportDsvTest::Benchmark_data()
+{
+    tableModelForBenchmarking_ = new TestTableModel(100, 100000);
+}
+
+void ExportDsvTest::Benchmark()
+{
+    //    QSKIP("Skip benchmark.");
+    QTableView view;
+    view.setModel(tableModelForBenchmarking_);
+    QBENCHMARK
+    {
+        QByteArray exportedByteArray;
+        QBuffer exportedBuffer(&exportedByteArray);
+        exportedBuffer.open(QIODevice::WriteOnly);
+
+        ExportDsv exportDsv(';');
+        exportDsv.exportView(view, exportedBuffer);
+    }
+}
+
+void ExportDsvTest::cleanupTestCase() { delete tableModelForBenchmarking_; }

@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+class TestTableModel;
+
 class ExportDsvTest : public QObject
 {
     Q_OBJECT
@@ -21,11 +23,11 @@ private Q_SLOTS:
     void testExportingViewWithMultiSelectionTsv();
     void testExportingViewWithMultiSelectionCsv();
 
-    //    void Benchmark_data();
+    void Benchmark_data();
 
-    //    void Benchmark();
+    void Benchmark();
 
-    //    void cleanupTestCase();
+    void cleanupTestCase();
 
 private:
     void checkExportingEmptyTable(char separator);
@@ -42,6 +44,7 @@ private:
     static QString headersOnlyDataCsv_;
     static QString emptyData_;
     static QStringList headers_;
+    TestTableModel* tableModelForBenchmarking_{nullptr};
 };
 
 #endif  // EXPORTDSVTEST_H
