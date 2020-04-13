@@ -9,7 +9,8 @@
 
 QString ExportDsvTest::tableData_ = R"()";
 QString ExportDsvTest::multiSelectionTableData_ = R"()";
-QString ExportDsvTest::headersOnlyData_ = R"()";
+QString ExportDsvTest::headersOnlyDataTsv_ = "Text\tNumeric\tDate\n";
+QString ExportDsvTest::headersOnlyDataCsv_ = "Text;Numeric;Date\n";
 QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
 
@@ -41,17 +42,31 @@ void ExportDsvTest::testExportingEmptyTableCsv()
     checkExportingEmptyTable(';');
 }
 
-void ExportDsvTest::testExportingHeadersOnly()
+void ExportDsvTest::checkExportingHeadersOnly(char separator,
+                                              const QString& expected)
 {
     TestTableModel model(3, 0);
     QTableView view;
     view.setModel(&model);
 
-    //    QByteArray exportedZipBuffer;
-    //    QBuffer exportedZip(&exportedZipBuffer);
-    //    exportZip(view, exportedZip);
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
 
-    //    compareWorkSheets(exportedZip, headersOnlySheetData_);
+    ExportDsv exportDsv(separator);
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, expected);
+}
+
+void ExportDsvTest::testExportingHeadersOnlyTsv()
+{
+    checkExportingHeadersOnly('\t', headersOnlyDataTsv_);
+}
+
+void ExportDsvTest::testExportingHeadersOnlyCsv()
+{
+    checkExportingHeadersOnly(';', headersOnlyDataCsv_);
 }
 
 void ExportDsvTest::testExportingSimpleTable()
