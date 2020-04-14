@@ -27,7 +27,7 @@ public:
     void setDateFormat(Qt::DateFormat format);
     void setDateFormat(QString format);
 
-    void setLocale(QLocale locale);
+    void setNumbersLocale(QLocale locale);
 
 private:
     void variantToString(const QVariant& variant, QByteArray& destinationArray,

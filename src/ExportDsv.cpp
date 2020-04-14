@@ -62,7 +62,7 @@ void ExportDsv::setDateFormat(Qt::DateFormat format) { qtDateFormat_ = format; }
 
 void ExportDsv::setDateFormat(QString format) { dateFormat_ = format; }
 
-void ExportDsv::setLocale(QLocale locale) { locale_ = locale; }
+void ExportDsv::setNumbersLocale(QLocale locale) { locale_ = locale; }
 
 QString doubleToStringUsingLocale(double value, int precision)
 {
