@@ -43,12 +43,8 @@ private:
     void checkHeadersOnly(char separator, const QString& expected);
     void checkSimpleTable(char separator, const QString& expected);
     void checkViewWithMultiSelection(char separator, const QString& expected);
-    void checkViewWithSeparatorInStringField(char separator,
-                                             const QString& expected);
-    void checkViewWithNewLineInStringField(char separator,
-                                           const QString& expected);
-    void checkViewWithDoubleQuotesInStringField(char separator,
-                                                const QString& expected);
+    void checkViewWithSpecialCharInStringField(char separator, char specialChar,
+                                               const QString& expected);
 
     static QString tableDataTsv_;
     static QString tableDataCsv_;

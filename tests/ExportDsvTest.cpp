@@ -149,13 +149,13 @@ void ExportDsvTest::testViewWithMultiSelectionCsv()
     checkViewWithMultiSelection(';', multiSelectionTableDataCsv_);
 }
 
-void ExportDsvTest::checkViewWithSeparatorInStringField(char separator,
-                                                        const QString& expected)
+void ExportDsvTest::checkViewWithSpecialCharInStringField(
+    char separator, char specialChar, const QString& expected)
 {
     TestTableModel model(3, 2);
     QTableView view;
     view.setModel(&model);
-    model.setData(model.index(0, 0), "Other" + QString(separator) + "item");
+    model.setData(model.index(0, 0), "Other" + QString(specialChar) + "item");
 
     QByteArray exportedByteArray;
     QBuffer exportedBuffer(&exportedByteArray);
@@ -169,70 +169,38 @@ void ExportDsvTest::checkViewWithSeparatorInStringField(char separator,
 
 void ExportDsvTest::testViewWithSeparatorInStringFieldTsv()
 {
-    checkViewWithSeparatorInStringField('\t', separatorInStringFieldDataTsv_);
+    checkViewWithSpecialCharInStringField('\t', '\t',
+                                          separatorInStringFieldDataTsv_);
 }
 
 void ExportDsvTest::testViewWithSeparatorInStringFieldCsv()
 {
-    checkViewWithSeparatorInStringField(';', separatorInStringFieldDataCsv_);
-}
-
-void ExportDsvTest::checkViewWithNewLineInStringField(char separator,
-                                                      const QString& expected)
-{
-    TestTableModel model(3, 2);
-    QTableView view;
-    view.setModel(&model);
-    model.setData(model.index(0, 0), "Other" + QString('\n') + "item");
-
-    QByteArray exportedByteArray;
-    QBuffer exportedBuffer(&exportedByteArray);
-    exportedBuffer.open(QIODevice::WriteOnly);
-
-    ExportDsv exportDsv(separator);
-    exportDsv.exportView(view, exportedBuffer);
-
-    QCOMPARE(exportedByteArray, expected);
+    checkViewWithSpecialCharInStringField(';', ';',
+                                          separatorInStringFieldDataCsv_);
 }
 
 void ExportDsvTest::testViewWithNewLineInStringFieldTsv()
 {
-    checkViewWithNewLineInStringField('\t', newLineInStringFieldDataTsv_);
+    checkViewWithSpecialCharInStringField('\t', '\n',
+                                          newLineInStringFieldDataTsv_);
 }
 
 void ExportDsvTest::testViewWithNewLineInStringFieldCsv()
 {
-    checkViewWithNewLineInStringField(';', newLineInStringFieldDataCsv_);
-}
-
-void ExportDsvTest::checkViewWithDoubleQuotesInStringField(
-    char separator, const QString& expected)
-{
-    TestTableModel model(3, 2);
-    QTableView view;
-    view.setModel(&model);
-    model.setData(model.index(0, 0), "Other" + QString('\"') + "item");
-
-    QByteArray exportedByteArray;
-    QBuffer exportedBuffer(&exportedByteArray);
-    exportedBuffer.open(QIODevice::WriteOnly);
-
-    ExportDsv exportDsv(separator);
-    exportDsv.exportView(view, exportedBuffer);
-
-    QCOMPARE(exportedByteArray, expected);
+    checkViewWithSpecialCharInStringField(';', '\n',
+                                          newLineInStringFieldDataCsv_);
 }
 
 void ExportDsvTest::testViewWithDoubleQuotesInStringFieldTsv()
 {
-    checkViewWithDoubleQuotesInStringField('\t',
-                                           doubleQuotesInStringFieldDataTsv_);
+    checkViewWithSpecialCharInStringField('\t', '\"',
+                                          doubleQuotesInStringFieldDataTsv_);
 }
 
 void ExportDsvTest::testViewWithDoubleQuotesInStringFieldCsv()
 {
-    checkViewWithDoubleQuotesInStringField(';',
-                                           doubleQuotesInStringFieldDataCsv_);
+    checkViewWithSpecialCharInStringField(';', '\"',
+                                          doubleQuotesInStringFieldDataCsv_);
 }
 
 void ExportDsvTest::Benchmark_data()
