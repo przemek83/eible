@@ -149,9 +149,34 @@ void ExportDsvTest::testViewWithMultiSelectionCsv()
     checkViewWithMultiSelection(';', multiSelectionTableDataCsv_);
 }
 
-void ExportDsvTest::checkViewWithSpecialCharInStringField(
-    char separator, char specialChar, const QString& expected)
+void ExportDsvTest::testViewWithSpecialCharInStringField_data()
 {
+    QTest::addColumn<char>("separator");
+    QTest::addColumn<char>("specialChar");
+    QTest::addColumn<QString>("expected");
+
+    QTest::newRow("TSV separator in string")
+        << '\t' << '\t' << separatorInStringFieldDataTsv_;
+    QTest::newRow("CSV separator in string")
+        << ';' << ';' << separatorInStringFieldDataCsv_;
+
+    QTest::newRow("TSV new line in string") << '\t' << '\n'
+                                            << newLineInStringFieldDataTsv_;
+    QTest::newRow("CSV new line in string") << ';' << '\n'
+                                            << newLineInStringFieldDataCsv_;
+
+    QTest::newRow("TSV double quotes in string")
+        << '\t' << '\"' << doubleQuotesInStringFieldDataTsv_;
+    QTest::newRow("CSV double quotes in string")
+        << ';' << '\"' << doubleQuotesInStringFieldDataCsv_;
+}
+
+void ExportDsvTest::testViewWithSpecialCharInStringField()
+{
+    QFETCH(char, separator);
+    QFETCH(char, specialChar);
+    QFETCH(QString, expected);
+
     TestTableModel model(3, 2);
     QTableView view;
     view.setModel(&model);
@@ -165,42 +190,6 @@ void ExportDsvTest::checkViewWithSpecialCharInStringField(
     exportDsv.exportView(view, exportedBuffer);
 
     QCOMPARE(exportedByteArray, expected);
-}
-
-void ExportDsvTest::testViewWithSeparatorInStringFieldTsv()
-{
-    checkViewWithSpecialCharInStringField('\t', '\t',
-                                          separatorInStringFieldDataTsv_);
-}
-
-void ExportDsvTest::testViewWithSeparatorInStringFieldCsv()
-{
-    checkViewWithSpecialCharInStringField(';', ';',
-                                          separatorInStringFieldDataCsv_);
-}
-
-void ExportDsvTest::testViewWithNewLineInStringFieldTsv()
-{
-    checkViewWithSpecialCharInStringField('\t', '\n',
-                                          newLineInStringFieldDataTsv_);
-}
-
-void ExportDsvTest::testViewWithNewLineInStringFieldCsv()
-{
-    checkViewWithSpecialCharInStringField(';', '\n',
-                                          newLineInStringFieldDataCsv_);
-}
-
-void ExportDsvTest::testViewWithDoubleQuotesInStringFieldTsv()
-{
-    checkViewWithSpecialCharInStringField('\t', '\"',
-                                          doubleQuotesInStringFieldDataTsv_);
-}
-
-void ExportDsvTest::testViewWithDoubleQuotesInStringFieldCsv()
-{
-    checkViewWithSpecialCharInStringField(';', '\"',
-                                          doubleQuotesInStringFieldDataCsv_);
 }
 
 void ExportDsvTest::Benchmark_data()
