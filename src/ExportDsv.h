@@ -3,6 +3,8 @@
 
 #include "Export.h"
 
+#include <QLocale>
+
 class QAbstractItemView;
 class QIODevice;
 
@@ -22,11 +24,21 @@ public:
     bool exportView(const QAbstractItemView& view,
                     QIODevice& ioDevice) override;
 
+    void setDateFormat(Qt::DateFormat format);
+    void setDateFormat(QString format);
+
+    void setLocale(QLocale locale);
+
 private:
     void variantToString(const QVariant& variant, QByteArray& destinationArray,
                          char separator) const;
 
     const char separator_;
+
+    Qt::DateFormat qtDateFormat_{Qt::ISODate};
+    QString dateFormat_{};
+
+    QLocale locale_;
 };
 
 #endif  // EXPORTDSV_H

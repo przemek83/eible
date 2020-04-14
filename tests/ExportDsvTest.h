@@ -21,8 +21,13 @@ private Q_SLOTS:
     void testViewWithMultiSelection_data();
     void testViewWithMultiSelection();
 
-    void testViewWithSpecialCharInStringField_data();
-    void testViewWithSpecialCharInStringField();
+    void testSpecialCharInStringField_data();
+    void testSpecialCharInStringField();
+
+    void testCustomDateFormat();
+    void testDefaultLocaleShortDate();
+
+    void testLocaleForNumbers();
 
     void Benchmark_data();
     void Benchmark();
@@ -42,6 +47,9 @@ private:
     static QString newLineInStringFieldDataCsv_;
     static QString doubleQuotesInStringFieldDataTsv_;
     static QString doubleQuotesInStringFieldDataCsv_;
+    static QString customDateFormat_;
+    static QString defaultLocaleShortDate_;
+    static QString localeForNumbers_;
     static QString emptyData_;
     static QStringList headers_;
     TestTableModel* tableModelForBenchmarking_{nullptr};

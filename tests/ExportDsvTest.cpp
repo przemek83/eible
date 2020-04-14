@@ -39,6 +39,12 @@ QString ExportDsvTest::doubleQuotesInStringFieldDataTsv_ =
 QString ExportDsvTest::doubleQuotesInStringFieldDataCsv_ =
     "Text;Numeric;Date\n\"Other\"\"item\";1.00;2020-01-03\nItem 0, "
     "1;2.00;2020-01-04";
+QString ExportDsvTest::customDateFormat_ =
+    "Text,Numeric,Date\n\"Item 0, 0\",1.00,03/01/20";
+QString ExportDsvTest::defaultLocaleShortDate_ =
+    "Text,Numeric,Date\n\"Item 0, 0\",1.00,3 Jan 2020";
+QString ExportDsvTest::localeForNumbers_ =
+    "Text\tNumeric\tDate\nItem 0, 0\t1,00\t2020-01-03";
 QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
 
@@ -157,7 +163,7 @@ void ExportDsvTest::testViewWithMultiSelection()
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testViewWithSpecialCharInStringField_data()
+void ExportDsvTest::testSpecialCharInStringField_data()
 {
     QTest::addColumn<char>("separator");
     QTest::addColumn<char>("specialChar");
@@ -179,7 +185,7 @@ void ExportDsvTest::testViewWithSpecialCharInStringField_data()
         << ';' << '\"' << doubleQuotesInStringFieldDataCsv_;
 }
 
-void ExportDsvTest::testViewWithSpecialCharInStringField()
+void ExportDsvTest::testSpecialCharInStringField()
 {
     QFETCH(char, separator);
     QFETCH(char, specialChar);
@@ -198,6 +204,59 @@ void ExportDsvTest::testViewWithSpecialCharInStringField()
     exportDsv.exportView(view, exportedBuffer);
 
     QCOMPARE(exportedByteArray, expected);
+}
+
+void ExportDsvTest::testCustomDateFormat()
+{
+    TestTableModel model(3, 1);
+    QTableView view;
+    view.setModel(&model);
+
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
+
+    ExportDsv exportDsv(',');
+    exportDsv.setDateFormat("dd/MM/yy");
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, customDateFormat_);
+}
+
+void ExportDsvTest::testDefaultLocaleShortDate()
+{
+    TestTableModel model(3, 1);
+    QTableView view;
+    view.setModel(&model);
+
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
+
+    ExportDsv exportDsv(',');
+    exportDsv.setDateFormat(Qt::DefaultLocaleShortDate);
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, defaultLocaleShortDate_);
+}
+
+void ExportDsvTest::testLocaleForNumbers()
+{
+    TestTableModel model(3, 1);
+    QTableView view;
+    view.setModel(&model);
+
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
+
+    ExportDsv exportDsv('\t');
+    QLocale locale(QLocale::Polish, QLocale::Poland);
+    locale.setNumberOptions(locale.numberOptions());
+    exportDsv.setLocale(locale);
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, localeForNumbers_);
 }
 
 void ExportDsvTest::Benchmark_data()

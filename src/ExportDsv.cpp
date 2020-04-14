@@ -8,13 +8,6 @@ ExportDsv::ExportDsv(char separator) : Export(), separator_(separator) {}
 
 bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {
-    /*
-     * Using standards described on:
-     * http://en.wikipedia.org/wiki/Comma-separated_values
-     * and
-     * http://tools.ietf.org/html/rfc4180
-     */
-
     const auto proxyModel = view.model();
     Q_ASSERT(proxyModel != nullptr);
 
@@ -65,10 +58,16 @@ bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
     return ioDevice.write(destinationArray) != -1;
 }
 
+void ExportDsv::setDateFormat(Qt::DateFormat format) { qtDateFormat_ = format; }
+
+void ExportDsv::setDateFormat(QString format) { dateFormat_ = format; }
+
+void ExportDsv::setLocale(QLocale locale) { locale_ = locale; }
+
 QString doubleToStringUsingLocale(double value, int precision)
 {
     static bool initialized{false};
-    static QLocale locale = QLocale::system();
+    static QLocale locale;
     if (!initialized)
     {
         locale.setNumberOptions(locale.numberOptions() &
@@ -88,15 +87,19 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QVariant::Double:
         case QVariant::Int:
         {
-            QString value(doubleToStringUsingLocale(variant.toDouble(), 2));
-            destinationArray.append(value);
+            destinationArray.append(
+                locale_.toString(variant.toDouble(), 'f', 2));
             break;
         }
 
         case QVariant::Date:
         case QVariant::DateTime:
         {
-            destinationArray.append(variant.toDate().toString(Qt::ISODate));
+            if (dateFormat_.isEmpty())
+                destinationArray.append(
+                    variant.toDate().toString(qtDateFormat_));
+            else
+                destinationArray.append(variant.toDate().toString(dateFormat_));
             break;
         }
 
