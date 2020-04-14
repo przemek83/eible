@@ -42,10 +42,18 @@ QString ExportDsvTest::doubleQuotesInStringFieldDataCsv_ =
 QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
 
-void ExportDsvTest::initTestCase() {}
-
-void ExportDsvTest::checkEmptyTable(char separator)
+void ExportDsvTest::testEmptyTable_data()
 {
+    QTest::addColumn<char>("separator");
+
+    QTest::newRow("TSV empty table") << '\t';
+    QTest::newRow("CSV empty table") << ';';
+}
+
+void ExportDsvTest::testEmptyTable()
+{
+    QFETCH(char, separator);
+
     TestTableModel model(0, 0);
     QTableView view;
     view.setModel(&model);
@@ -60,12 +68,20 @@ void ExportDsvTest::checkEmptyTable(char separator)
     QCOMPARE(exportedByteArray, emptyData_);
 }
 
-void ExportDsvTest::testEmptyTableTsv() { checkEmptyTable('\t'); }
-
-void ExportDsvTest::testEmptyTableCsv() { checkEmptyTable(';'); }
-
-void ExportDsvTest::checkHeadersOnly(char separator, const QString& expected)
+void ExportDsvTest::testHeadersOnly_data()
 {
+    QTest::addColumn<char>("separator");
+    QTest::addColumn<QString>("expected");
+
+    QTest::newRow("TSV headers only") << '\t' << headersOnlyDataTsv_;
+    QTest::newRow("CSV headers only") << ';' << headersOnlyDataCsv_;
+}
+
+void ExportDsvTest::testHeadersOnly()
+{
+    QFETCH(char, separator);
+    QFETCH(QString, expected);
+
     TestTableModel model(3, 0);
     QTableView view;
     view.setModel(&model);
@@ -80,18 +96,20 @@ void ExportDsvTest::checkHeadersOnly(char separator, const QString& expected)
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testHeadersOnlyTsv()
+void ExportDsvTest::testSimpleTable_data()
 {
-    checkHeadersOnly('\t', headersOnlyDataTsv_);
+    QTest::addColumn<char>("separator");
+    QTest::addColumn<QString>("expected");
+
+    QTest::newRow("TSV simple table") << '\t' << tableDataTsv_;
+    QTest::newRow("CSV simple table") << ';' << tableDataCsv_;
 }
 
-void ExportDsvTest::testHeadersOnlyCsv()
+void ExportDsvTest::testSimpleTable()
 {
-    checkHeadersOnly(';', headersOnlyDataCsv_);
-}
+    QFETCH(char, separator);
+    QFETCH(QString, expected);
 
-void ExportDsvTest::checkSimpleTable(char separator, const QString& expected)
-{
     TestTableModel model(3, 3);
     QTableView view;
     view.setModel(&model);
@@ -106,19 +124,19 @@ void ExportDsvTest::checkSimpleTable(char separator, const QString& expected)
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testSimpleTableTsv()
+void ExportDsvTest::testViewWithMultiSelection_data()
 {
-    checkSimpleTable('\t', tableDataTsv_);
-}
+    QTest::addColumn<char>("separator");
+    QTest::addColumn<QString>("expected");
 
-void ExportDsvTest::testSimpleTableCsv()
-{
-    checkSimpleTable(';', tableDataCsv_);
+    QTest::newRow("TSV multi selection") << '\t' << multiSelectionTableDataTsv_;
+    QTest::newRow("CSV multi selection") << ';' << multiSelectionTableDataCsv_;
 }
-
-void ExportDsvTest::checkViewWithMultiSelection(char separator,
-                                                const QString& expected)
+void ExportDsvTest::testViewWithMultiSelection()
 {
+    QFETCH(char, separator);
+    QFETCH(QString, expected);
+
     TestTableModel model(3, 3);
     QTableView view;
     view.setModel(&model);
@@ -137,16 +155,6 @@ void ExportDsvTest::checkViewWithMultiSelection(char separator,
     exportDsv.exportView(view, exportedBuffer);
 
     QCOMPARE(exportedByteArray, expected);
-}
-
-void ExportDsvTest::testViewWithMultiSelectionTsv()
-{
-    checkViewWithMultiSelection('\t', multiSelectionTableDataTsv_);
-}
-
-void ExportDsvTest::testViewWithMultiSelectionCsv()
-{
-    checkViewWithMultiSelection(';', multiSelectionTableDataCsv_);
 }
 
 void ExportDsvTest::testViewWithSpecialCharInStringField_data()

@@ -9,35 +9,27 @@ class ExportDsvTest : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
-    void initTestCase();
+    void testEmptyTable_data();
+    void testEmptyTable();
 
-    void testEmptyTableTsv();
-    void testEmptyTableCsv();
+    void testHeadersOnly_data();
+    void testHeadersOnly();
 
-    void testHeadersOnlyTsv();
-    void testHeadersOnlyCsv();
+    void testSimpleTable_data();
+    void testSimpleTable();
 
-    void testSimpleTableTsv();
-    void testSimpleTableCsv();
-
-    void testViewWithMultiSelectionTsv();
-    void testViewWithMultiSelectionCsv();
+    void testViewWithMultiSelection_data();
+    void testViewWithMultiSelection();
 
     void testViewWithSpecialCharInStringField_data();
     void testViewWithSpecialCharInStringField();
 
     void Benchmark_data();
-
     void Benchmark();
 
     void cleanupTestCase();
 
 private:
-    void checkEmptyTable(char separator);
-    void checkHeadersOnly(char separator, const QString& expected);
-    void checkSimpleTable(char separator, const QString& expected);
-    void checkViewWithMultiSelection(char separator, const QString& expected);
-
     static QString tableDataTsv_;
     static QString tableDataCsv_;
     static QString multiSelectionTableDataTsv_;
