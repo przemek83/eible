@@ -47,9 +47,9 @@ private:
     static QString newLineInStringFieldDataCsv_;
     static QString doubleQuotesInStringFieldDataTsv_;
     static QString doubleQuotesInStringFieldDataCsv_;
-    static QString customDateFormat_;
-    static QString defaultLocaleShortDate_;
-    static QString localeForNumbers_;
+    static QString customDateFormatData_;
+    static QString defaultLocaleShortDateData_;
+    static QString localeForNumbersData_;
     static QString emptyData_;
     static QStringList headers_;
     TestTableModel* tableModelForBenchmarking_{nullptr};

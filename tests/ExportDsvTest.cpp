@@ -39,11 +39,11 @@ QString ExportDsvTest::doubleQuotesInStringFieldDataTsv_ =
 QString ExportDsvTest::doubleQuotesInStringFieldDataCsv_ =
     "Text,Numeric,Date\n\"Other\"\"item\",1.00,2020-01-03\nItem 0 "
     "1,2.00,2020-01-04";
-QString ExportDsvTest::customDateFormat_ =
+QString ExportDsvTest::customDateFormatData_ =
     "Text,Numeric,Date\nItem 0 0,1.00,03/01/20";
-QString ExportDsvTest::defaultLocaleShortDate_ =
+QString ExportDsvTest::defaultLocaleShortDateData_ =
     "Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020";
-QString ExportDsvTest::localeForNumbers_ =
+QString ExportDsvTest::localeForNumbersData_ =
     "Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03";
 QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
@@ -220,7 +220,7 @@ void ExportDsvTest::testCustomDateFormat()
     exportDsv.setDateFormat("dd/MM/yy");
     exportDsv.exportView(view, exportedBuffer);
 
-    QCOMPARE(exportedByteArray, customDateFormat_);
+    QCOMPARE(exportedByteArray, customDateFormatData_);
 }
 
 void ExportDsvTest::testDefaultLocaleShortDate()
@@ -237,7 +237,7 @@ void ExportDsvTest::testDefaultLocaleShortDate()
     exportDsv.setDateFormat(Qt::DefaultLocaleShortDate);
     exportDsv.exportView(view, exportedBuffer);
 
-    QCOMPARE(exportedByteArray, defaultLocaleShortDate_);
+    QCOMPARE(exportedByteArray, defaultLocaleShortDateData_);
 }
 
 void ExportDsvTest::testLocaleForNumbers()
@@ -256,7 +256,7 @@ void ExportDsvTest::testLocaleForNumbers()
     exportDsv.setLocale(locale);
     exportDsv.exportView(view, exportedBuffer);
 
-    QCOMPARE(exportedByteArray, localeForNumbers_);
+    QCOMPARE(exportedByteArray, localeForNumbersData_);
 }
 
 void ExportDsvTest::Benchmark_data()
