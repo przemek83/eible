@@ -26,6 +26,12 @@ private Q_SLOTS:
     void testViewWithSeparatorInStringFieldTsv();
     void testViewWithSeparatorInStringFieldCsv();
 
+    void testViewWithNewLineInStringFieldTsv();
+    void testViewWithNewLineInStringFieldCsv();
+
+    void testViewWithDoubleQuotesInStringFieldTsv();
+    void testViewWithDoubleQuotesInStringFieldCsv();
+
     void Benchmark_data();
 
     void Benchmark();
@@ -39,6 +45,10 @@ private:
     void checkViewWithMultiSelection(char separator, const QString& expected);
     void checkViewWithSeparatorInStringField(char separator,
                                              const QString& expected);
+    void checkViewWithNewLineInStringField(char separator,
+                                           const QString& expected);
+    void checkViewWithDoubleQuotesInStringField(char separator,
+                                                const QString& expected);
 
     static QString tableDataTsv_;
     static QString tableDataCsv_;
@@ -48,6 +58,10 @@ private:
     static QString headersOnlyDataCsv_;
     static QString separatorInStringFieldDataTsv_;
     static QString separatorInStringFieldDataCsv_;
+    static QString newLineInStringFieldDataTsv_;
+    static QString newLineInStringFieldDataCsv_;
+    static QString doubleQuotesInStringFieldDataTsv_;
+    static QString doubleQuotesInStringFieldDataCsv_;
     static QString emptyData_;
     static QStringList headers_;
     TestTableModel* tableModelForBenchmarking_{nullptr};

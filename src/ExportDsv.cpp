@@ -102,10 +102,14 @@ void ExportDsv::variantToString(const QVariant& variant,
 
         case QVariant::String:
         {
+            // Following https://tools.ietf.org/html/rfc4180
             QString value{variant.toString()};
-            value.replace('"', QStringLiteral("\"\""));
-            if (value.contains(separator))
+            if (value.contains(separator) || value.contains('\"') ||
+                value.contains('\n'))
+            {
+                value.replace('"', QStringLiteral("\"\""));
                 destinationArray.append("\"" + value + "\"");
+            }
             else
                 destinationArray.append(value);
             break;

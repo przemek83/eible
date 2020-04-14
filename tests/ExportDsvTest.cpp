@@ -27,6 +27,18 @@ QString ExportDsvTest::separatorInStringFieldDataTsv_ =
 QString ExportDsvTest::separatorInStringFieldDataCsv_ =
     "Text;Numeric;Date\n\"Other;item\";1.00;2020-01-03\nItem 0, "
     "1;2.00;2020-01-04";
+QString ExportDsvTest::newLineInStringFieldDataTsv_ =
+    "Text\tNumeric\tDate\n\"Other\nitem\"\t1.00\t2020-01-03\nItem 0, "
+    "1\t2.00\t2020-01-04";
+QString ExportDsvTest::newLineInStringFieldDataCsv_ =
+    "Text;Numeric;Date\n\"Other\nitem\";1.00;2020-01-03\nItem 0, "
+    "1;2.00;2020-01-04";
+QString ExportDsvTest::doubleQuotesInStringFieldDataTsv_ =
+    "Text\tNumeric\tDate\n\"Other\"\"item\"\t1.00\t2020-01-03\nItem 0, "
+    "1\t2.00\t2020-01-04";
+QString ExportDsvTest::doubleQuotesInStringFieldDataCsv_ =
+    "Text;Numeric;Date\n\"Other\"\"item\";1.00;2020-01-03\nItem 0, "
+    "1;2.00;2020-01-04";
 QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
 
@@ -163,6 +175,64 @@ void ExportDsvTest::testViewWithSeparatorInStringFieldTsv()
 void ExportDsvTest::testViewWithSeparatorInStringFieldCsv()
 {
     checkViewWithSeparatorInStringField(';', separatorInStringFieldDataCsv_);
+}
+
+void ExportDsvTest::checkViewWithNewLineInStringField(char separator,
+                                                      const QString& expected)
+{
+    TestTableModel model(3, 2);
+    QTableView view;
+    view.setModel(&model);
+    model.setData(model.index(0, 0), "Other" + QString('\n') + "item");
+
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
+
+    ExportDsv exportDsv(separator);
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, expected);
+}
+
+void ExportDsvTest::testViewWithNewLineInStringFieldTsv()
+{
+    checkViewWithNewLineInStringField('\t', newLineInStringFieldDataTsv_);
+}
+
+void ExportDsvTest::testViewWithNewLineInStringFieldCsv()
+{
+    checkViewWithNewLineInStringField(';', newLineInStringFieldDataCsv_);
+}
+
+void ExportDsvTest::checkViewWithDoubleQuotesInStringField(
+    char separator, const QString& expected)
+{
+    TestTableModel model(3, 2);
+    QTableView view;
+    view.setModel(&model);
+    model.setData(model.index(0, 0), "Other" + QString('\"') + "item");
+
+    QByteArray exportedByteArray;
+    QBuffer exportedBuffer(&exportedByteArray);
+    exportedBuffer.open(QIODevice::WriteOnly);
+
+    ExportDsv exportDsv(separator);
+    exportDsv.exportView(view, exportedBuffer);
+
+    QCOMPARE(exportedByteArray, expected);
+}
+
+void ExportDsvTest::testViewWithDoubleQuotesInStringFieldTsv()
+{
+    checkViewWithDoubleQuotesInStringField('\t',
+                                           doubleQuotesInStringFieldDataTsv_);
+}
+
+void ExportDsvTest::testViewWithDoubleQuotesInStringFieldCsv()
+{
+    checkViewWithDoubleQuotesInStringField(';',
+                                           doubleQuotesInStringFieldDataCsv_);
 }
 
 void ExportDsvTest::Benchmark_data()
