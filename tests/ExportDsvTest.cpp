@@ -8,43 +8,43 @@
 #include "TestTableModel.h"
 
 QString ExportDsvTest::tableDataTsv_ =
-    "Text\tNumeric\tDate\nItem 0, 0\t1.00\t2020-01-03\nItem 0, "
-    "1\t2.00\t2020-01-04\nItem 0, 2\t3.00\t2020-01-05";
+    "Text\tNumeric\tDate\nItem 0 0\t1.00\t2020-01-03\nItem 0 "
+    "1\t2.00\t2020-01-04\nItem 0 2\t3.00\t2020-01-05";
 QString ExportDsvTest::tableDataCsv_ =
-    "Text;Numeric;Date\nItem 0, 0;1.00;2020-01-03\nItem 0, "
-    "1;2.00;2020-01-04\nItem 0, 2;3.00;2020-01-05";
+    "Text,Numeric,Date\nItem 0 0,1.00,2020-01-03\nItem 0 "
+    "1,2.00,2020-01-04\nItem 0 2,3.00,2020-01-05";
 QString ExportDsvTest::multiSelectionTableDataTsv_ =
-    "Text\tNumeric\tDate\nItem 0, 0\t1.00\t2020-01-03\nItem 0, "
+    "Text\tNumeric\tDate\nItem 0 0\t1.00\t2020-01-03\nItem 0 "
     "2\t3.00\t2020-01-05";
 QString ExportDsvTest::multiSelectionTableDataCsv_ =
-    "Text;Numeric;Date\nItem 0, 0;1.00;2020-01-03\nItem 0, "
-    "2;3.00;2020-01-05";
+    "Text,Numeric,Date\nItem 0 0,1.00,2020-01-03\nItem 0 "
+    "2,3.00,2020-01-05";
 QString ExportDsvTest::headersOnlyDataTsv_ = "Text\tNumeric\tDate";
-QString ExportDsvTest::headersOnlyDataCsv_ = "Text;Numeric;Date";
+QString ExportDsvTest::headersOnlyDataCsv_ = "Text,Numeric,Date";
 QString ExportDsvTest::separatorInStringFieldDataTsv_ =
-    "Text\tNumeric\tDate\n\"Other\titem\"\t1.00\t2020-01-03\nItem 0, "
+    "Text\tNumeric\tDate\n\"Other\titem\"\t1.00\t2020-01-03\nItem 0 "
     "1\t2.00\t2020-01-04";
 QString ExportDsvTest::separatorInStringFieldDataCsv_ =
-    "Text;Numeric;Date\n\"Other;item\";1.00;2020-01-03\nItem 0, "
-    "1;2.00;2020-01-04";
+    "Text,Numeric,Date\n\"Other,item\",1.00,2020-01-03\nItem 0 "
+    "1,2.00,2020-01-04";
 QString ExportDsvTest::newLineInStringFieldDataTsv_ =
-    "Text\tNumeric\tDate\n\"Other\nitem\"\t1.00\t2020-01-03\nItem 0, "
+    "Text\tNumeric\tDate\n\"Other\nitem\"\t1.00\t2020-01-03\nItem 0 "
     "1\t2.00\t2020-01-04";
 QString ExportDsvTest::newLineInStringFieldDataCsv_ =
-    "Text;Numeric;Date\n\"Other\nitem\";1.00;2020-01-03\nItem 0, "
-    "1;2.00;2020-01-04";
+    "Text,Numeric,Date\n\"Other\nitem\",1.00,2020-01-03\nItem 0 "
+    "1,2.00,2020-01-04";
 QString ExportDsvTest::doubleQuotesInStringFieldDataTsv_ =
-    "Text\tNumeric\tDate\n\"Other\"\"item\"\t1.00\t2020-01-03\nItem 0, "
+    "Text\tNumeric\tDate\n\"Other\"\"item\"\t1.00\t2020-01-03\nItem 0 "
     "1\t2.00\t2020-01-04";
 QString ExportDsvTest::doubleQuotesInStringFieldDataCsv_ =
-    "Text;Numeric;Date\n\"Other\"\"item\";1.00;2020-01-03\nItem 0, "
-    "1;2.00;2020-01-04";
+    "Text,Numeric,Date\n\"Other\"\"item\",1.00,2020-01-03\nItem 0 "
+    "1,2.00,2020-01-04";
 QString ExportDsvTest::customDateFormat_ =
-    "Text,Numeric,Date\n\"Item 0, 0\",1.00,03/01/20";
+    "Text,Numeric,Date\nItem 0 0,1.00,03/01/20";
 QString ExportDsvTest::defaultLocaleShortDate_ =
-    "Text,Numeric,Date\n\"Item 0, 0\",1.00,3 Jan 2020";
+    "Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020";
 QString ExportDsvTest::localeForNumbers_ =
-    "Text\tNumeric\tDate\nItem 0, 0\t1,00\t2020-01-03";
+    "Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03";
 QString ExportDsvTest::emptyData_ = "";
 QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
 
@@ -53,7 +53,7 @@ void ExportDsvTest::testEmptyTable_data()
     QTest::addColumn<char>("separator");
 
     QTest::newRow("TSV empty table") << '\t';
-    QTest::newRow("CSV empty table") << ';';
+    QTest::newRow("CSV empty table") << ',';
 }
 
 void ExportDsvTest::testEmptyTable()
@@ -80,7 +80,7 @@ void ExportDsvTest::testHeadersOnly_data()
     QTest::addColumn<QString>("expected");
 
     QTest::newRow("TSV headers only") << '\t' << headersOnlyDataTsv_;
-    QTest::newRow("CSV headers only") << ';' << headersOnlyDataCsv_;
+    QTest::newRow("CSV headers only") << ',' << headersOnlyDataCsv_;
 }
 
 void ExportDsvTest::testHeadersOnly()
@@ -108,7 +108,7 @@ void ExportDsvTest::testSimpleTable_data()
     QTest::addColumn<QString>("expected");
 
     QTest::newRow("TSV simple table") << '\t' << tableDataTsv_;
-    QTest::newRow("CSV simple table") << ';' << tableDataCsv_;
+    QTest::newRow("CSV simple table") << ',' << tableDataCsv_;
 }
 
 void ExportDsvTest::testSimpleTable()
@@ -136,7 +136,7 @@ void ExportDsvTest::testViewWithMultiSelection_data()
     QTest::addColumn<QString>("expected");
 
     QTest::newRow("TSV multi selection") << '\t' << multiSelectionTableDataTsv_;
-    QTest::newRow("CSV multi selection") << ';' << multiSelectionTableDataCsv_;
+    QTest::newRow("CSV multi selection") << ',' << multiSelectionTableDataCsv_;
 }
 void ExportDsvTest::testViewWithMultiSelection()
 {
@@ -172,17 +172,17 @@ void ExportDsvTest::testSpecialCharInStringField_data()
     QTest::newRow("TSV separator in string")
         << '\t' << '\t' << separatorInStringFieldDataTsv_;
     QTest::newRow("CSV separator in string")
-        << ';' << ';' << separatorInStringFieldDataCsv_;
+        << ',' << ',' << separatorInStringFieldDataCsv_;
 
     QTest::newRow("TSV new line in string") << '\t' << '\n'
                                             << newLineInStringFieldDataTsv_;
-    QTest::newRow("CSV new line in string") << ';' << '\n'
+    QTest::newRow("CSV new line in string") << ',' << '\n'
                                             << newLineInStringFieldDataCsv_;
 
     QTest::newRow("TSV double quotes in string")
         << '\t' << '\"' << doubleQuotesInStringFieldDataTsv_;
     QTest::newRow("CSV double quotes in string")
-        << ';' << '\"' << doubleQuotesInStringFieldDataCsv_;
+        << ',' << '\"' << doubleQuotesInStringFieldDataCsv_;
 }
 
 void ExportDsvTest::testSpecialCharInStringField()
@@ -275,7 +275,7 @@ void ExportDsvTest::Benchmark()
         QBuffer exportedBuffer(&exportedByteArray);
         exportedBuffer.open(QIODevice::WriteOnly);
 
-        ExportDsv exportDsv(';');
+        ExportDsv exportDsv(',');
         exportDsv.exportView(view, exportedBuffer);
     }
 }

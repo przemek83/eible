@@ -16,7 +16,7 @@ TestTableModel::TestTableModel(int columnCount, int rowCount)
             {
                 case 0:
                     data_[column].append(
-                        QString("Item %1, %2").arg(column).arg(row));
+                        QString("Item %1 %2").arg(column).arg(row));
                     break;
                 case 1:
                     data_[column].append(column + row);
