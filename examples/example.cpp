@@ -44,7 +44,7 @@ static bool exportXlsx(const QTableWidget& tableWidget)
 {
     QString file{QCoreApplication::applicationDirPath() + "/ExportedFile.xlsx"};
     ExportXlsx exportXlsx;
-    QObject::connect(&exportXlsx, &ExportXlsx::updateProgress, &tableWidget,
+    QObject::connect(&exportXlsx, &ExportData::updateProgress, &tableWidget,
                      [&tableWidget](int progress) {
                          std::cout << "Progress: " << progress << "/"
                                    << tableWidget.rowCount() << "."
@@ -67,6 +67,12 @@ static bool exportCsv(const QTableWidget& tableWidget)
 {
     QString file{QCoreApplication::applicationDirPath() + "/ExportedFile.csv"};
     ExportDsv exportDsv(',');
+    QObject::connect(&exportDsv, &ExportData::updateProgress, &tableWidget,
+                     [&tableWidget](int progress) {
+                         std::cout << "Progress: " << progress << "/"
+                                   << tableWidget.rowCount() << "."
+                                   << std::endl;
+                     });
 
     std::cout << "Exporting CSV to " << file.toStdString() << "." << std::endl;
     QFile outFile(file);
