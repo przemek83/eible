@@ -6,16 +6,16 @@
 
 ExportDsv::ExportDsv(char separator) : ExportData(), separator_(separator) {}
 
-bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
+QByteArray ExportDsv::generateContent(const QAbstractItemView& view)
 {
     const auto proxyModel = view.model();
     Q_ASSERT(proxyModel != nullptr);
 
     int proxyColumnCount = proxyModel->columnCount();
-    if (proxyColumnCount == 0)
-        return true;
-
     QByteArray destinationArray;
+    if (proxyColumnCount == 0)
+        return destinationArray;
+
     // Save column names.
     for (int j = 0; j < proxyColumnCount; ++j)
     {
@@ -55,7 +55,7 @@ bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
         //        bar.updateProgress(i + 1);
     }
 
-    return ioDevice.write(destinationArray) != -1;
+    return destinationArray;
 }
 
 void ExportDsv::setDateFormat(Qt::DateFormat format) { qtDateFormat_ = format; }
@@ -63,6 +63,11 @@ void ExportDsv::setDateFormat(Qt::DateFormat format) { qtDateFormat_ = format; }
 void ExportDsv::setDateFormat(QString format) { dateFormat_ = format; }
 
 void ExportDsv::setNumbersLocale(QLocale locale) { locale_ = locale; }
+
+bool ExportDsv::writeContent(const QByteArray& content, QIODevice& ioDevice)
+{
+    return ioDevice.write(content) != -1;
+}
 
 QString doubleToStringUsingLocale(double value, int precision)
 {

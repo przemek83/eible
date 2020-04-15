@@ -22,13 +22,13 @@ public:
     ExportXlsx& operator=(ExportXlsx&& other) = delete;
     ExportXlsx(ExportXlsx&& other) = delete;
 
-    bool exportView(const QAbstractItemView& view,
-                    QIODevice& ioDevice) override;
+protected:
+    QByteArray generateContent(const QAbstractItemView& view) override;
+
+    bool writeContent(const QByteArray& content, QIODevice& ioDevice) override;
 
 private:
     const QByteArray& getCellTypeTag(QVariant& cell);
-
-    QByteArray gatherSheetContent(const QAbstractItemView& view);
 
     void addHeaders(QByteArray& rowsContent,
                     const QAbstractItemModel& proxyModel,

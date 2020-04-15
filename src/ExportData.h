@@ -21,8 +21,13 @@ public:
     ExportData& operator=(ExportData&& other) = delete;
     ExportData(ExportData&& other) = delete;
 
-    virtual bool exportView(const QAbstractItemView& view,
-                            QIODevice& ioDevice) = 0;
+    bool exportView(const QAbstractItemView& view, QIODevice& ioDevice);
+
+protected:
+    virtual QByteArray generateContent(const QAbstractItemView& view) = 0;
+
+    virtual bool writeContent(const QByteArray& content,
+                              QIODevice& ioDevice) = 0;
 };
 
 #endif  // EXPORTDATA_H

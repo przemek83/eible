@@ -23,13 +23,15 @@ public:
     ExportDsv& operator=(ExportDsv&& other) = delete;
     ExportDsv(ExportDsv&& other) = delete;
 
-    bool exportView(const QAbstractItemView& view,
-                    QIODevice& ioDevice) override;
-
     void setDateFormat(Qt::DateFormat format);
     void setDateFormat(QString format);
 
     void setNumbersLocale(QLocale locale);
+
+protected:
+    bool writeContent(const QByteArray& content, QIODevice& ioDevice) override;
+
+    QByteArray generateContent(const QAbstractItemView& view) override;
 
 private:
     void variantToString(const QVariant& variant, QByteArray& destinationArray,

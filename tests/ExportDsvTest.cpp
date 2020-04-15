@@ -252,7 +252,6 @@ void ExportDsvTest::testLocaleForNumbers()
 
     ExportDsv exportDsv('\t');
     QLocale locale(QLocale::Polish, QLocale::Poland);
-    locale.setNumberOptions(locale.numberOptions());
     exportDsv.setNumbersLocale(locale);
     exportDsv.exportView(view, exportedBuffer);
 
