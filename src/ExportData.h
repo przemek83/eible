@@ -1,5 +1,5 @@
-#ifndef EXPORT_H
-#define EXPORT_H
+#ifndef EXPORTDATA_H
+#define EXPORTDATA_H
 
 #include <QObject>
 
@@ -25,4 +25,4 @@ public:
                             QIODevice& ioDevice) = 0;
 };
 
-#endif  // EXPORT_H
+#endif  // EXPORTDATA_H
