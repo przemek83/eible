@@ -1,7 +1,7 @@
 #ifndef EXPORTXLSX_H
 #define EXPORTXLSX_H
 
-#include "Export.h"
+#include "ExportData.h"
 
 #include "eible_global.h"
 
@@ -9,7 +9,7 @@ class QAbstractItemModel;
 class QAbstractItemView;
 class QIODevice;
 
-class EIBLE_EXPORT ExportXlsx : public Export
+class EIBLE_EXPORT ExportXlsx : public ExportData
 {
     Q_OBJECT
 public:

@@ -4,7 +4,7 @@
 #include <QDate>
 #include <QVariant>
 
-ExportDsv::ExportDsv(char separator) : Export(), separator_(separator) {}
+ExportDsv::ExportDsv(char separator) : ExportData(), separator_(separator) {}
 
 bool ExportDsv::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {

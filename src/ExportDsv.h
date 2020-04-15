@@ -1,7 +1,7 @@
 #ifndef EXPORTDSV_H
 #define EXPORTDSV_H
 
-#include "Export.h"
+#include "ExportData.h"
 
 #include "eible_global.h"
 
@@ -10,7 +10,7 @@
 class QAbstractItemView;
 class QIODevice;
 
-class EIBLE_EXPORT ExportDsv : public Export
+class EIBLE_EXPORT ExportDsv : public ExportData
 {
     Q_OBJECT
 public:

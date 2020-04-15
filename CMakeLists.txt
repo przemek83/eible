@@ -46,8 +46,8 @@ add_library(${PROJECT_NAME} SHARED
   src/ExportXlsx.h
   src/ExportDsv.cpp
   src/ExportDsv.h
-  src/Export.cpp
-  src/Export.h
+  src/ExportData.cpp
+  src/ExportData.h
   qrc_resources.cpp
 )
 
@@ -61,7 +61,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER
     src/ExportXlsx.h
     src/EibleUtilities.h
     src/ExportDsv.h
-    src/Export.h)
+    src/ExportData.h)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 include(GNUInstallDirs)
 
