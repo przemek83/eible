@@ -7,7 +7,7 @@
 
 namespace EibleUtilities
 {
-QDate getStartOfExcelWorld();
+QDate EIBLE_EXPORT getStartOfExcelWorld();
 
 QStringList EIBLE_EXPORT generateExcelColumnNames(int columnsNumber);
 

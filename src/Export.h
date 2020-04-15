@@ -3,10 +3,12 @@
 
 #include <QObject>
 
+#include "eible_global.h"
+
 class QAbstractItemView;
 class QIODevice;
 
-class Export : public QObject
+class EIBLE_EXPORT Export : public QObject
 {
     Q_OBJECT
 public:
