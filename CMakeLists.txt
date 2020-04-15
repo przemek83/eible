@@ -59,7 +59,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1)
 set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER
     src/eible_global.h
     src/ExportXlsx.h
-    src/EibleUtilities.h)
+    src/EibleUtilities.h
+    src/ExportDsv.h
+    src/Export.h)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 include(GNUInstallDirs)
 
