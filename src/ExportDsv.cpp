@@ -6,56 +6,36 @@
 
 ExportDsv::ExportDsv(char separator) : ExportData(), separator_(separator) {}
 
-QByteArray ExportDsv::generateContent(const QAbstractItemView& view)
+QByteArray ExportDsv::getEmptyContent() { return QByteArray(); }
+
+QByteArray ExportDsv::generateHeaderContent(const QAbstractItemModel& model)
 {
-    const auto proxyModel = view.model();
-    Q_ASSERT(proxyModel != nullptr);
-
-    int proxyColumnCount = proxyModel->columnCount();
-    QByteArray destinationArray;
-    if (proxyColumnCount == 0)
-        return destinationArray;
-
-    // Save column names.
-    for (int j = 0; j < proxyColumnCount; ++j)
+    QByteArray headersContent;
+    for (int j = 0; j < model.columnCount(); ++j)
     {
-        destinationArray.append(
-            proxyModel->headerData(j, Qt::Horizontal).toString());
-        if (j != proxyColumnCount - 1)
-            destinationArray.append(separator_);
+        headersContent.append(model.headerData(j, Qt::Horizontal).toString());
+        if (j != model.columnCount() - 1)
+            headersContent.append(separator_);
+    }
+    return headersContent;
+}
+
+QByteArray ExportDsv::generateRowContent(const QAbstractItemModel& model,
+                                         int row,
+                                         [[maybe_unused]] int skippedRowsCount)
+{
+    QByteArray rowContent;
+    rowContent.append("\n");
+    for (int j = 0; j < model.columnCount(); ++j)
+    {
+        QVariant actualField = model.index(row, j).data();
+        if (!actualField.isNull())
+            variantToString(actualField, rowContent, separator_);
+        if (j != model.columnCount() - 1)
+            rowContent.append(separator_);
     }
 
-    //    const QString barTitle =
-    //        Constants::getProgressBarTitle(Constants::BarTitle::SAVING);
-    //    ProgressBarCounter bar(barTitle, proxyModel->rowCount(), nullptr);
-    //    bar.showDetached();
-
-    bool multiSelection =
-        (QAbstractItemView::MultiSelection == view.selectionMode());
-    QItemSelectionModel* selectionModel = view.selectionModel();
-
-    int proxyRowCount = proxyModel->rowCount();
-    for (int i = 0; i < proxyRowCount; ++i)
-    {
-        if (multiSelection &&
-            !selectionModel->isSelected(proxyModel->index(i, 0)))
-            continue;
-
-        destinationArray.append("\n");
-        for (int j = 0; j < proxyColumnCount; ++j)
-        {
-            QVariant actualField = proxyModel->index(i, j).data();
-
-            if (!actualField.isNull())
-                variantToString(actualField, destinationArray, separator_);
-
-            if (j != proxyColumnCount - 1)
-                destinationArray.append(separator_);
-        }
-        //        bar.updateProgress(i + 1);
-    }
-
-    return destinationArray;
+    return rowContent;
 }
 
 void ExportDsv::setDateFormat(Qt::DateFormat format) { qtDateFormat_ = format; }

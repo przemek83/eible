@@ -23,16 +23,19 @@ public:
     ExportXlsx(ExportXlsx&& other) = delete;
 
 protected:
-    QByteArray generateContent(const QAbstractItemView& view) override;
-
     bool writeContent(const QByteArray& content, QIODevice& ioDevice) override;
+
+    QByteArray getEmptyContent() override;
+
+    QByteArray generateHeaderContent(const QAbstractItemModel& model) override;
+
+    QByteArray generateRowContent(const QAbstractItemModel& model, int row,
+                                  int skippedRowsCount) override;
+
+    QByteArray getContentEnding() override;
 
 private:
     const QByteArray& getCellTypeTag(QVariant& cell);
-
-    void addHeaders(QByteArray& rowsContent,
-                    const QAbstractItemModel& proxyModel,
-                    const QStringList& columnNames) const;
 
 Q_SIGNALS:
     void updateProgress(int progress);

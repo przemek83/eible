@@ -9,73 +9,6 @@
 
 #include "EibleUtilities.h"
 
-QByteArray ExportXlsx::generateContent(const QAbstractItemView& view)
-{
-    const auto proxyModel = view.model();
-    Q_ASSERT(proxyModel != nullptr);
-
-    const int proxyColumnCount = proxyModel->columnCount();
-    if (proxyColumnCount == 0)
-        return QByteArrayLiteral("</sheetData>");
-
-    const QStringList columnNames =
-        EibleUtilities::generateExcelColumnNames(proxyColumnCount);
-
-    QByteArray rowsContent{QByteArrayLiteral("<sheetData>")};
-    addHeaders(rowsContent, *proxyModel, columnNames);
-
-    const bool multiSelection =
-        (QAbstractItemView::MultiSelection == view.selectionMode());
-    const QItemSelectionModel* selectionModel = view.selectionModel();
-
-    const int proxyRowCount = proxyModel->rowCount();
-    int skippedRows = 0;
-
-    // For each row.
-    for (int i = 0; i < proxyRowCount; ++i)
-    {
-        if (multiSelection &&
-            !selectionModel->isSelected(proxyModel->index(i, 0)))
-        {
-            skippedRows++;
-            continue;
-        }
-
-        // Create new row.
-        const QByteArray rowNumber{QByteArray::number(i - skippedRows + 2)};
-        rowsContent.append(QByteArrayLiteral("<row r=\""));
-        rowsContent.append(rowNumber);
-        rowsContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
-
-        // For each column.
-        for (int j = 0; j < proxyColumnCount; ++j)
-        {
-            QVariant cell = proxyModel->index(i, j).data();
-            if (cell.isNull())
-                continue;
-
-            // Create cell.
-            rowsContent.append(QByteArrayLiteral("<c r=\""));
-            rowsContent.append(columnNames.at(j));
-            rowsContent.append(rowNumber);
-            rowsContent.append(QByteArrayLiteral("\" "));
-            rowsContent.append(getCellTypeTag(cell));
-            rowsContent.append(QByteArrayLiteral("><v>"));
-            rowsContent.append(cell.toByteArray());
-            rowsContent.append(QByteArrayLiteral("</v></c>"));
-        }
-        rowsContent.append(QByteArrayLiteral("</row>"));
-
-        Q_EMIT updateProgress(i + 1);
-        QCoreApplication::processEvents();
-    }
-
-    // Close XML tag for data.
-    rowsContent.append(QByteArrayLiteral("</sheetData>"));
-
-    return rowsContent;
-}
-
 bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
 {
     QFile xlsxTemplate(QStringLiteral(":/") +
@@ -126,6 +59,71 @@ bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
     return true;
 }
 
+QByteArray ExportXlsx::getEmptyContent()
+{
+    return QByteArrayLiteral("</sheetData>");
+}
+
+QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
+{
+    const QStringList columnNames =
+        EibleUtilities::generateExcelColumnNames(model.columnCount());
+
+    QByteArray headersContent{QByteArrayLiteral("<sheetData>")};
+    headersContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
+    for (int j = 0; j < model.columnCount(); ++j)
+    {
+        QString header = model.headerData(j, Qt::Horizontal).toString();
+        QString clearedHeader(
+            header
+                .replace(QRegExp(QStringLiteral("[<>&\"']")),
+                         QStringLiteral(" "))
+                .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
+        headersContent.append("<c r=\"" + columnNames.at(j));
+        headersContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader +
+                              "</v></c>");
+    }
+    headersContent.append("</row>");
+    return headersContent;
+}
+
+QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
+                                          int row, int skippedRowsCount)
+{
+    const QStringList columnNames =
+        EibleUtilities::generateExcelColumnNames(model.columnCount());
+
+    QByteArray rowContent;
+    const QByteArray rowNumber{QByteArray::number(row - skippedRowsCount + 2)};
+    rowContent.append(QByteArrayLiteral("<row r=\""));
+    rowContent.append(rowNumber);
+    rowContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
+
+    // For each column.
+    for (int column = 0; column < model.columnCount(); ++column)
+    {
+        QVariant cell = model.index(row, column).data();
+        if (cell.isNull())
+            continue;
+
+        rowContent.append(QByteArrayLiteral("<c r=\""));
+        rowContent.append(columnNames.at(column));
+        rowContent.append(rowNumber);
+        rowContent.append(QByteArrayLiteral("\" "));
+        rowContent.append(getCellTypeTag(cell));
+        rowContent.append(QByteArrayLiteral("><v>"));
+        rowContent.append(cell.toByteArray());
+        rowContent.append(QByteArrayLiteral("</v></c>"));
+    }
+    rowContent.append(QByteArrayLiteral("</row>"));
+    return rowContent;
+}
+
+QByteArray ExportXlsx::getContentEnding()
+{
+    return QByteArrayLiteral("</sheetData>");
+}
+
 const QByteArray& ExportXlsx::getCellTypeTag(QVariant& cell)
 {
     switch (cell.type())
@@ -152,24 +150,4 @@ const QByteArray& ExportXlsx::getCellTypeTag(QVariant& cell)
             return stringTag;
         }
     }
-}
-
-void ExportXlsx::addHeaders(QByteArray& rowsContent,
-                            const QAbstractItemModel& proxyModel,
-                            const QStringList& columnNames) const
-{
-    rowsContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
-    for (int j = 0; j < proxyModel.columnCount(); ++j)
-    {
-        QString header = proxyModel.headerData(j, Qt::Horizontal).toString();
-        QString clearedHeader(
-            header
-                .replace(QRegExp(QStringLiteral("[<>&\"']")),
-                         QStringLiteral(" "))
-                .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
-        rowsContent.append("<c r=\"" + columnNames.at(j));
-        rowsContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader +
-                           "</v></c>");
-    }
-    rowsContent.append("</row>");
 }

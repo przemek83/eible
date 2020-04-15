@@ -6,6 +6,7 @@
 #include "eible_global.h"
 
 class QAbstractItemView;
+class QAbstractItemModel;
 class QIODevice;
 
 class EIBLE_EXPORT ExportData : public QObject
@@ -24,10 +25,23 @@ public:
     bool exportView(const QAbstractItemView& view, QIODevice& ioDevice);
 
 protected:
-    virtual QByteArray generateContent(const QAbstractItemView& view) = 0;
-
     virtual bool writeContent(const QByteArray& content,
                               QIODevice& ioDevice) = 0;
+
+    bool rowShouldBeSkipped(const QAbstractItemView& view, int row);
+
+    virtual QByteArray getEmptyContent() = 0;
+
+    virtual QByteArray generateHeaderContent(
+        const QAbstractItemModel& model) = 0;
+
+    virtual QByteArray generateRowContent(const QAbstractItemModel& model,
+                                          int row, int skippedRowsCount) = 0;
+
+    virtual QByteArray getContentEnding();
+
+Q_SIGNALS:
+    void updateProgress(int progress);
 };
 
 #endif  // EXPORTDATA_H

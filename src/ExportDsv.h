@@ -31,7 +31,12 @@ public:
 protected:
     bool writeContent(const QByteArray& content, QIODevice& ioDevice) override;
 
-    QByteArray generateContent(const QAbstractItemView& view) override;
+    QByteArray getEmptyContent() override;
+
+    QByteArray generateHeaderContent(const QAbstractItemModel& model) override;
+
+    QByteArray generateRowContent(const QAbstractItemModel& model, int row,
+                                  int skippedRowsCount) override;
 
 private:
     void variantToString(const QVariant& variant, QByteArray& destinationArray,
