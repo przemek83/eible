@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt5 COMPONENTS Widgets Core Test REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core Test Xml REQUIRED)
 add_definitions( ${QT_DEFINITIONS} )
 
 set(THIRD_PARTY_LIBS zlib quazip)
@@ -48,6 +48,10 @@ add_library(${PROJECT_NAME} SHARED
   src/ExportDsv.h
   src/ExportData.cpp
   src/ExportData.h
+  src/ImportSpreadsheet.cpp
+  src/ImportSpreadsheet.h
+  src/ImportXlsx.cpp
+  src/ImportXlsx.h
   qrc_resources.cpp
 )
 
@@ -65,7 +69,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 include(GNUInstallDirs)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Widgets Qt5::Xml)
 target_link_libraries(${PROJECT_NAME} PRIVATE optimized quazip5)
 target_link_libraries(${PROJECT_NAME} PRIVATE debug quazip5d)
 

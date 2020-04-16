@@ -99,7 +99,6 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
     rowContent.append(rowNumber);
     rowContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
 
-    // For each column.
     for (int column = 0; column < model.columnCount(); ++column)
     {
         QVariant cell = model.index(row, column).data();
