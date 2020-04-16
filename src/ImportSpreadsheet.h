@@ -3,9 +3,11 @@
 
 #include <QObject>
 
+#include "eible_global.h"
+
 class QIODevice;
 
-class ImportSpreadsheet : public QObject
+class EIBLE_EXPORT ImportSpreadsheet : public QObject
 {
     Q_OBJECT
 public:

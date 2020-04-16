@@ -3,7 +3,9 @@
 
 #include "ImportSpreadsheet.h"
 
-class ImportXlsx : public ImportSpreadsheet
+#include "eible_global.h"
+
+class EIBLE_EXPORT ImportXlsx : public ImportSpreadsheet
 {
 public:
     explicit ImportXlsx(QIODevice& ioDevice);

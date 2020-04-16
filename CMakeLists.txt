@@ -65,7 +65,9 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER
     src/ExportXlsx.h
     src/EibleUtilities.h
     src/ExportDsv.h
-    src/ExportData.h)
+    src/ExportData.h
+    src/ImportSpreadsheet.h
+    src/ImportXlsx.h)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 include(GNUInstallDirs)
 

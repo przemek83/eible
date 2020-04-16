@@ -87,7 +87,6 @@ std::pair<bool, QMap<QString, QString> > ImportXlsx::getSheetList()
         {
             setError(__FUNCTION__, "File is corrupted.");
             return {false, {}};
-            ;
         }
         zipFile.close();
 
