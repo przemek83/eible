@@ -10,6 +10,8 @@ set(${PROJECT_NAME}_SOURCES
     TestTableModel.h
     ExportDsvTest.cpp
     ExportDsvTest.h
+    ImportXlsxTest.cpp
+    ImportXlsxTest.h
     )
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})

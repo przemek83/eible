@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>template.xlsx</file>
+        <file>testXlsx.xlsx</file>
     </qresource>
 </RCC>

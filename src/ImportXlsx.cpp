@@ -12,6 +12,7 @@ ImportXlsx::ImportXlsx(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 std::pair<bool, QMap<QString, QString> > ImportXlsx::getSheetList()
 {
     QuaZip zip(&ioDevice_);
+    zip.open(QuaZip::mdUnzip);
     QMap<QString, QString> sheetIdToUserFriendlyNameMap;
     QMap<QString, QString> sheetToFileMapInZip;
 
