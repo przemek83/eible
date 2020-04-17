@@ -4,6 +4,8 @@
 #include <quazip5/quazipfile.h>
 #include <QIODevice>
 #include <QMap>
+#include <QSet>
+#include <QXmlStreamReader>
 
 #include <QtXml/QDomDocument>
 
@@ -215,4 +217,54 @@ std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
     }
 
     return {true, dateStyles, allStyles};
+}
+
+std::pair<bool, QSet<QString> > ImportXlsx::getSharedStrings()
+{
+    // Loading shared strings, it is separate file in archive with unique table
+    // of all strings, in spreadsheet there are calls to this table.
+
+    QSet<QString> sharedStrings;
+    QuaZip zip(&ioDevice_);
+
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return {false, {}};
+    }
+
+    if (zip.setCurrentFile(QStringLiteral("xl/sharedStrings.xml")))
+    {
+        // Set variable.
+        QuaZipFile zipFile(&zip);
+
+        // Opening file.
+        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            setError(__FUNCTION__,
+                     "Can not open file " + zipFile.getFileName() + ".");
+            return {false, {}};
+        }
+
+        QXmlStreamReader xmlStreamReader;
+        xmlStreamReader.setDevice(&zipFile);
+
+        while (!xmlStreamReader.atEnd())
+        {
+            xmlStreamReader.readNext();
+
+            // If 't' tag found add value to shared strings.
+            if (xmlStreamReader.name() == "t")
+                sharedStrings.insert(xmlStreamReader.readElementText());
+        }
+        zipFile.close();
+    }
+    else
+    {
+        setError(__FUNCTION__, "No file xl/sharedStrings.xml in archive.");
+        return {true, {}};
+    }
+
+    return {true, sharedStrings};
 }
