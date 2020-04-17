@@ -11,6 +11,8 @@ public:
     explicit ImportXlsx(QIODevice& ioDevice);
 
     std::pair<bool, QMap<QString, QString>> getSheetList() override;
+
+    std::tuple<bool, QList<int>, QList<int>> getStyles();
 };
 
 #endif  // IMPORTXLSX_H

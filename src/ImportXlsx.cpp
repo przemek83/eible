@@ -126,3 +126,93 @@ std::pair<bool, QMap<QString, QString> > ImportXlsx::getSheetList()
 
     return {true, sheetToFileMapInZip};
 }
+
+std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
+{
+    QList<int> dateStyles;
+    QList<int> allStyles;
+
+    const QList predefinedExcelStylesForDates{14, 15, 16, 17, 22};
+    // List of predefined excel styles for dates.
+    dateStyles.append(predefinedExcelStylesForDates);
+
+    QuaZip zip(&ioDevice_);
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return {false, {}, {}};
+    }
+
+    // Load styles.
+    if (zip.setCurrentFile(QStringLiteral("xl/styles.xml")))
+    {
+        // Open file in archive.
+        QuaZipFile zipFile(&zip);
+        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            setError(__FUNCTION__, "Can not open file.");
+            return {false, {}, {}};
+        }
+
+        // Create, set content and read DOM.
+        QDomDocument xmlDocument(__FUNCTION__);
+        if (!xmlDocument.setContent(zipFile.readAll()))
+        {
+            setError(__FUNCTION__, "Xml file is corrupted.");
+            return {false, {}, {}};
+        }
+        zipFile.close();
+
+        QDomElement root = xmlDocument.documentElement();
+        QDomNodeList sheetNodes =
+            root.firstChildElement(QStringLiteral("numFmts")).childNodes();
+
+        for (int i = 0; i < sheetNodes.size(); ++i)
+        {
+            QDomElement sheet = sheetNodes.at(i).toElement();
+
+            if (sheet.hasAttribute(QStringLiteral("numFmtId")) &&
+                sheet.hasAttribute(QStringLiteral("formatCode")))  //&&
+            // sheet.attribute("formatCode").contains("@"))
+            {
+                QString formatCode =
+                    sheet.attribute(QStringLiteral("formatCode"));
+                bool gotD = formatCode.contains(QStringLiteral("d"),
+                                                Qt::CaseInsensitive);
+                bool gotM = formatCode.contains(QStringLiteral("m"),
+                                                Qt::CaseInsensitive);
+                bool gotY = formatCode.contains(QStringLiteral("y"),
+                                                Qt::CaseInsensitive);
+
+                if ((gotD && gotY) || (gotD && gotM) || (gotM && gotY))
+                {
+                    dateStyles.push_back(
+                        sheet.attribute(QStringLiteral("numFmtId")).toInt());
+                }
+            }
+        }
+
+        sheetNodes =
+            root.firstChildElement(QStringLiteral("cellXfs")).childNodes();
+
+        for (int i = 0; i < sheetNodes.size(); ++i)
+        {
+            QDomElement sheet = sheetNodes.at(i).toElement();
+
+            if (!sheet.isNull() &&
+                sheet.hasAttribute(QStringLiteral("numFmtId")))
+            {
+                allStyles.push_back(
+                    sheet.attribute(QStringLiteral("numFmtId")).toInt());
+            }
+        }
+    }
+    else
+    {
+        setError(__FUNCTION__, "No file named xl/workbook.xml in archive.");
+        return {false, {}, {}};
+    }
+
+    return {true, dateStyles, allStyles};
+}
