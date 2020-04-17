@@ -2,6 +2,7 @@
 #define IMPORTXLSXTEST_H
 
 #include <QObject>
+#include <QSet>
 
 class ImportXlsxTest : public QObject
 {
@@ -13,8 +14,13 @@ private Q_SLOTS:
     void testGetStyles();
     void testGetStylesNoContent();
 
+    void testGetSharedStrings();
+    void testGetSharedStringsNoContent();
+
 private:
     static QMap<QString, QString> sheetNames_;
+
+    static QSet<QString> sharedStrings_;
 };
 
 #endif  // IMPORTXLSXTEST_H
