@@ -10,6 +10,9 @@ private Q_SLOTS:
     void testRetrievingSheetNames();
     void testRetrievingSheetNamesFromEmptyFile();
 
+    void testGetStyles();
+    void testGetStylesNoContent();
+
 private:
     static QMap<QString, QString> sheetNames_;
 };

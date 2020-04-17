@@ -32,3 +32,24 @@ void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
     QCOMPARE(success, false);
     QCOMPARE(actualNames, {});
 }
+
+void ImportXlsxTest::testGetStyles()
+{
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx ImportXlsx(xlsxTestFile);
+    auto [success, dateStyle, allStyles] = ImportXlsx.getStyles();
+    QCOMPARE(success, true);
+    QCOMPARE(dateStyle, QList({14, 15, 16, 17, 22, 167, 169, 170, 171}));
+    QCOMPARE(allStyles, QList({164, 165, 164, 166, 167, 168, 169, 164, 164, 170,
+                               171, 164}));
+}
+
+void ImportXlsxTest::testGetStylesNoContent()
+{
+    QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
+    ImportXlsx ImportXlsx(xlsxTestFile);
+    auto [success, dateStyle, allStyles] = ImportXlsx.getStyles();
+    QCOMPARE(success, true);
+    QCOMPARE(dateStyle, QList({14, 15, 16, 17, 22}));
+    QCOMPARE(allStyles, QList({0, 164, 10, 14, 4, 0, 0, 3}));
+}
