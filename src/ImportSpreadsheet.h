@@ -20,13 +20,15 @@ public:
 
     std::pair<QString, QString> getError() const;
 
+    void setNameForEmptyColumn(const QString& name);
+
 protected:
     void setError(QString functionName, QString errorContent);
 
     QIODevice& ioDevice_;
 
     /// If empty column is encountered insert defined string.
-    const QString emptyColName_;
+    QString emptyColName_;
 
 private:
     std::pair<QString, QString> error_;

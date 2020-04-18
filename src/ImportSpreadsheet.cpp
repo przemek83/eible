@@ -12,6 +12,11 @@ std::pair<QString, QString> ImportSpreadsheet::getError() const
     return error_;
 }
 
+void ImportSpreadsheet::setNameForEmptyColumn(const QString& name)
+{
+    emptyColName_ = name;
+}
+
 void ImportSpreadsheet::setError(QString functionName, QString errorContent)
 {
     error_ = {functionName, errorContent};

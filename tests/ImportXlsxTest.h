@@ -19,8 +19,11 @@ private Q_SLOTS:
 
     void testGetColumnList_data();
     void testGetColumnList();
+    void testSettingEmptyColumnName();
 
 private:
+    QHash<QString, int> createSharedStringsMap(
+        const QStringList& sharedStrings);
     static QMap<QString, QString> sheetNames_;
 
     static QStringList sharedStrings_;

@@ -101,8 +101,8 @@ QStringList ImportXlsxTest::testSheet7Columns_ = {"Pow", "Cena", "cena_m"};
 void ImportXlsxTest::testRetrievingSheetNames()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
-    ImportXlsx ImportXlsx(xlsxTestFile);
-    auto [success, actualNames] = ImportXlsx.getSheetList();
+    ImportXlsx importXlsx(xlsxTestFile);
+    auto [success, actualNames] = importXlsx.getSheetList();
     QCOMPARE(success, true);
     QCOMPARE(actualNames, sheetNames_);
 }
@@ -111,8 +111,8 @@ void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
 {
     QByteArray byteArray;
     QBuffer emptyBuffer(&byteArray);
-    ImportXlsx ImportXlsx(emptyBuffer);
-    auto [success, actualNames] = ImportXlsx.getSheetList();
+    ImportXlsx importXlsx(emptyBuffer);
+    auto [success, actualNames] = importXlsx.getSheetList();
     QCOMPARE(success, false);
     QCOMPARE(actualNames, {});
 }
@@ -120,8 +120,8 @@ void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
 void ImportXlsxTest::testGetStyles()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
-    ImportXlsx ImportXlsx(xlsxTestFile);
-    auto [success, dateStyle, allStyles] = ImportXlsx.getStyles();
+    ImportXlsx importXlsx(xlsxTestFile);
+    auto [success, dateStyle, allStyles] = importXlsx.getStyles();
     QCOMPARE(success, true);
     QCOMPARE(dateStyle, QList({14, 15, 16, 17, 22, 167, 169, 170, 171}));
     QCOMPARE(allStyles, QList({164, 165, 164, 166, 167, 168, 169, 164, 164, 170,
@@ -131,8 +131,8 @@ void ImportXlsxTest::testGetStyles()
 void ImportXlsxTest::testGetStylesNoContent()
 {
     QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
-    ImportXlsx ImportXlsx(xlsxTestFile);
-    auto [success, dateStyle, allStyles] = ImportXlsx.getStyles();
+    ImportXlsx importXlsx(xlsxTestFile);
+    auto [success, dateStyle, allStyles] = importXlsx.getStyles();
     QCOMPARE(success, true);
     QCOMPARE(dateStyle, QList({14, 15, 16, 17, 22}));
     QCOMPARE(allStyles, QList({0, 164, 10, 14, 4, 0, 0, 3}));
@@ -141,8 +141,8 @@ void ImportXlsxTest::testGetStylesNoContent()
 void ImportXlsxTest::testGetSharedStrings()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
-    ImportXlsx ImportXlsx(xlsxTestFile);
-    auto [success, actualSharedStrings] = ImportXlsx.getSharedStrings();
+    ImportXlsx importXlsx(xlsxTestFile);
+    auto [success, actualSharedStrings] = importXlsx.getSharedStrings();
     QCOMPARE(success, true);
     QCOMPARE(actualSharedStrings, sharedStrings_);
 }
@@ -150,8 +150,8 @@ void ImportXlsxTest::testGetSharedStrings()
 void ImportXlsxTest::testGetSharedStringsNoContent()
 {
     QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
-    ImportXlsx ImportXlsx(xlsxTestFile);
-    auto [success, actualSharedStrings] = ImportXlsx.getSharedStrings();
+    ImportXlsx importXlsx(xlsxTestFile);
+    auto [success, actualSharedStrings] = importXlsx.getSharedStrings();
     QCOMPARE(success, true);
     QCOMPARE(actualSharedStrings, {});
 }
@@ -181,13 +181,41 @@ void ImportXlsxTest::testGetColumnList()
     QFETCH(QString, sheetName);
     QFETCH(QStringList, expectedColumnList);
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
-    ImportXlsx ImportXlsx(xlsxTestFile);
-    QHash<QString, int> sharedStringsMap;
-    int currentSharedStringIndex{0};
-    for (const auto& sharedString : sharedStrings_)
-        sharedStringsMap[sharedString] = currentSharedStringIndex++;
+    ImportXlsx importXlsx(xlsxTestFile);
+    QHash<QString, int> sharedStringsMap =
+        createSharedStringsMap(sharedStrings_);
     auto [success, actualColumnList] =
-        ImportXlsx.getColumnList(sheetName, sharedStringsMap);
+        importXlsx.getColumnList(sheetName, sharedStringsMap);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, expectedColumnList);
+}
+
+void ImportXlsxTest::testSettingEmptyColumnName()
+{
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    const QString newEmptyColumnName{"<empty column>"};
+    importXlsx.setNameForEmptyColumn(newEmptyColumnName);
+    QHash<QString, int> sharedStringsMap =
+        createSharedStringsMap(sharedStrings_);
+    auto [success, actualColumnList] =
+        importXlsx.getColumnList(sheetNames_["Sheet5"], sharedStringsMap);
+
+    std::list<QString> expectedColumnList(testSheet5Columns_.size());
+    std::replace_copy(testSheet5Columns_.begin(), testSheet5Columns_.end(),
+                      expectedColumnList.begin(), QString("---"),
+                      newEmptyColumnName);
+
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, QStringList::fromStdList(expectedColumnList));
+}
+
+QHash<QString, int> ImportXlsxTest::createSharedStringsMap(
+    const QStringList& sharedStrings)
+{
+    QHash<QString, int> sharedStringsMap;
+    int currentSharedStringIndex{0};
+    for (const auto& sharedString : sharedStrings)
+        sharedStringsMap[sharedString] = currentSharedStringIndex++;
+    return sharedStringsMap;
 }
