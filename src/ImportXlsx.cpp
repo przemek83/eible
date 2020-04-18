@@ -131,7 +131,7 @@ std::pair<bool, QMap<QString, QString> > ImportXlsx::getSheetList()
 }
 
 std::pair<bool, QStringList> ImportXlsx::getColumnList(
-    const QString& sheetName, QHash<QString, int> sharedStrings)
+    const QString& sheetPath, const QHash<QString, int>& sharedStrings)
 {
     QuaZip zip(&ioDevice_);
 
@@ -148,7 +148,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(
     QStringList excelColNames =
         EibleUtilities::generateExcelColumnNames(columnsCount);
 
-    if (zip.setCurrentFile(sheetName))
+    if (zip.setCurrentFile(sheetPath))
     {
         QuaZipFile zipFile(&zip);
 
@@ -244,7 +244,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(
     else
     {
         setError(__FUNCTION__,
-                 "File named " + sheetName + " not found in archive.");
+                 "File named " + sheetPath + " not found in archive.");
         return {false, {}};
     }
 

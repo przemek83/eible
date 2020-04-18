@@ -16,7 +16,7 @@ public:
     virtual std::pair<bool, QMap<QString, QString>> getSheetList() = 0;
 
     virtual std::pair<bool, QStringList> getColumnList(
-        const QString& sheetName, QHash<QString, int> sharedStrings) = 0;
+        const QString& sheetPath, const QHash<QString, int>& sharedStrings) = 0;
 
     std::pair<QString, QString> getError() const;
 

@@ -158,7 +158,7 @@ void ImportXlsxTest::testGetSharedStringsNoContent()
 
 void ImportXlsxTest::testGetColumnList_data()
 {
-    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<QString>("sheetPath");
     QTest::addColumn<QStringList>("expectedColumnList");
     QTest::newRow("Columns in Sheet1")
         << sheetNames_["Sheet1"] << testSheet1Columns_;
@@ -178,14 +178,14 @@ void ImportXlsxTest::testGetColumnList_data()
 
 void ImportXlsxTest::testGetColumnList()
 {
-    QFETCH(QString, sheetName);
+    QFETCH(QString, sheetPath);
     QFETCH(QStringList, expectedColumnList);
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
     QHash<QString, int> sharedStringsMap =
         createSharedStringsMap(sharedStrings_);
     auto [success, actualColumnList] =
-        importXlsx.getColumnList(sheetName, sharedStringsMap);
+        importXlsx.getColumnList(sheetPath, sharedStringsMap);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, expectedColumnList);
 }

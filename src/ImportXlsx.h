@@ -13,7 +13,8 @@ public:
     std::pair<bool, QMap<QString, QString>> getSheetList() override;
 
     std::pair<bool, QStringList> getColumnList(
-        const QString& sheetName, QHash<QString, int> sharedStrings) override;
+        const QString& sheetPath,
+        const QHash<QString, int>& sharedStrings) override;
 
     std::tuple<bool, QList<int>, QList<int>> getStyles();
 
