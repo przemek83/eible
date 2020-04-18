@@ -85,6 +85,19 @@ QStringList ImportXlsxTest::sharedStrings_{"Text",
                                            "Q75",
                                            "Q90"};
 
+QStringList ImportXlsxTest::testSheet1Columns_ = {"Text", "Numeric", "Date"};
+QStringList ImportXlsxTest::testSheet2Columns_ = {
+    "Trait #1", "Value #1",       "Transaction date", "Units",
+    "Price",    "Price per unit", "Another trait"};
+QStringList ImportXlsxTest::testSheet3Columns_ = {};
+QStringList ImportXlsxTest::testSheet4Columns_ = {
+    "cena nier", "pow", "cena metra", "data transakcji", "text"};
+QStringList ImportXlsxTest::testSheet5Columns_ = {
+    "name", "date", "mass (kg)", "height", "---", "---",
+    "---",  "---",  "---",       "---",    "---", "---"};
+QStringList ImportXlsxTest::testSheet6Columns_ = {"modificator", "x", "y"};
+QStringList ImportXlsxTest::testSheet7Columns_ = {"Pow", "Cena", "cena_m"};
+
 void ImportXlsxTest::testRetrievingSheetNames()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
@@ -141,4 +154,40 @@ void ImportXlsxTest::testGetSharedStringsNoContent()
     auto [success, actualSharedStrings] = ImportXlsx.getSharedStrings();
     QCOMPARE(success, true);
     QCOMPARE(actualSharedStrings, {});
+}
+
+void ImportXlsxTest::testGetColumnList_data()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<QStringList>("expectedColumnList");
+    QTest::newRow("Columns in Sheet1")
+        << sheetNames_["Sheet1"] << testSheet1Columns_;
+    QTest::newRow("Columns in Sheet2")
+        << sheetNames_["Sheet2"] << testSheet2Columns_;
+    QTest::newRow("Columns in Sheet3(empty)")
+        << sheetNames_["Sheet3(empty)"] << testSheet3Columns_;
+    QTest::newRow("Columns in Sheet4")
+        << sheetNames_["Sheet4"] << testSheet4Columns_;
+    QTest::newRow("Columns in Sheet5")
+        << sheetNames_["Sheet5"] << testSheet5Columns_;
+    QTest::newRow("Columns in Sheet6")
+        << sheetNames_["Sheet6"] << testSheet6Columns_;
+    QTest::newRow("Columns in Sheet7")
+        << sheetNames_["Sheet7"] << testSheet7Columns_;
+}
+
+void ImportXlsxTest::testGetColumnList()
+{
+    QFETCH(QString, sheetName);
+    QFETCH(QStringList, expectedColumnList);
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx ImportXlsx(xlsxTestFile);
+    QHash<QString, int> sharedStringsMap;
+    int currentSharedStringIndex{0};
+    for (const auto& sharedString : sharedStrings_)
+        sharedStringsMap[sharedString] = currentSharedStringIndex++;
+    auto [success, actualColumnList] =
+        ImportXlsx.getColumnList(sheetName, sharedStringsMap);
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, expectedColumnList);
 }

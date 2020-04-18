@@ -3,7 +3,7 @@
 #include <QIODevice>
 
 ImportSpreadsheet::ImportSpreadsheet(QIODevice& ioDevice)
-    : ioDevice_(ioDevice), emptyColName_(QObject::tr("no name"))
+    : ioDevice_(ioDevice), emptyColName_("---")
 {
 }
 
