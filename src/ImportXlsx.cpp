@@ -219,12 +219,12 @@ std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
     return {true, dateStyles, allStyles};
 }
 
-std::pair<bool, QSet<QString> > ImportXlsx::getSharedStrings()
+std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 {
     // Loading shared strings, it is separate file in archive with unique table
     // of all strings, in spreadsheet there are calls to this table.
 
-    QSet<QString> sharedStrings;
+    QStringList sharedStrings;
     QuaZip zip(&ioDevice_);
 
     if (!zip.open(QuaZip::mdUnzip))
@@ -256,7 +256,7 @@ std::pair<bool, QSet<QString> > ImportXlsx::getSharedStrings()
 
             // If 't' tag found add value to shared strings.
             if (xmlStreamReader.name() == "t")
-                sharedStrings.insert(xmlStreamReader.readElementText());
+                sharedStrings.append(xmlStreamReader.readElementText());
         }
         zipFile.close();
     }

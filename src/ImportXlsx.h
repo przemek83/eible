@@ -14,7 +14,7 @@ public:
 
     std::tuple<bool, QList<int>, QList<int>> getStyles();
 
-    std::pair<bool, QSet<QString>> getSharedStrings();
+    std::pair<bool, QStringList> getSharedStrings();
 };
 
 #endif  // IMPORTXLSX_H

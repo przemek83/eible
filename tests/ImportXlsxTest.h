@@ -20,7 +20,7 @@ private Q_SLOTS:
 private:
     static QMap<QString, QString> sheetNames_;
 
-    static QSet<QString> sharedStrings_;
+    static QStringList sharedStrings_;
 };
 
 #endif  // IMPORTXLSXTEST_H
