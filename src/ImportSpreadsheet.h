@@ -15,12 +15,18 @@ public:
 
     virtual std::pair<bool, QMap<QString, QString>> getSheetList() = 0;
 
+    virtual std::pair<bool, QStringList> getColumnList(
+        const QString& sheetName, QHash<QString, int> sharedStrings) = 0;
+
     std::pair<QString, QString> getError() const;
 
 protected:
     void setError(QString functionName, QString errorContent);
 
     QIODevice& ioDevice_;
+
+    /// If empty column is encountered insert defined string.
+    const QString emptyColName_;
 
 private:
     std::pair<QString, QString> error_;

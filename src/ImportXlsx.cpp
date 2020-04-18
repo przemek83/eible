@@ -6,8 +6,9 @@
 #include <QMap>
 #include <QSet>
 #include <QXmlStreamReader>
-
 #include <QtXml/QDomDocument>
+
+#include "EibleUtilities.h"
 
 ImportXlsx::ImportXlsx(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
@@ -127,6 +128,127 @@ std::pair<bool, QMap<QString, QString> > ImportXlsx::getSheetList()
     }
 
     return {true, sheetToFileMapInZip};
+}
+
+std::pair<bool, QStringList> ImportXlsx::getColumnList(
+    const QString& sheetName, QHash<QString, int> sharedStrings)
+{
+    QuaZip zip(&ioDevice_);
+
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return {false, {}};
+    }
+
+    QStringList columnList;
+    // Loading column names is using Excel names names. Set 600 temporary.
+    const int columnsCount = EibleUtilities::getMaxExcelColumns();
+    QStringList excelColNames =
+        EibleUtilities::generateExcelColumnNames(columnsCount);
+
+    if (zip.setCurrentFile(sheetName))
+    {
+        QuaZipFile zipFile(&zip);
+
+        // Opening file.
+        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            setError(__FUNCTION__,
+                     "Can not open file " + zipFile.getFileName() + ".");
+            return {false, {}};
+        }
+
+        QXmlStreamReader xmlStreamReader;
+        xmlStreamReader.setDevice(&zipFile);
+
+        // Variable with actual type of data in cell (s, str, null).
+        QString currentColType = QStringLiteral("s");
+
+        // Go to first row.
+        while (!xmlStreamReader.atEnd() &&
+               xmlStreamReader.name() != "sheetData")
+        {
+            xmlStreamReader.readNext();
+        }
+
+        xmlStreamReader.readNext();
+        xmlStreamReader.readNext();
+
+        // Actual column number.
+        int columnIndex = -1;
+        QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
+
+        const QRegExp regExp(QLatin1String("[0-9]"));
+
+        // Parse first row.
+        while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != "row")
+        {
+            // If we encounter start of cell content we add it to list.
+            if (xmlStreamReader.name().toString() == QLatin1String("c") &&
+                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+            {
+                columnIndex++;
+                QString rowNumber(xmlStreamReader.attributes()
+                                      .value(QLatin1String("r"))
+                                      .toString());
+
+                // If cells are missing add default name.
+                while (excelColNames.indexOf(rowNumber.remove(regExp)) >
+                       columnIndex)
+                {
+                    columnList << emptyColName_;
+                    columnIndex++;
+                }
+                // Remember column type.
+                currentColType = xmlStreamReader.attributes()
+                                     .value(QLatin1String("t"))
+                                     .toString();
+            }
+
+            // If we encounter start of cell content than add it to list.
+            if (!xmlStreamReader.atEnd() &&
+                xmlStreamReader.name().toString() == QLatin1String("v") &&
+                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+            {
+                if (currentColType == QLatin1String("s"))
+                {
+                    int value = xmlStreamReader.readElementText().toInt();
+                    columnList.push_back(sharedStrings.key(value));
+                }
+                else
+                {
+                    if (currentColType == QLatin1String("str"))
+                    {
+                        columnList.push_back(xmlStreamReader.readElementText());
+                    }
+                    else
+                    {
+                        columnList.push_back(xmlStreamReader.readElementText());
+                    }
+                }
+            }
+
+            // If we encounter empty cell than add it to list.
+            if (xmlStreamReader.name().toString() == QLatin1String("c") &&
+                xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
+                lastToken == QXmlStreamReader::StartElement)
+            {
+                columnList << emptyColName_;
+            }
+            lastToken = xmlStreamReader.tokenType();
+            xmlStreamReader.readNext();
+        }
+    }
+    else
+    {
+        setError(__FUNCTION__,
+                 "File named " + sheetName + " not found in archive.");
+        return {false, {}};
+    }
+
+    return {true, columnList};
 }
 
 std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
