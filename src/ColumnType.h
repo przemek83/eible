@@ -11,4 +11,6 @@ enum class EIBLE_EXPORT ColumnType : char
     DATE
 };
 
+Q_DECLARE_METATYPE(ColumnType)
+
 #endif  // COLUMNTYPE_H

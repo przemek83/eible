@@ -21,6 +21,7 @@ private Q_SLOTS:
     void testGetColumnList();
     void testSettingEmptyColumnName();
 
+    void testGetColumnTypes_data();
     void testGetColumnTypes();
 
 private:
@@ -29,6 +30,9 @@ private:
     static QMap<QString, QString> sheetNames_;
 
     static QStringList sharedStrings_;
+
+    static QList<int> dateStyle_;
+    static QList<int> allStyles_;
 
     static QStringList testSheet1Columns_;
     static QStringList testSheet2Columns_;
