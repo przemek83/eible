@@ -19,6 +19,8 @@ public:
     std::tuple<bool, QList<int>, QList<int>> getStyles();
 
     std::pair<bool, QStringList> getSharedStrings();
+
+    std::pair<bool, QVector<DataFormat>> getColumnDataFormats() override;
 };
 
 #endif  // IMPORTXLSX_H

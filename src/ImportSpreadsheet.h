@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+#include "DataFormat.h"
 #include "eible_global.h"
 
 class QIODevice;
@@ -17,6 +18,8 @@ public:
 
     virtual std::pair<bool, QStringList> getColumnList(
         const QString& sheetPath, const QHash<QString, int>& sharedStrings) = 0;
+
+    virtual std::pair<bool, QVector<DataFormat>> getColumnDataFormats() = 0;
 
     std::pair<QString, QString> getError() const;
 
