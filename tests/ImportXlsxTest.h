@@ -21,6 +21,8 @@ private Q_SLOTS:
     void testGetColumnList();
     void testSettingEmptyColumnName();
 
+    void testGetColumnTypes();
+
 private:
     QHash<QString, int> createSharedStringsMap(
         const QStringList& sharedStrings);

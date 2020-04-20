@@ -18,9 +18,7 @@ QStringList ImportXlsxTest::sharedStrings_{"Text",
                                            "Numeric",
                                            "Date",
                                            "Item 0, 0",
-                                           "2020-01-03",
                                            "Other item",
-                                           "2020-01-04",
                                            "Trait #1",
                                            "Value #1",
                                            "Transaction date",
@@ -123,9 +121,9 @@ void ImportXlsxTest::testGetStyles()
     ImportXlsx importXlsx(xlsxTestFile);
     auto [success, dateStyle, allStyles] = importXlsx.getStyles();
     QCOMPARE(success, true);
-    QCOMPARE(dateStyle, QList({14, 15, 16, 17, 22, 167, 169, 170, 171}));
-    QCOMPARE(allStyles, QList({164, 165, 164, 166, 167, 168, 169, 164, 164, 170,
-                               171, 164}));
+    QCOMPARE(dateStyle, QList({14, 15, 16, 17, 22, 165, 167, 170, 171, 172}));
+    QCOMPARE(allStyles, QList({164, 164, 165, 167, 168, 164, 169, 170, 166, 164,
+                               164, 171, 172}));
 }
 
 void ImportXlsxTest::testGetStylesNoContent()
@@ -208,6 +206,23 @@ void ImportXlsxTest::testSettingEmptyColumnName()
 
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, QStringList::fromStdList(expectedColumnList));
+}
+
+void ImportXlsxTest::testGetColumnTypes()
+{
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    QHash<QString, int> sharedStringsMap =
+        createSharedStringsMap(sharedStrings_);
+    QList<int> dateStyle{14, 15, 16, 17, 22, 165, 167, 170, 171, 172};
+    QList<int> allStyles{164, 164, 165, 167, 168, 164, 169,
+                         170, 166, 164, 164, 171, 172};
+
+    auto [success, columnTypes] = importXlsx.getColumnTypes(
+        sheetNames_["Sheet1"], 3, sharedStringsMap, dateStyle, allStyles);
+    QCOMPARE(success, true);
+    QCOMPARE(columnTypes, QVector({ColumnType::STRING, ColumnType::NUMBER,
+                                   ColumnType::DATE}));
 }
 
 QHash<QString, int> ImportXlsxTest::createSharedStringsMap(
