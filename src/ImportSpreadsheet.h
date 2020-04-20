@@ -19,7 +19,10 @@ public:
     virtual std::pair<bool, QStringList> getColumnList(
         const QString& sheetPath, const QHash<QString, int>& sharedStrings) = 0;
 
-    virtual std::pair<bool, QVector<ColumnType>> getColumnTypes() = 0;
+    virtual std::pair<bool, QVector<ColumnType>> getColumnTypes(
+        const QString& sheetPath, int columnsCount,
+        const QHash<QString, int>& sharedStrings, const QList<int>& dateStyles,
+        const QList<int>& allStyles) = 0;
 
     std::pair<QString, QString> getError() const;
 
