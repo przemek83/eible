@@ -391,7 +391,7 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
     return {true, sharedStrings};
 }
 
-std::pair<bool, QVector<DataFormat> > ImportXlsx::getColumnDataFormats()
+std::pair<bool, QVector<ColumnType> > ImportXlsx::getColumnTypes()
 {
     return {false, {}};
 }

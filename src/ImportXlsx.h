@@ -20,7 +20,7 @@ public:
 
     std::pair<bool, QStringList> getSharedStrings();
 
-    std::pair<bool, QVector<DataFormat>> getColumnDataFormats() override;
+    std::pair<bool, QVector<ColumnType>> getColumnTypes() override;
 };
 
 #endif  // IMPORTXLSX_H
