@@ -14,15 +14,13 @@ class EIBLE_EXPORT ImportSpreadsheet : public QObject
 public:
     explicit ImportSpreadsheet(QIODevice& ioDevice);
 
-    virtual std::pair<bool, QMap<QString, QString>> getSheetList() = 0;
+    virtual std::pair<bool, QStringList> getSheetList() = 0;
 
     virtual std::pair<bool, QStringList> getColumnList(
-        const QString& sheetPath, const QHash<QString, int>& sharedStrings) = 0;
+        const QString& sheetName) = 0;
 
     virtual std::pair<bool, QVector<ColumnType>> getColumnTypes(
-        const QString& sheetPath, int columnsCount,
-        const QHash<QString, int>& sharedStrings, const QList<int>& dateStyles,
-        const QList<int>& allStyles) = 0;
+        const QString& sheetName, int columnsCount) = 0;
 
     std::pair<QString, QString> getError() const;
 

@@ -11,8 +11,11 @@ private Q_SLOTS:
     void testRetrievingSheetNames();
     void testRetrievingSheetNamesFromEmptyFile();
 
-    void testGetStyles();
-    void testGetStylesNoContent();
+    void testGetDateStyles();
+    void testGetDateStylesNoContent();
+
+    void testGetAllStyles();
+    void testGetAllStylesNoContent();
 
     void testGetSharedStrings();
     void testGetSharedStringsNoContent();
@@ -25,13 +28,11 @@ private Q_SLOTS:
     void testGetColumnTypes();
 
 private:
-    QHash<QString, int> createSharedStringsMap(
-        const QStringList& sharedStrings);
-    static QMap<QString, QString> sheetNames_;
+    static QMap<QString, QString> sheetMap_;
 
     static QStringList sharedStrings_;
 
-    static QList<int> dateStyle_;
+    static QList<int> dateStyles_;
     static QList<int> allStyles_;
 
     static QStringList testSheet1Columns_;

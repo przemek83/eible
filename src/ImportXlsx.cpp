@@ -14,8 +14,16 @@
 
 ImportXlsx::ImportXlsx(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
-std::pair<bool, QMap<QString, QString> > ImportXlsx::getSheetList()
+std::pair<bool, QStringList> ImportXlsx::getSheetList()
 {
+    if (sheetMap_)
+    {
+        QStringList sheets;
+        for (const auto& [sheetName, sheetPath] : sheetMap_->toStdMap())
+            sheets << sheetName;
+        return {true, sheets};
+    }
+
     QuaZip zip(&ioDevice_);
 
     if (!zip.open(QuaZip::mdUnzip))
@@ -129,12 +137,39 @@ std::pair<bool, QMap<QString, QString> > ImportXlsx::getSheetList()
         return {false, {}};
     }
 
-    return {true, sheetToFileMapInZip};
+    sheetMap_ = std::move(sheetToFileMapInZip);
+
+    QStringList sheets;
+    for (const auto& [sheetName, sheetPath] : sheetMap_->toStdMap())
+        sheets << sheetName;
+    return {true, sheets};
+
+    //    return {true, sheetToFileMapInZip};
 }
 
-std::pair<bool, QStringList> ImportXlsx::getColumnList(
-    const QString& sheetPath, const QHash<QString, int>& sharedStrings)
+std::pair<bool, QMap<QString, QString>> ImportXlsx::getSheetMap()
 {
+    if (!sheetMap_ && !getSheetList().first)
+        return {false, {}};
+    return {true, *sheetMap_};
+}
+
+void ImportXlsx::setSheetMap(QMap<QString, QString> sheetMap)
+{
+    sheetMap_ = std::move(sheetMap);
+}
+
+std::pair<bool, QStringList> ImportXlsx::getColumnList(const QString& sheetName)
+{
+    if (columnList_)
+        return {true, *columnList_};
+
+    if (!sheetMap_ && !getSheetList().first)
+        return {false, {}};
+
+    if (!sharedStrings_ && !getSharedStrings().first)
+        return {false, {}};
+
     QuaZip zip(&ioDevice_);
 
     if (!zip.open(QuaZip::mdUnzip))
@@ -150,7 +185,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(
     const QStringList excelColNames =
         EibleUtilities::generateExcelColumnNames(columnsCount);
 
-    if (zip.setCurrentFile(sheetPath))
+    if (zip.setCurrentFile((*sheetMap_)[sheetName]))
     {
         QuaZipFile zipFile(&zip);
 
@@ -171,9 +206,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(
         // Go to first row.
         while (!xmlStreamReader.atEnd() &&
                xmlStreamReader.name() != "sheetData")
-        {
             xmlStreamReader.readNext();
-        }
 
         xmlStreamReader.readNext();
         xmlStreamReader.readNext();
@@ -217,18 +250,14 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(
                 if (currentColType == QLatin1String("s"))
                 {
                     int value = xmlStreamReader.readElementText().toInt();
-                    columnList.push_back(sharedStrings.key(value));
+                    columnList.push_back((*sharedStrings_)[value]);
                 }
                 else
                 {
                     if (currentColType == QLatin1String("str"))
-                    {
                         columnList.push_back(xmlStreamReader.readElementText());
-                    }
                     else
-                    {
                         columnList.push_back(xmlStreamReader.readElementText());
-                    }
                 }
             }
 
@@ -236,9 +265,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(
             if (xmlStreamReader.name().toString() == QLatin1String("c") &&
                 xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
                 lastToken == QXmlStreamReader::StartElement)
-            {
                 columnList << emptyColName_;
-            }
             lastToken = xmlStreamReader.tokenType();
             xmlStreamReader.readNext();
         }
@@ -246,14 +273,17 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(
     else
     {
         setError(__FUNCTION__,
-                 "File named " + sheetPath + " not found in archive.");
+                 "File named " + sheetName + " not found in archive.");
         return {false, {}};
     }
 
-    return {true, columnList};
+    columnList_ = std::move(columnList);
+
+    return {true, *columnList_};
 }
 
-std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
+std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
+ImportXlsx::getStyles()
 {
     QList<int> dateStyles;
     QList<int> allStyles;
@@ -267,7 +297,7 @@ std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
     {
         setError(__FUNCTION__,
                  "Can not open zip file " + zip.getZipName() + ".");
-        return {false, {}, {}};
+        return {false, std::nullopt, std::nullopt};
     }
 
     // Load styles.
@@ -278,7 +308,7 @@ std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
         if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             setError(__FUNCTION__, "Can not open file.");
-            return {false, {}, {}};
+            return {false, std::nullopt, std::nullopt};
         }
 
         // Create, set content and read DOM.
@@ -286,7 +316,7 @@ std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
         if (!xmlDocument.setContent(zipFile.readAll()))
         {
             setError(__FUNCTION__, "Xml file is corrupted.");
-            return {false, {}, {}};
+            return {false, std::nullopt, std::nullopt};
         }
         zipFile.close();
 
@@ -337,7 +367,7 @@ std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
     else
     {
         setError(__FUNCTION__, "No file named xl/workbook.xml in archive.");
-        return {false, {}, {}};
+        return {false, std::nullopt, std::nullopt};
     }
 
     return {true, dateStyles, allStyles};
@@ -345,10 +375,12 @@ std::tuple<bool, QList<int>, QList<int> > ImportXlsx::getStyles()
 
 std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 {
-    // Loading shared strings, it is separate file in archive with unique table
-    // of all strings, in spreadsheet there are calls to this table.
+    if (sharedStrings_)
+        return {true, *sharedStrings_};
 
-    QStringList sharedStrings;
+    // Loading shared strings, it is separate file in archive with unique
+    // table of all strings, in spreadsheet there are calls to this table.
+
     QuaZip zip(&ioDevice_);
 
     if (!zip.open(QuaZip::mdUnzip))
@@ -357,6 +389,8 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
                  "Can not open zip file " + zip.getZipName() + ".");
         return {false, {}};
     }
+
+    QStringList sharedStrings;
 
     if (zip.setCurrentFile(QStringLiteral("xl/sharedStrings.xml")))
     {
@@ -390,14 +424,22 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
         return {true, {}};
     }
 
-    return {true, sharedStrings};
+    sharedStrings_ = std::move(sharedStrings);
+    return {true, *sharedStrings_};
 }
 
-std::pair<bool, QVector<ColumnType> > ImportXlsx::getColumnTypes(
-    const QString& sheetPath, int columnsCount,
-    const QHash<QString, int>& sharedStrings, const QList<int>& dateStyles,
-    const QList<int>& allStyles)
+std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
+    const QString& sheetName, int columnsCount)
 {
+    if (!sheetMap_ && !getSheetList().first)
+        return {false, {}};
+
+    if (!sharedStrings_ && !getSharedStrings().first)
+        return {false, {}};
+
+    if (!getDateStyles().first && !getAllStyles().first)
+        return {false, {}};
+
     // const int columnsCount = EibleUtilities::getMaxExcelColumns();
     const QStringList excelColNames =
         EibleUtilities::generateExcelColumnNames(columnsCount);
@@ -428,7 +470,8 @@ std::pair<bool, QVector<ColumnType> > ImportXlsx::getColumnTypes(
     QuaZipFile zipFile;
     QXmlStreamReader xmlStreamReader;
 
-    if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
+    if (!openZipAndMoveToSecondRow(zip, (*sheetMap_)[sheetName], zipFile,
+                                   xmlStreamReader))
         return {false, {}};
 
     QVector<ColumnType> columnTypes;
@@ -518,9 +561,8 @@ std::pair<bool, QVector<ColumnType> > ImportXlsx::getColumnTypes(
                         if (0 == xmlStreamReader.name().compare(vTag) &&
                             xmlStreamReader.tokenType() ==
                                 QXmlStreamReader::StartElement &&
-                            sharedStrings
-                                .key(xmlStreamReader.readElementText().toInt() +
-                                     1)
+                            (*sharedStrings_)[xmlStreamReader.readElementText()
+                                                  .toInt()]
                                 .isEmpty())
                         {
                         }
@@ -539,7 +581,8 @@ std::pair<bool, QVector<ColumnType> > ImportXlsx::getColumnTypes(
                     QString otherValue =
                         xmlStreamAtrributes.value(sTag).toString();
                     if (!otherValue.isEmpty() &&
-                        dateStyles.contains(allStyles.at(otherValue.toInt())))
+                        dateStyles_->contains(
+                            allStyles_->at(otherValue.toInt())))
                         columnTypes[column] = ColumnType::DATE;
                     else
                         columnTypes[column] = ColumnType::NUMBER;
@@ -562,11 +605,9 @@ std::pair<bool, QVector<ColumnType> > ImportXlsx::getColumnTypes(
                             if (0 == xmlStreamReader.name().compare(vTag) &&
                                 xmlStreamReader.tokenType() ==
                                     QXmlStreamReader::StartElement &&
-                                sharedStrings
-                                    .key(xmlStreamReader.readElementText()
-                                             .toInt() +
-                                         1)
-                                    .isEmpty())
+                                (*sharedStrings_)
+                                    [xmlStreamReader.readElementText().toInt()]
+                                        .isEmpty())
                             {
                             }
                             else
@@ -585,8 +626,8 @@ std::pair<bool, QVector<ColumnType> > ImportXlsx::getColumnTypes(
                             xmlStreamAtrributes.value(sTag).toString();
 
                         if (!othervalue.isEmpty() &&
-                            dateStyles.contains(
-                                allStyles.at(othervalue.toInt())))
+                            dateStyles_->contains(
+                                allStyles_->at(othervalue.toInt())))
                         {
                             if (columnTypes.at(column) != ColumnType::DATE)
                                 columnTypes[column] = ColumnType::STRING;
@@ -656,4 +697,42 @@ bool ImportXlsx::openZipAndMoveToSecondRow(QuaZip& zip,
     }
 
     return true;
+}
+
+std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
+{
+    if (allStyles_)
+        return {true, *allStyles_};
+    bool success{false};
+    std::tie(success, dateStyles_, allStyles_) = getStyles();
+    return {success, *allStyles_};
+}
+
+void ImportXlsx::setAllStyles(QList<int> allStyles)
+{
+    allStyles_ = std::move(allStyles);
+}
+
+std::pair<bool, QList<int>> ImportXlsx::getDateStyles()
+{
+    if (dateStyles_)
+        return {true, *dateStyles_};
+    bool success{false};
+    std::tie(success, dateStyles_, allStyles_) = getStyles();
+    return {success, *dateStyles_};
+}
+
+void ImportXlsx::setDateStyles(QList<int> dateStyles)
+{
+    dateStyles_ = std::move(dateStyles);
+}
+
+void ImportXlsx::setSharedStrings(QStringList sharedStrings)
+{
+    sharedStrings_ = std::move(sharedStrings);
+}
+
+void ImportXlsx::setColumnList(QStringList columnList)
+{
+    columnList_ = std::move(columnList);
 }
