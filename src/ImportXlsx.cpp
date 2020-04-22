@@ -449,7 +449,7 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 }
 
 std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
-    const QString& sheetName, int columnsCount)
+    const QString& sheetName)
 {
     if (!sheets_ && !getSheetNames().first)
         return {false, {}};
@@ -461,8 +461,6 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
         return {false, {}};
 
     // const int columnsCount = EibleUtilities::getMaxExcelColumns();
-    const QStringList excelColNames =
-        EibleUtilities::generateExcelColumnNames(columnsCount);
 
     //    excelColNames_ =
     //    EibleUtilities::generateExcelColumnNames(columnsCount_);
@@ -499,8 +497,8 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
 
     QVector<ColumnType> columnTypes;
 
-    for (int i = 0; i < columnsCount; ++i)
-        columnTypes.push_back(ColumnType::UNKNOWN);
+    const QStringList excelColNames = EibleUtilities::generateExcelColumnNames(
+        EibleUtilities::getMaxExcelColumns());
 
     // Current column.
     int column = NOT_SET_COLUMN;
@@ -568,6 +566,10 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
                 xmlStreamReader.skipCurrentElement();
                 continue;
             }
+
+            if (column >= columnTypes.size())
+                for (int i = columnTypes.size(); i <= column; ++i)
+                    columnTypes.push_back(ColumnType::UNKNOWN);
 
             // If data format in column is unknown than read it.
             if (columnTypes.at(column) == ColumnType::UNKNOWN)
@@ -668,7 +670,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
         xmlStreamReader.readNextStartElement();
     }
 
-    for (int i = 0; i < columnsCount; ++i)
+    for (int i = 0; i < columnTypes.size(); ++i)
     {
         if (ColumnType::UNKNOWN == columnTypes.at(i))
             columnTypes[i] = ColumnType::STRING;
@@ -734,6 +736,12 @@ std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
 void ImportXlsx::setAllStyles(QList<int> allStyles)
 {
     allStyles_ = std::move(allStyles);
+}
+
+std::pair<bool, uint32_t> ImportXlsx::getColumnCount(const QString& name)
+{
+    auto [success, columnTypes] = getColumnTypes(name);
+    return {success, columnTypes.size()};
 }
 
 std::pair<bool, QList<int>> ImportXlsx::getDateStyles()

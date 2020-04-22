@@ -20,11 +20,13 @@ public:
         const QString& sheetName) = 0;
 
     virtual std::pair<bool, QVector<ColumnType>> getColumnTypes(
-        const QString& sheetName, int columnsCount) = 0;
+        const QString& sheetName) = 0;
 
     std::pair<QString, QString> getError() const;
 
     void setNameForEmptyColumn(const QString& name);
+
+    virtual std::pair<bool, uint32_t> getColumnCount(const QString& name) = 0;
 
 protected:
     void setError(QString functionName, QString errorContent);

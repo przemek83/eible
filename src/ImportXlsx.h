@@ -21,7 +21,7 @@ public:
     void setSheets(QList<std::pair<QString, QString>> sheets);
 
     std::pair<bool, QVector<ColumnType>> getColumnTypes(
-        const QString& sheetName, int columnsCount) override;
+        const QString& sheetName) override;
 
     std::pair<bool, QStringList> getColumnList(
         const QString& sheetName) override;
@@ -35,6 +35,8 @@ public:
 
     std::pair<bool, QList<int>> getAllStyles();
     void setAllStyles(QList<int> allStyles);
+
+    std::pair<bool, uint32_t> getColumnCount(const QString& name) override;
 
 private:
     std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>

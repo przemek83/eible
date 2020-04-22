@@ -84,9 +84,9 @@ QStringList ImportXlsxTest::sharedStrings_{"Text",
                                            "Q90"};
 
 QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22,
-                                       165, 167, 170, 171, 172};
-QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 167, 168, 164, 169,
-                                      170, 166, 164, 164, 171, 172};
+                                       165, 167, 169, 170, 171};
+QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 164, 166, 167,
+                                      168, 169, 164, 164, 170, 171};
 
 QStringList ImportXlsxTest::testSheet1Columns_ = {"Text", "Numeric", "Date"};
 QStringList ImportXlsxTest::testSheet2Columns_ = {
@@ -226,36 +226,35 @@ void ImportXlsxTest::testSettingEmptyColumnName()
 void ImportXlsxTest::testGetColumnTypes_data()
 {
     QTest::addColumn<QString>("sheetPath");
-    QTest::addColumn<int>("columnCount");
     QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
 
     QTest::newRow("Column types in Sheet1")
-        << "Sheet1" << 3
+        << "Sheet1"
         << QVector({ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE});
     QTest::newRow("Column types in Sheet2")
-        << "Sheet2" << 7
+        << "Sheet2"
         << QVector({ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
                     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::STRING});
     QTest::newRow("Column types in Sheet3(empty)")
-        << "Sheet3(empty)" << 0 << QVector<ColumnType>();
+        << "Sheet3(empty)" << QVector<ColumnType>();
     QTest::newRow("Column types in Sheet4")
-        << "Sheet4" << 5
+        << "Sheet4"
         << QVector({ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::DATE, ColumnType::STRING});
     QTest::newRow("Column types in Sheet5")
-        << "Sheet5" << 12
+        << "Sheet5"
         << QVector({ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
                     ColumnType::NUMBER, ColumnType::STRING, ColumnType::NUMBER,
                     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
                     ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::NUMBER});
     QTest::newRow("Column types in Sheet6")
-        << "Sheet6" << 3
+        << "Sheet6"
         << QVector(
                {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER});
     QTest::newRow("Column types in Sheet7")
-        << "Sheet7" << 6
+        << "Sheet7"
         << QVector({ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::STRING, ColumnType::STRING,
                     ColumnType::NUMBER});
@@ -264,7 +263,6 @@ void ImportXlsxTest::testGetColumnTypes_data()
 void ImportXlsxTest::testGetColumnTypes()
 {
     QFETCH(QString, sheetPath);
-    QFETCH(int, columnCount);
     QFETCH(QVector<ColumnType>, expectedColumnTypes);
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
@@ -274,8 +272,7 @@ void ImportXlsxTest::testGetColumnTypes()
     importXlsx.setAllStyles(allStyles_);
     importXlsx.setSheets(sheets_);
 
-    auto [success, columnTypes] =
-        importXlsx.getColumnTypes(sheetPath, columnCount);
+    auto [success, columnTypes] = importXlsx.getColumnTypes(sheetPath);
     QCOMPARE(success, true);
     QCOMPARE(columnTypes, expectedColumnTypes);
 }
