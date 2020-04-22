@@ -28,7 +28,7 @@ private Q_SLOTS:
     void testGetColumnTypes();
 
 private:
-    static QMap<QString, QString> sheetMap_;
+    static QList<std::pair<QString, QString>> sheets_;
 
     static QStringList sharedStrings_;
 

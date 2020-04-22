@@ -14,7 +14,7 @@ class EIBLE_EXPORT ImportSpreadsheet : public QObject
 public:
     explicit ImportSpreadsheet(QIODevice& ioDevice);
 
-    virtual std::pair<bool, QStringList> getSheetList() = 0;
+    virtual std::pair<bool, QStringList> getSheetNames() = 0;
 
     virtual std::pair<bool, QStringList> getColumnList(
         const QString& sheetName) = 0;

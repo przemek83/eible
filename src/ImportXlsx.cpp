@@ -14,12 +14,12 @@
 
 ImportXlsx::ImportXlsx(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
-std::pair<bool, QStringList> ImportXlsx::getSheetList()
+std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 {
-    if (sheetMap_)
+    if (sheets_)
     {
         QStringList sheets;
-        for (const auto& [sheetName, sheetPath] : sheetMap_->toStdMap())
+        for (const auto& [sheetName, sheetPath] : *sheets_)
             sheets << sheetName;
         return {true, sheets};
     }
@@ -34,7 +34,7 @@ std::pair<bool, QStringList> ImportXlsx::getSheetList()
     }
 
     QMap<QString, QString> sheetIdToUserFriendlyNameMap;
-    QMap<QString, QString> sheetToFileMapInZip;
+    QList<std::pair<QString, QString>> sheets;
 
     if (zip.setCurrentFile(QStringLiteral("xl/workbook.xml")))
     {
@@ -124,8 +124,9 @@ std::pair<bool, QStringList> ImportXlsx::getSheetList()
 
                 if (sheetIdToUserFriendlyNameMap.constEnd() != iterator)
                 {
-                    sheetToFileMapInZip[*iterator] =
-                        "xl/" + sheet.attribute(QStringLiteral("Target"));
+                    sheets.append(
+                        {*iterator,
+                         "xl/" + sheet.attribute(QStringLiteral("Target"))});
                 }
             }
         }
@@ -137,26 +138,26 @@ std::pair<bool, QStringList> ImportXlsx::getSheetList()
         return {false, {}};
     }
 
-    sheetMap_ = std::move(sheetToFileMapInZip);
+    sheets_ = std::move(sheets);
 
-    QStringList sheets;
-    for (const auto& [sheetName, sheetPath] : sheetMap_->toStdMap())
-        sheets << sheetName;
-    return {true, sheets};
+    QStringList sheetsToReturn;
+    for (const auto& [sheetName, sheetPath] : *sheets_)
+        sheetsToReturn << sheetName;
+    return {true, sheetsToReturn};
 
     //    return {true, sheetToFileMapInZip};
 }
 
-std::pair<bool, QMap<QString, QString>> ImportXlsx::getSheetMap()
+std::pair<bool, QList<std::pair<QString, QString>>> ImportXlsx::getSheets()
 {
-    if (!sheetMap_ && !getSheetList().first)
+    if (!sheets_ && !getSheetNames().first)
         return {false, {}};
-    return {true, *sheetMap_};
+    return {true, *sheets_};
 }
 
-void ImportXlsx::setSheetMap(QMap<QString, QString> sheetMap)
+void ImportXlsx::setSheets(QList<std::pair<QString, QString>> sheets)
 {
-    sheetMap_ = std::move(sheetMap);
+    sheets_ = std::move(sheets);
 }
 
 std::pair<bool, QStringList> ImportXlsx::getColumnList(const QString& sheetName)
@@ -164,7 +165,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(const QString& sheetName)
     if (columnList_)
         return {true, *columnList_};
 
-    if (!sheetMap_ && !getSheetList().first)
+    if (!sheets_ && !getSheetNames().first)
         return {false, {}};
 
     if (!sharedStrings_ && !getSharedStrings().first)
@@ -185,7 +186,11 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(const QString& sheetName)
     const QStringList excelColNames =
         EibleUtilities::generateExcelColumnNames(columnsCount);
 
-    if (zip.setCurrentFile((*sheetMap_)[sheetName]))
+    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    if (!sheetFound)
+        return {false, {}};
+
+    if (zip.setCurrentFile(sheetPath))
     {
         QuaZipFile zipFile(&zip);
 
@@ -373,6 +378,21 @@ ImportXlsx::getStyles()
     return {true, dateStyles, allStyles};
 }
 
+std::pair<bool, QString> ImportXlsx::getSheetPath(QString sheetName)
+{
+    for (const auto& [currentSheetName, sheetPath] : *sheets_)
+        if (currentSheetName == sheetName)
+            return {true, sheetPath};
+
+    QStringList sheetNames;
+    for (const auto& [currenSheetName, sheetPath] : *sheets_)
+        sheetNames << currenSheetName;
+    setError(__FUNCTION__,
+             "Can not find sheet path for sheet name " + sheetName +
+                 ". Available sheet names:" + sheetNames.join(','));
+    return {false, {}};
+}
+
 std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 {
     if (sharedStrings_)
@@ -431,7 +451,7 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     const QString& sheetName, int columnsCount)
 {
-    if (!sheetMap_ && !getSheetList().first)
+    if (!sheets_ && !getSheetNames().first)
         return {false, {}};
 
     if (!sharedStrings_ && !getSharedStrings().first)
@@ -467,11 +487,14 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
         return {false, {}};
     }
 
+    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    if (!sheetFound)
+        return {false, {}};
+
     QuaZipFile zipFile;
     QXmlStreamReader xmlStreamReader;
 
-    if (!openZipAndMoveToSecondRow(zip, (*sheetMap_)[sheetName], zipFile,
-                                   xmlStreamReader))
+    if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
         return {false, {}};
 
     QVector<ColumnType> columnTypes;

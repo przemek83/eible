@@ -5,7 +5,7 @@
 
 #include "ImportXlsx.h"
 
-QMap<QString, QString> ImportXlsxTest::sheetMap_{
+QList<std::pair<QString, QString>> ImportXlsxTest::sheets_{
     {"Sheet1", "xl/worksheets/sheet1.xml"},
     {"Sheet2", "xl/worksheets/sheet2.xml"},
     {"Sheet3(empty)", "xl/worksheets/sheet3.xml"},
@@ -105,10 +105,10 @@ void ImportXlsxTest::testRetrievingSheetNames()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualNames] = importXlsx.getSheetList();
+    auto [success, actualNames] = importXlsx.getSheetNames();
     QCOMPARE(success, true);
     QStringList sheets;
-    for (const auto& [sheetName, sheetPath] : sheetMap_.toStdMap())
+    for (const auto& [sheetName, sheetPath] : sheets_)
         sheets << sheetName;
     QCOMPARE(actualNames, sheets);
 }
@@ -118,7 +118,7 @@ void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
     QByteArray byteArray;
     QBuffer emptyBuffer(&byteArray);
     ImportXlsx importXlsx(emptyBuffer);
-    auto [success, actualNames] = importXlsx.getSheetList();
+    auto [success, actualNames] = importXlsx.getSheetNames();
     QCOMPARE(success, false);
     QCOMPARE(actualNames, {});
 }
@@ -198,7 +198,7 @@ void ImportXlsxTest::testGetColumnList()
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
     importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setSheetMap(sheetMap_);
+    importXlsx.setSheets(sheets_);
     auto [success, actualColumnList] = importXlsx.getColumnList(sheetPath);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, expectedColumnList);
@@ -211,7 +211,7 @@ void ImportXlsxTest::testSettingEmptyColumnName()
     const QString newEmptyColumnName{"<empty column>"};
     importXlsx.setNameForEmptyColumn(newEmptyColumnName);
     importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setSheetMap(sheetMap_);
+    importXlsx.setSheets(sheets_);
     auto [success, actualColumnList] = importXlsx.getColumnList("Sheet5");
 
     std::list<QString> expectedColumnList(testSheet5Columns_.size());
@@ -272,7 +272,7 @@ void ImportXlsxTest::testGetColumnTypes()
     importXlsx.setSharedStrings(sharedStrings_);
     importXlsx.setDateStyles(dateStyles_);
     importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheetMap(sheetMap_);
+    importXlsx.setSheets(sheets_);
 
     auto [success, columnTypes] =
         importXlsx.getColumnTypes(sheetPath, columnCount);

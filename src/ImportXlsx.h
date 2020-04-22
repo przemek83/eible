@@ -16,9 +16,9 @@ class EIBLE_EXPORT ImportXlsx : public ImportSpreadsheet
 public:
     explicit ImportXlsx(QIODevice& ioDevice);
 
-    std::pair<bool, QStringList> getSheetList() override;
-    std::pair<bool, QMap<QString, QString>> getSheetMap();
-    void setSheetMap(QMap<QString, QString> sheetMap);
+    std::pair<bool, QStringList> getSheetNames() override;
+    std::pair<bool, QList<std::pair<QString, QString>>> getSheets();
+    void setSheets(QList<std::pair<QString, QString>> sheets);
 
     std::pair<bool, QVector<ColumnType>> getColumnTypes(
         const QString& sheetName, int columnsCount) override;
@@ -40,22 +40,19 @@ private:
     std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
     getStyles();
 
+    std::pair<bool, QString> getSheetPath(QString sheetName);
+
     bool openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
                                    QuaZipFile& zipFile,
                                    QXmlStreamReader& xmlStreamReader);
 
-    std::optional<QMap<QString, QString>> sheetMap_{std::nullopt};
-
+    std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> columnList_{std::nullopt};
-
     std::optional<QStringList> sharedStrings_{std::nullopt};
-
     std::optional<QList<int>> dateStyles_{std::nullopt};
-
     std::optional<QList<int>> allStyles_{std::nullopt};
 
     static constexpr int NOT_SET_COLUMN{-1};
-
     static constexpr int DECIMAL_BASE{10};
 };
 
