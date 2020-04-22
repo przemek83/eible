@@ -779,6 +779,7 @@ std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
         if (0 == xmlStreamReader.name().compare(rowTag) &&
             xmlStreamReader.isStartElement())
             rowCounter++;
+        xmlStreamReader.readNextStartElement();
     }
 
     rowCounts_[sheetName] = rowCounter;
