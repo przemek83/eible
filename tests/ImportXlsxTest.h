@@ -31,6 +31,9 @@ private Q_SLOTS:
     void testGetColumnCount_data();
     void testGetColumnCount();
 
+    void testGetRowCount_data();
+    void testGetRowCount();
+
 private:
     static QList<std::pair<QString, QString>> sheets_;
     static QStringList sharedStrings_;

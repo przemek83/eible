@@ -321,3 +321,32 @@ void ImportXlsxTest::testGetColumnCount()
     QCOMPARE(success, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
 }
+
+void ImportXlsxTest::testGetRowCount_data()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<unsigned int>("expectedRowCount");
+    std::vector<unsigned int> expectedRowCounts{2, 19, 0, 4, 30, 100, 71};
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        const QString& sheetName{sheets_[i].first};
+        QTest::newRow(("Rows in " + sheetName).toStdString().c_str())
+            << sheetName << expectedRowCounts[i];
+    }
+}
+
+void ImportXlsxTest::testGetRowCount()
+{
+    QFETCH(QString, sheetName);
+    QFETCH(unsigned int, expectedRowCount);
+
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+    auto [success, actualRowCount] = importXlsx.getRowCount(sheetName);
+    QCOMPARE(success, true);
+    QCOMPARE(actualRowCount, expectedRowCount);
+}
