@@ -162,9 +162,6 @@ void ImportXlsx::setSheets(QList<std::pair<QString, QString>> sheets)
 
 std::pair<bool, QStringList> ImportXlsx::getColumnList(const QString& sheetName)
 {
-    if (columnList_)
-        return {true, *columnList_};
-
     if (!sheets_ && !getSheetNames().first)
         return {false, {}};
 
@@ -282,9 +279,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnList(const QString& sheetName)
         return {false, {}};
     }
 
-    columnList_ = std::move(columnList);
-
-    return {true, *columnList_};
+    return {true, columnList};
 }
 
 std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
@@ -761,9 +756,4 @@ void ImportXlsx::setDateStyles(QList<int> dateStyles)
 void ImportXlsx::setSharedStrings(QStringList sharedStrings)
 {
     sharedStrings_ = std::move(sharedStrings);
-}
-
-void ImportXlsx::setColumnList(QStringList columnList)
-{
-    columnList_ = std::move(columnList);
 }

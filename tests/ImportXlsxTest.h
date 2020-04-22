@@ -23,6 +23,7 @@ private Q_SLOTS:
     void testGetColumnList_data();
     void testGetColumnList();
     void testSettingEmptyColumnName();
+    void testGetColumnListTwoSheets();
 
     void testGetColumnTypes_data();
     void testGetColumnTypes();

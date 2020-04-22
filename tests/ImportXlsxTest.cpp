@@ -223,6 +223,21 @@ void ImportXlsxTest::testSettingEmptyColumnName()
     QCOMPARE(actualColumnList, QStringList::fromStdList(expectedColumnList));
 }
 
+void ImportXlsxTest::testGetColumnListTwoSheets()
+{
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setSheets(sheets_);
+    auto [success, actualColumnList] = importXlsx.getColumnList("Sheet5");
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, testSheet5Columns_);
+
+    std::tie(success, actualColumnList) = importXlsx.getColumnList("Sheet1");
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, testSheet1Columns_);
+}
+
 void ImportXlsxTest::testGetColumnTypes_data()
 {
     QTest::addColumn<QString>("sheetPath");

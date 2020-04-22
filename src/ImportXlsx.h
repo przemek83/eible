@@ -25,7 +25,6 @@ public:
 
     std::pair<bool, QStringList> getColumnList(
         const QString& sheetName) override;
-    void setColumnList(QStringList columnList);
 
     std::pair<bool, QStringList> getSharedStrings();
     void setSharedStrings(QStringList sharedStrings);
@@ -49,7 +48,6 @@ private:
                                    QXmlStreamReader& xmlStreamReader);
 
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
-    std::optional<QStringList> columnList_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
     std::optional<QList<int>> allStyles_{std::nullopt};
