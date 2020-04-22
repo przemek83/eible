@@ -84,9 +84,9 @@ QStringList ImportXlsxTest::sharedStrings_{"Text",
                                            "Q90"};
 
 QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22,
-                                       165, 167, 169, 170, 171};
-QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 164, 166, 167,
-                                      168, 169, 164, 164, 170, 171};
+                                       165, 167, 170, 171, 172};
+QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 164, 166, 167, 168,
+                                      169, 170, 164, 164, 171, 172};
 
 QStringList ImportXlsxTest::testSheet1Columns_ = {"Text", "Numeric", "Date"};
 QStringList ImportXlsxTest::testSheet2Columns_ = {
