@@ -23,7 +23,7 @@ public:
     std::pair<bool, QVector<ColumnType>> getColumnTypes(
         const QString& sheetName) override;
 
-    std::pair<bool, QStringList> getColumnList(
+    std::pair<bool, QStringList> getColumnNames(
         const QString& sheetName) override;
 
     std::pair<bool, QStringList> getSharedStrings();

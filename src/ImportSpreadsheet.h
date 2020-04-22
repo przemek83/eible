@@ -16,7 +16,7 @@ public:
 
     virtual std::pair<bool, QStringList> getSheetNames() = 0;
 
-    virtual std::pair<bool, QStringList> getColumnList(
+    virtual std::pair<bool, QStringList> getColumnNames(
         const QString& sheetName) = 0;
 
     virtual std::pair<bool, QVector<ColumnType>> getColumnTypes(

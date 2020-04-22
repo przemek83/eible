@@ -160,7 +160,8 @@ void ImportXlsx::setSheets(QList<std::pair<QString, QString>> sheets)
     sheets_ = std::move(sheets);
 }
 
-std::pair<bool, QStringList> ImportXlsx::getColumnList(const QString& sheetName)
+std::pair<bool, QStringList> ImportXlsx::getColumnNames(
+    const QString& sheetName)
 {
     if (!sheets_ && !getSheetNames().first)
         return {false, {}};
