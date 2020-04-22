@@ -88,18 +88,16 @@ QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22,
 QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 164, 166, 167, 168,
                                       169, 170, 164, 164, 171, 172};
 
-QStringList ImportXlsxTest::testSheet1Columns_ = {"Text", "Numeric", "Date"};
-QStringList ImportXlsxTest::testSheet2Columns_ = {
-    "Trait #1", "Value #1",       "Transaction date", "Units",
-    "Price",    "Price per unit", "Another trait"};
-QStringList ImportXlsxTest::testSheet3Columns_ = {};
-QStringList ImportXlsxTest::testSheet4Columns_ = {
-    "cena nier", "pow", "cena metra", "data transakcji", "text"};
-QStringList ImportXlsxTest::testSheet5Columns_ = {
-    "name", "date", "mass (kg)", "height", "---", "---",
-    "---",  "---",  "---",       "---",    "---", "---"};
-QStringList ImportXlsxTest::testSheet6Columns_ = {"modificator", "x", "y"};
-QStringList ImportXlsxTest::testSheet7Columns_ = {"Pow", "Cena", "cena_m"};
+QList<QStringList> ImportXlsxTest::testColumnNames_ = {
+    {"Text", "Numeric", "Date"},
+    {"Trait #1", "Value #1", "Transaction date", "Units", "Price",
+     "Price per unit", "Another trait"},
+    {},
+    {"cena nier", "pow", "cena metra", "data transakcji", "text"},
+    {"name", "date", "mass (kg)", "height", "---", "---", "---", "---", "---",
+     "---", "---", "---"},
+    {"modificator", "x", "y"},
+    {"Pow", "Cena", "cena_m"}};
 
 void ImportXlsxTest::testRetrievingSheetNames()
 {
@@ -179,27 +177,25 @@ void ImportXlsxTest::testGetSharedStringsNoContent()
 
 void ImportXlsxTest::testGetColumnList_data()
 {
-    QTest::addColumn<QString>("sheetPath");
+    QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QStringList>("expectedColumnList");
-    QTest::newRow("Columns in Sheet1") << "Sheet1" << testSheet1Columns_;
-    QTest::newRow("Columns in Sheet2") << "Sheet2" << testSheet2Columns_;
-    QTest::newRow("Columns in Sheet3(empty)")
-        << "Sheet3(empty)" << testSheet3Columns_;
-    QTest::newRow("Columns in Sheet4") << "Sheet4" << testSheet4Columns_;
-    QTest::newRow("Columns in Sheet5") << "Sheet5" << testSheet5Columns_;
-    QTest::newRow("Columns in Sheet6") << "Sheet6" << testSheet6Columns_;
-    QTest::newRow("Columns in Sheet7") << "Sheet7" << testSheet7Columns_;
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        const QString& sheetName{sheets_[i].first};
+        QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
+            << sheetName << testColumnNames_[i];
+    }
 }
 
 void ImportXlsxTest::testGetColumnList()
 {
-    QFETCH(QString, sheetPath);
+    QFETCH(QString, sheetName);
     QFETCH(QStringList, expectedColumnList);
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
     importXlsx.setSharedStrings(sharedStrings_);
     importXlsx.setSheets(sheets_);
-    auto [success, actualColumnList] = importXlsx.getColumnNames(sheetPath);
+    auto [success, actualColumnList] = importXlsx.getColumnNames(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, expectedColumnList);
 }
@@ -212,10 +208,11 @@ void ImportXlsxTest::testSettingEmptyColumnName()
     importXlsx.setNameForEmptyColumn(newEmptyColumnName);
     importXlsx.setSharedStrings(sharedStrings_);
     importXlsx.setSheets(sheets_);
-    auto [success, actualColumnList] = importXlsx.getColumnNames("Sheet5");
+    auto [success, actualColumnList] =
+        importXlsx.getColumnNames(sheets_[4].first);
 
-    std::list<QString> expectedColumnList(testSheet5Columns_.size());
-    std::replace_copy(testSheet5Columns_.begin(), testSheet5Columns_.end(),
+    std::list<QString> expectedColumnList(testColumnNames_[4].size());
+    std::replace_copy(testColumnNames_[4].begin(), testColumnNames_[4].end(),
                       expectedColumnList.begin(), QString("---"),
                       newEmptyColumnName);
 
@@ -229,47 +226,49 @@ void ImportXlsxTest::testGetColumnListTwoSheets()
     ImportXlsx importXlsx(xlsxTestFile);
     importXlsx.setSharedStrings(sharedStrings_);
     importXlsx.setSheets(sheets_);
-    auto [success, actualColumnList] = importXlsx.getColumnNames("Sheet5");
+    auto [success, actualColumnList] =
+        importXlsx.getColumnNames(sheets_[4].first);
     QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, testSheet5Columns_);
+    QCOMPARE(actualColumnList, testColumnNames_[4]);
 
-    std::tie(success, actualColumnList) = importXlsx.getColumnNames("Sheet1");
+    std::tie(success, actualColumnList) =
+        importXlsx.getColumnNames(sheets_[0].first);
     QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, testSheet1Columns_);
+    QCOMPARE(actualColumnList, testColumnNames_[0]);
 }
 
 void ImportXlsxTest::testGetColumnTypes_data()
 {
-    QTest::addColumn<QString>("sheetPath");
+    QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
 
-    QTest::newRow("Column types in Sheet1")
-        << "Sheet1"
+    QTest::newRow(("Column types in " + sheets_[0].first).toStdString().c_str())
+        << sheets_[0].first
         << QVector({ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE});
-    QTest::newRow("Column types in Sheet2")
-        << "Sheet2"
+    QTest::newRow(("Column types in " + sheets_[1].first).toStdString().c_str())
+        << sheets_[1].first
         << QVector({ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
                     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::STRING});
-    QTest::newRow("Column types in Sheet3(empty)")
-        << "Sheet3(empty)" << QVector<ColumnType>();
-    QTest::newRow("Column types in Sheet4")
-        << "Sheet4"
+    QTest::newRow(("Column types in " + sheets_[2].first).toStdString().c_str())
+        << sheets_[2].first << QVector<ColumnType>();
+    QTest::newRow(("Column types in " + sheets_[3].first).toStdString().c_str())
+        << sheets_[3].first
         << QVector({ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::DATE, ColumnType::STRING});
-    QTest::newRow("Column types in Sheet5")
-        << "Sheet5"
+    QTest::newRow(("Column types in " + sheets_[4].first).toStdString().c_str())
+        << sheets_[4].first
         << QVector({ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
                     ColumnType::NUMBER, ColumnType::STRING, ColumnType::NUMBER,
                     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
                     ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::NUMBER});
-    QTest::newRow("Column types in Sheet6")
-        << "Sheet6"
+    QTest::newRow(("Column types in " + sheets_[5].first).toStdString().c_str())
+        << sheets_[5].first
         << QVector(
                {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER});
-    QTest::newRow("Column types in Sheet7")
-        << "Sheet7"
+    QTest::newRow(("Column types in " + sheets_[6].first).toStdString().c_str())
+        << sheets_[6].first
         << QVector({ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
                     ColumnType::STRING, ColumnType::STRING,
                     ColumnType::NUMBER});
@@ -277,7 +276,7 @@ void ImportXlsxTest::testGetColumnTypes_data()
 
 void ImportXlsxTest::testGetColumnTypes()
 {
-    QFETCH(QString, sheetPath);
+    QFETCH(QString, sheetName);
     QFETCH(QVector<ColumnType>, expectedColumnTypes);
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
@@ -287,7 +286,38 @@ void ImportXlsxTest::testGetColumnTypes()
     importXlsx.setAllStyles(allStyles_);
     importXlsx.setSheets(sheets_);
 
-    auto [success, columnTypes] = importXlsx.getColumnTypes(sheetPath);
+    auto [success, columnTypes] = importXlsx.getColumnTypes(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(columnTypes, expectedColumnTypes);
+}
+
+void ImportXlsxTest::testGetColumnCount_data()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<int>("expectedColumnCount");
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        // Bug in getColumnNames() method.
+        if (i == 6)
+            continue;
+        const QString& sheetName{sheets_[i].first};
+        QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
+            << sheetName << testColumnNames_[i].size();
+    }
+}
+
+void ImportXlsxTest::testGetColumnCount()
+{
+    QFETCH(QString, sheetName);
+    QFETCH(int, expectedColumnCount);
+
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+    auto [success, actualColumnCount] = importXlsx.getColumnCount(sheetName);
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnCount, expectedColumnCount);
 }

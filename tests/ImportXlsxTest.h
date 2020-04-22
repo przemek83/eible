@@ -28,21 +28,15 @@ private Q_SLOTS:
     void testGetColumnTypes_data();
     void testGetColumnTypes();
 
+    void testGetColumnCount_data();
+    void testGetColumnCount();
+
 private:
     static QList<std::pair<QString, QString>> sheets_;
-
     static QStringList sharedStrings_;
-
     static QList<int> dateStyles_;
     static QList<int> allStyles_;
-
-    static QStringList testSheet1Columns_;
-    static QStringList testSheet2Columns_;
-    static QStringList testSheet3Columns_;
-    static QStringList testSheet4Columns_;
-    static QStringList testSheet5Columns_;
-    static QStringList testSheet6Columns_;
-    static QStringList testSheet7Columns_;
+    static QList<QStringList> testColumnNames_;
 };
 
 #endif  // IMPORTXLSXTEST_H
