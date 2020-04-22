@@ -672,6 +672,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
             columnTypes[i] = ColumnType::STRING;
     }
 
+    rowCounts_[sheetName] = rowCounter;
     // rowsCount_ = rowCounter;
 
     //    LOG(LogTypes::IMPORT_EXPORT,
@@ -734,10 +735,55 @@ void ImportXlsx::setAllStyles(QList<int> allStyles)
     allStyles_ = std::move(allStyles);
 }
 
-std::pair<bool, uint32_t> ImportXlsx::getColumnCount(const QString& name)
+std::pair<bool, unsigned int> ImportXlsx::getColumnCount(
+    const QString& sheetName)
 {
-    auto [success, columnTypes] = getColumnTypes(name);
+    auto [success, columnTypes] = getColumnTypes(sheetName);
     return {success, columnTypes.size()};
+}
+
+std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
+{
+    if (!sheets_ && !getSheetNames().first)
+        return {false, {}};
+
+    const auto it = rowCounts_.find(sheetName);
+    if (it != rowCounts_.end())
+        return {true, it.value()};
+
+    QuaZip zip(&ioDevice_);
+
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return {false, {}};
+    }
+
+    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    if (!sheetFound)
+        return {false, {}};
+
+    QuaZipFile zipFile;
+    QXmlStreamReader xmlStreamReader;
+
+    if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
+        return {false, {}};
+
+    const QString rowTag(QStringLiteral("row"));
+    const QString sheetDataTag(QStringLiteral("sheetData"));
+    unsigned int rowCounter = 0;
+    while (!xmlStreamReader.atEnd() &&
+           0 != xmlStreamReader.name().compare(sheetDataTag))
+    {
+        if (0 == xmlStreamReader.name().compare(rowTag) &&
+            xmlStreamReader.isStartElement())
+            rowCounter++;
+    }
+
+    rowCounts_[sheetName] = rowCounter;
+
+    return {true, rowCounter};
 }
 
 std::pair<bool, QList<int>> ImportXlsx::getDateStyles()

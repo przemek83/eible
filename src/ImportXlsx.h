@@ -1,7 +1,7 @@
 #ifndef IMPORTXLSX_H
 #define IMPORTXLSX_H
 
-#include <QMap>
+#include <QHash>
 
 #include "ImportSpreadsheet.h"
 
@@ -35,7 +35,11 @@ public:
     std::pair<bool, QList<int>> getAllStyles();
     void setAllStyles(QList<int> allStyles);
 
-    std::pair<bool, uint32_t> getColumnCount(const QString& name) override;
+    std::pair<bool, unsigned int> getColumnCount(
+        const QString& sheetName) override;
+
+    std::pair<bool, unsigned int> getRowCount(
+        const QString& sheetName) override;
 
 private:
     std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
@@ -51,6 +55,7 @@ private:
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
     std::optional<QList<int>> allStyles_{std::nullopt};
+    QHash<QString, unsigned int> rowCounts_;
 
     static constexpr int NOT_SET_COLUMN{-1};
     static constexpr int DECIMAL_BASE{10};
