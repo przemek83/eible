@@ -145,8 +145,6 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
     for (const auto& [sheetName, sheetPath] : *sheets_)
         sheetsToReturn << sheetName;
     return {true, sheetsToReturn};
-
-    //    return {true, sheetToFileMapInZip};
 }
 
 std::pair<bool, QList<std::pair<QString, QString>>> ImportXlsx::getSheets()
@@ -465,22 +463,6 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     if (!getDateStyles().first && !getAllStyles().first)
         return {false, {}};
 
-    // const int columnsCount = EibleUtilities::getMaxExcelColumns();
-
-    //    excelColNames_ =
-    //    EibleUtilities::generateExcelColumnNames(columnsCount_);
-
-    //    const QString barTitle =
-    //        Constants::getProgressBarTitle(Constants::BarTitle::ANALYSING);
-    //    ProgressBarInfinite bar(barTitle, nullptr);
-    //    bar.showDetached();
-    //    bar.start();
-
-    //    QTime performanceTimer;
-    //    performanceTimer.start();
-
-    //    QApplication::processEvents();
-
     QuaZip zip(&ioDevice_);
 
     if (!zip.open(QuaZip::mdUnzip))
@@ -535,15 +517,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
             xmlStreamReader.isStartElement())
         {
             column = NOT_SET_COLUMN;
-
-            //            const int batchSize{100};
-            //            if (0 == rowCounter % batchSize)
-            //            {
-            //                QApplication::processEvents();
-            //            }
-
             rowCounter++;
-
             double power = pow(DECIMAL_BASE, charsToChopFromEndInCellName);
             if (power <= rowCounter + 1)
                 charsToChopFromEndInCellName++;
@@ -686,12 +660,6 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
 
     rowCounts_[sheetName] = rowCounter;
     columnCounts_[sheetName] = maxColumn + 1;
-
-    //    LOG(LogTypes::IMPORT_EXPORT,
-    //        "Analyzed file having " + QString::number(rowsCount_) +
-    //            " rows in time " +
-    //            QString::number(performanceTimer.elapsed() * 1.0 / 1000) +
-    //            " seconds.");
 
     return {true, columnTypes};
 }
