@@ -34,12 +34,16 @@ private Q_SLOTS:
     void testGetRowCount_data();
     void testGetRowCount();
 
+    void testGetRowAndColumnCountViaGetColumnTypes_data();
+    void testGetRowAndColumnCountViaGetColumnTypes();
+
 private:
     static QList<std::pair<QString, QString>> sheets_;
     static QStringList sharedStrings_;
     static QList<int> dateStyles_;
     static QList<int> allStyles_;
     static QList<QStringList> testColumnNames_;
+    static std::vector<unsigned int> expectedRowCounts_;
 };
 
 #endif  // IMPORTXLSXTEST_H

@@ -99,6 +99,9 @@ QList<QStringList> ImportXlsxTest::testColumnNames_ = {
     {"modificator", "x", "y"},
     {"Pow", "Cena", "cena_m", "---", "---", "---"}};
 
+std::vector<unsigned int> ImportXlsxTest::expectedRowCounts_{2,  19,  0, 4,
+                                                             30, 100, 71};
+
 void ImportXlsxTest::testRetrievingSheetNames()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
@@ -323,12 +326,11 @@ void ImportXlsxTest::testGetRowCount_data()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<unsigned int>("expectedRowCount");
-    std::vector<unsigned int> expectedRowCounts{2, 19, 0, 4, 30, 100, 71};
     for (int i = 0; i < testColumnNames_.size(); ++i)
     {
         const QString& sheetName{sheets_[i].first};
         QTest::newRow(("Rows in " + sheetName).toStdString().c_str())
-            << sheetName << expectedRowCounts[i];
+            << sheetName << expectedRowCounts_[i];
     }
 }
 
@@ -346,4 +348,43 @@ void ImportXlsxTest::testGetRowCount()
     auto [success, actualRowCount] = importXlsx.getRowCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualRowCount, expectedRowCount);
+}
+
+void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes_data()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<unsigned int>("expectedRowCount");
+    QTest::addColumn<unsigned int>("expectedColumnCount");
+
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        const QString& sheetName{sheets_[i].first};
+        QTest::newRow(("Rows and columns via GetColumnTypes() in " + sheetName)
+                          .toStdString()
+                          .c_str())
+            << sheetName << expectedRowCounts_[i]
+            << static_cast<unsigned int>(testColumnNames_[i].size());
+    }
+}
+
+void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
+{
+    QFETCH(QString, sheetName);
+    QFETCH(unsigned int, expectedRowCount);
+    QFETCH(unsigned int, expectedColumnCount);
+
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+    importXlsx.getColumnTypes(sheetName);
+    auto [successRowCount, actualRowCount] = importXlsx.getRowCount(sheetName);
+    QCOMPARE(successRowCount, true);
+    QCOMPARE(actualRowCount, expectedRowCount);
+    auto [successColumnCount, actualColumnCount] =
+        importXlsx.getColumnCount(sheetName);
+    QCOMPARE(successColumnCount, true);
+    QCOMPARE(actualColumnCount, expectedColumnCount);
 }
