@@ -170,6 +170,10 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!sharedStrings_ && !getSharedStrings().first)
         return {false, {}};
 
+    const auto it = columnCounts_.find(sheetName);
+    if (it == columnCounts_.end() && !analyzeSheet(sheetName))
+        return {false, {}};
+
     QuaZip zip(&ioDevice_);
 
     if (!zip.open(QuaZip::mdUnzip))
@@ -179,11 +183,12 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
         return {false, {}};
     }
 
+    const unsigned int columnCount{columnCounts_.find(sheetName).value()};
     QStringList columnList;
     // Loading column names is using Excel names names. Set 600 temporary.
-    const int columnsCount = EibleUtilities::getMaxExcelColumns();
+    // const int columnsCount = EibleUtilities::getMaxExcelColumns();
     const QStringList excelColNames =
-        EibleUtilities::generateExcelColumnNames(columnsCount);
+        EibleUtilities::generateExcelColumnNames(columnCount);
 
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
     if (!sheetFound)
@@ -280,6 +285,9 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
                  "File named " + sheetName + " not found in archive.");
         return {false, {}};
     }
+
+    while (columnList.count() < static_cast<int>(columnCount))
+        columnList << emptyColName_;
 
     return {true, columnList};
 }
@@ -499,6 +507,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
 
     // Current column.
     int column = NOT_SET_COLUMN;
+    int maxColumn = NOT_SET_COLUMN;
 
     // Current row.
     int rowCounter = 0;
@@ -556,6 +565,8 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
             // If cells are missing increment column number.
             while (expectedIndexCurrentColumn > column)
                 column++;
+
+            maxColumn = std::max(maxColumn, column);
 
             // If we encounter column outside expected grid we move to row end.
             if (expectedIndexCurrentColumn == NOT_SET_COLUMN)
@@ -674,7 +685,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     }
 
     rowCounts_[sheetName] = rowCounter;
-    // rowsCount_ = rowCounter;
+    columnCounts_[sheetName] = maxColumn + 1;
 
     //    LOG(LogTypes::IMPORT_EXPORT,
     //        "Analyzed file having " + QString::number(rowsCount_) +

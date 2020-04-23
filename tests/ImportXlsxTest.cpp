@@ -97,7 +97,7 @@ QList<QStringList> ImportXlsxTest::testColumnNames_ = {
     {"name", "date", "mass (kg)", "height", "---", "---", "---", "---", "---",
      "---", "---", "---"},
     {"modificator", "x", "y"},
-    {"Pow", "Cena", "cena_m"}};
+    {"Pow", "Cena", "cena_m", "---", "---", "---"}};
 
 void ImportXlsxTest::testRetrievingSheetNames()
 {
@@ -297,9 +297,6 @@ void ImportXlsxTest::testGetColumnCount_data()
     QTest::addColumn<int>("expectedColumnCount");
     for (int i = 0; i < testColumnNames_.size(); ++i)
     {
-        // Bug in getColumnNames() method.
-        if (i == 6)
-            continue;
         const QString& sheetName{sheets_[i].first};
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
             << sheetName << testColumnNames_[i].size();
