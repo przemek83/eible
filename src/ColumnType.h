@@ -1,6 +1,8 @@
 #ifndef COLUMNTYPE_H
 #define COLUMNTYPE_H
 
+#include <QMetaType>
+
 #include "eible_global.h"
 
 enum class EIBLE_EXPORT ColumnType : char
