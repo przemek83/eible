@@ -1,5 +1,6 @@
 #include "ImportXlsx.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <quazip5/quazip.h>
@@ -721,6 +722,95 @@ bool ImportXlsx::openZipAndMoveToSecondRow(QuaZip& zip,
     return true;
 }
 
+std::pair<bool, unsigned int> ImportXlsx::getCount(
+    const QString& sheetName, const QHash<QString, unsigned int>& countMap)
+{
+    if (!sheets_ && !getSheetNames().first)
+        return {false, {}};
+
+    const auto it = countMap.find(sheetName);
+    if (it != countMap.end())
+        return {true, it.value()};
+
+    if (!analyzeSheet(sheetName))
+        return {false, 0};
+
+    return {true, countMap.find(sheetName).value()};
+}
+
+bool ImportXlsx::analyzeSheet(const QString& sheetName)
+{
+    QuaZip zip(&ioDevice_);
+
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return false;
+    }
+
+    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    if (!sheetFound)
+        return false;
+
+    QuaZipFile zipFile;
+    QXmlStreamReader xmlStreamReader;
+
+    if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
+        return false;
+
+    const QStringList excelColNames = EibleUtilities::generateExcelColumnNames(
+        EibleUtilities::getMaxExcelColumns());
+
+    const QString rowTag(QStringLiteral("row"));
+    const QString cellTag(QStringLiteral("c"));
+    const QString rTag(QStringLiteral("r"));
+    const QString sheetDataTag(QStringLiteral("sheetData"));
+
+    unsigned int rowCounter = 0;
+    int maxColumn = NOT_SET_COLUMN;
+    int column = NOT_SET_COLUMN;
+    int charsToChopFromEndInCellName = 1;
+
+    while (!xmlStreamReader.atEnd() &&
+           0 != xmlStreamReader.name().compare(sheetDataTag))
+    {
+        if (0 == xmlStreamReader.name().compare(rowTag) &&
+            xmlStreamReader.isStartElement())
+        {
+            rowCounter++;
+            column = NOT_SET_COLUMN;
+            double power = pow(DECIMAL_BASE, charsToChopFromEndInCellName);
+            if (power <= rowCounter + 1)
+                charsToChopFromEndInCellName++;
+        }
+
+        if (0 == xmlStreamReader.name().compare(cellTag) &&
+            xmlStreamReader.isStartElement())
+        {
+            column++;
+            QString stringToChop =
+                xmlStreamReader.attributes().value(rTag).toString();
+            int numberOfCharsToRemove =
+                stringToChop.size() - charsToChopFromEndInCellName;
+            int expectedIndexCurrentColumn =
+                excelColNames.indexOf(stringToChop.left(numberOfCharsToRemove));
+
+            // If cells are missing increment column number.
+            while (expectedIndexCurrentColumn > column)
+                column++;
+
+            maxColumn = std::max(maxColumn, column);
+        }
+        xmlStreamReader.readNextStartElement();
+    }
+
+    rowCounts_[sheetName] = rowCounter;
+    columnCounts_[sheetName] = maxColumn + 1;
+
+    return true;
+}
+
 std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
 {
     if (allStyles_)
@@ -738,53 +828,12 @@ void ImportXlsx::setAllStyles(QList<int> allStyles)
 std::pair<bool, unsigned int> ImportXlsx::getColumnCount(
     const QString& sheetName)
 {
-    auto [success, columnTypes] = getColumnTypes(sheetName);
-    return {success, columnTypes.size()};
+    return getCount(sheetName, columnCounts_);
 }
 
 std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
 {
-    if (!sheets_ && !getSheetNames().first)
-        return {false, {}};
-
-    const auto it = rowCounts_.find(sheetName);
-    if (it != rowCounts_.end())
-        return {true, it.value()};
-
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
-        return {false, {}};
-    }
-
-    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
-    if (!sheetFound)
-        return {false, {}};
-
-    QuaZipFile zipFile;
-    QXmlStreamReader xmlStreamReader;
-
-    if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
-        return {false, {}};
-
-    const QString rowTag(QStringLiteral("row"));
-    const QString sheetDataTag(QStringLiteral("sheetData"));
-    unsigned int rowCounter = 0;
-    while (!xmlStreamReader.atEnd() &&
-           0 != xmlStreamReader.name().compare(sheetDataTag))
-    {
-        if (0 == xmlStreamReader.name().compare(rowTag) &&
-            xmlStreamReader.isStartElement())
-            rowCounter++;
-        xmlStreamReader.readNextStartElement();
-    }
-
-    rowCounts_[sheetName] = rowCounter;
-
-    return {true, rowCounter};
+    return getCount(sheetName, rowCounts_);
 }
 
 std::pair<bool, QList<int>> ImportXlsx::getDateStyles()

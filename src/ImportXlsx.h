@@ -51,11 +51,17 @@ private:
                                    QuaZipFile& zipFile,
                                    QXmlStreamReader& xmlStreamReader);
 
+    std::pair<bool, unsigned int> getCount(
+        const QString& sheetName, const QHash<QString, unsigned int>& countMap);
+
+    bool analyzeSheet(const QString& sheetName);
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
     std::optional<QList<int>> allStyles_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_;
+    QHash<QString, unsigned int> columnCounts_;
 
     static constexpr int NOT_SET_COLUMN{-1};
     static constexpr int DECIMAL_BASE{10};
