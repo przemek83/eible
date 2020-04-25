@@ -388,3 +388,31 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
     QCOMPARE(successColumnCount, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
 }
+
+void ImportXlsxTest::testGetData_data()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
+
+    const QString& sheetName{sheets_[0].first};
+    QTest::newRow(("Data in " + sheetName).toStdString().c_str())
+        << sheetName
+        << QVector<QVector<QVariant>>(
+               {{3, 1., QDate(2020, 1, 3)}, {4, 2., QDate(2020, 1, 4)}});
+}
+
+void ImportXlsxTest::testGetData()
+{
+    QFETCH(QString, sheetName);
+    QFETCH(QVector<QVector<QVariant>>, expectedData);
+
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+    auto [success, actualData] = importXlsx.getData(sheetName, {});
+    QCOMPARE(success, true);
+    QCOMPARE(actualData, expectedData);
+}
