@@ -102,6 +102,15 @@ QList<QStringList> ImportXlsxTest::testColumnNames_ = {
 std::vector<unsigned int> ImportXlsxTest::expectedRowCounts_{2,  19,  0, 4,
                                                              30, 100, 71};
 
+QVector<QVector<QVector<QVariant>>> ImportXlsxTest::sheetData_ = {
+    {{3, 1., QDate(2020, 1, 3)}, {4, 2., QDate(2020, 1, 4)}},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}};
+
 void ImportXlsxTest::testRetrievingSheetNames()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
@@ -393,12 +402,14 @@ void ImportXlsxTest::testGetData_data()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
-
-    const QString& sheetName{sheets_[0].first};
-    QTest::newRow(("Data in " + sheetName).toStdString().c_str())
-        << sheetName
-        << QVector<QVector<QVariant>>(
-               {{3, 1., QDate(2020, 1, 3)}, {4, 2., QDate(2020, 1, 4)}});
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        if (i != 0 && i != 2)
+            continue;
+        const QString& sheetName{sheets_[i].first};
+        QTest::newRow(("Data in " + sheetName).toStdString().c_str())
+            << sheetName << sheetData_[i];
+    }
 }
 
 void ImportXlsxTest::testGetData()

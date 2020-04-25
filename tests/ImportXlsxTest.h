@@ -47,6 +47,7 @@ private:
     static QList<int> allStyles_;
     static QList<QStringList> testColumnNames_;
     static std::vector<unsigned int> expectedRowCounts_;
+    static QVector<QVector<QVector<QVariant>>> sheetData_;
 };
 
 #endif  // IMPORTXLSXTEST_H
