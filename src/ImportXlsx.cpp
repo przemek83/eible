@@ -1,6 +1,5 @@
 #include "ImportXlsx.h"
 
-#include <QVariant>
 #include <algorithm>
 #include <cmath>
 
@@ -9,6 +8,7 @@
 #include <QIODevice>
 #include <QMap>
 #include <QSet>
+#include <QVariant>
 #include <QXmlStreamReader>
 #include <QtXml/QDomDocument>
 
@@ -870,7 +870,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QuaZipFile zipFile;
     QXmlStreamReader xmlStreamReader;
 
-    openZipAndMoveToSecondRow(zip, sheetName, zipFile, xmlStreamReader);
+    openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader);
 
     // Actual column number.
     int column = NOT_SET_COLUMN;
@@ -913,7 +913,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     // Current row data.
     QVector<QVariant> currentDataRow(templateDataRow);
 
-    // Nmebr of chars to chop from end.
+    // Number of chars to chop from end.
     int charsToChopFromEndInCellName = 1;
 
     // Optimization.
