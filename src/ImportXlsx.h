@@ -42,10 +42,10 @@ public:
         const QString& sheetName) override;
 
     std::pair<bool, QVector<QVector<QVariant>>> getData(
-        const QString& sheetName, const QVector<bool>& activeColumns) override;
+        const QString& sheetName, const QVector<int>& excludedColumns) override;
 
     std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
-        const QString& sheetName, const QVector<bool>& activeColumns,
+        const QString& sheetName, const QVector<int>& excludedColumns,
         unsigned int rowLimit) override;
 
 private:

@@ -817,16 +817,16 @@ std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getData(
-    const QString& sheetName, const QVector<bool>& activeColumns)
+    const QString& sheetName, const QVector<int>& excludedColumns)
 {
     auto [success, rowCount] = getRowCount(sheetName);
     if (!success)
         return {false, {}};
-    return getLimitedData(sheetName, activeColumns, rowCount);
+    return getLimitedData(sheetName, excludedColumns, rowCount);
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
-    const QString& sheetName, const QVector<bool>& activeColumns,
+    const QString& sheetName, const QVector<int>& excludedColumns,
     unsigned int rowLimit)
 {
     //    const QString barTitle =
@@ -888,11 +888,11 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
     int columnToFill = 0;
 
-    templateDataRow.resize(fillSamplesOnly ? columnCount
-                                           : activeColumns.count(true));
+    templateDataRow.resize(
+        fillSamplesOnly ? columnCount : columnCount - excludedColumns.size());
     for (unsigned int i = 0; i < columnCount; ++i)
     {
-        if (fillSamplesOnly || activeColumns.at(i))
+        if (fillSamplesOnly || !excludedColumns.contains(i))
         {
             templateDataRow[columnToFill] =
                 EibleUtilities::getDefaultVariantForFormat(columnTypes[i]);
@@ -995,7 +995,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         if (!xmlStreamReader.atEnd() &&
             0 == xmlStreamReader.name().compare(vTag) &&
             xmlStreamReader.tokenType() == QXmlStreamReader::StartElement &&
-            (fillSamplesOnly || activeColumns.at(column)))
+            (fillSamplesOnly || !excludedColumns.contains(column)))
         {
             ColumnType format = columnTypes.at(column);
 
