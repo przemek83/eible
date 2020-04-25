@@ -32,6 +32,13 @@ public:
     virtual std::pair<bool, unsigned int> getRowCount(
         const QString& sheetName) = 0;
 
+    virtual std::pair<bool, QVector<QVector<QVariant>>> getData(
+        const QString& sheetName, const QVector<bool>& activeColumns) = 0;
+
+    virtual std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
+        const QString& sheetName, const QVector<bool>& activeColumns,
+        unsigned int rowLimit) = 0;
+
 protected:
     void setError(QString functionName, QString errorContent);
 

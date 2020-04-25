@@ -41,6 +41,13 @@ public:
     std::pair<bool, unsigned int> getRowCount(
         const QString& sheetName) override;
 
+    std::pair<bool, QVector<QVector<QVariant>>> getData(
+        const QString& sheetName, const QVector<bool>& activeColumns) override;
+
+    std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
+        const QString& sheetName, const QVector<bool>& activeColumns,
+        unsigned int rowLimit) override;
+
 private:
     std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
     getStyles();
@@ -60,11 +67,13 @@ private:
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
     std::optional<QList<int>> allStyles_{std::nullopt};
-    QHash<QString, unsigned int> rowCounts_;
-    QHash<QString, unsigned int> columnCounts_;
+    QHash<QString, unsigned int> rowCounts_{};
+    QHash<QString, unsigned int> columnCounts_{};
 
     static constexpr int NOT_SET_COLUMN{-1};
     static constexpr int DECIMAL_BASE{10};
+    /// Number of lines in sample data.
+    static constexpr int SAMPLE_SIZE{10};
 };
 
 #endif  // IMPORTXLSX_H
