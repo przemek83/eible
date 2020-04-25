@@ -106,7 +106,10 @@ QVector<QVector<QVector<QVariant>>> ImportXlsxTest::sheetData_ = {
     {{3, 1., QDate(2020, 1, 3)}, {4, 2., QDate(2020, 1, 4)}},
     {},
     {},
-    {},
+    {{200000., 51., 3921.56862745098, QDate(2012, 02, 02), 39},
+     {200001., 52., 3846.17307692308, QDate(), 40},
+     {200002., 53., 3773.62264150943, QDate(2012, 02, 04), 40},
+     {200003., 54., 3703.75925925926, QDate(2012, 02, 05), 41}},
     {},
     {},
     {}};
@@ -404,7 +407,7 @@ void ImportXlsxTest::testGetData_data()
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
     for (int i = 0; i < testColumnNames_.size(); ++i)
     {
-        if (i != 0 && i != 2)
+        if (i != 0 && i != 2 && i != 3)
             continue;
         const QString& sheetName{sheets_[i].first};
         QTest::newRow(("Data in " + sheetName).toStdString().c_str())
