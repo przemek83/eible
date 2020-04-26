@@ -901,7 +901,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         }
     }
 
-    QVector<QVector<QVariant>> dataContainer(getRowCount(sheetName).second);
+    QVector<QVector<QVariant>> dataContainer(
+        std::min(getRowCount(sheetName).second, rowLimit));
 
     // Protection from potential core related to empty rows.
     unsigned int containerSize = dataContainer.size();

@@ -40,6 +40,9 @@ private Q_SLOTS:
     void testGetData_data();
     void testGetData();
 
+    void testGetDataLimitRows_data();
+    void testGetDataLimitRows();
+
 private:
     static QList<std::pair<QString, QString>> sheets_;
     static QStringList sharedStrings_;

@@ -512,3 +512,38 @@ void ImportXlsxTest::testGetData()
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
+
+void ImportXlsxTest::testGetDataLimitRows_data()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<unsigned int>("rowLimit");
+    QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
+    QString sheetName{sheets_[0].first};
+    QTest::newRow(("Data in " + sheetName).toStdString().c_str())
+        << sheetName << 10u << sheetData_[0];
+    sheetName = sheets_[5].first;
+    QVector<QVector<QVariant>> expectedValues;
+    const unsigned int rowLimit{12u};
+    for (unsigned int i = 0; i < rowLimit; ++i)
+        expectedValues.append(sheetData_[5][i]);
+    QTest::newRow(("Data in " + sheetName).toStdString().c_str())
+        << sheetName << rowLimit << expectedValues;
+}
+
+void ImportXlsxTest::testGetDataLimitRows()
+{
+    QFETCH(QString, sheetName);
+    QFETCH(unsigned int, rowLimit);
+    QFETCH(QVector<QVector<QVariant>>, expectedData);
+
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+    auto [success, actualData] =
+        importXlsx.getLimitedData(sheetName, {}, rowLimit);
+    QCOMPARE(success, true);
+    QCOMPARE(actualData, expectedData);
+}
