@@ -519,14 +519,19 @@ void ImportXlsxTest::testGetDataLimitRows_data()
     QTest::addColumn<unsigned int>("rowLimit");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
     QString sheetName{sheets_[0].first};
-    QTest::newRow(("Data in " + sheetName).toStdString().c_str())
+    QTest::newRow(("Limited data to 10 in " + sheetName).toStdString().c_str())
         << sheetName << 10u << sheetData_[0];
+    QTest::newRow(("Limited data to 2 in " + sheetName).toStdString().c_str())
+        << sheetName << 2u << sheetData_[0];
     sheetName = sheets_[5].first;
     QVector<QVector<QVariant>> expectedValues;
     const unsigned int rowLimit{12u};
     for (unsigned int i = 0; i < rowLimit; ++i)
         expectedValues.append(sheetData_[5][i]);
-    QTest::newRow(("Data in " + sheetName).toStdString().c_str())
+    QTest::newRow(
+        ("Limited data to " + QString::number(rowLimit) + " in " + sheetName)
+            .toStdString()
+            .c_str())
         << sheetName << rowLimit << expectedValues;
 }
 

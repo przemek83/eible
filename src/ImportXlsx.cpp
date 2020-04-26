@@ -1050,7 +1050,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         xmlStreamReader.readNextStartElement();
     }
 
-    if (0 != rowCounter && (!fillSamplesOnly || SAMPLE_SIZE > rowCount))
+    if (rowCounter != 0 && (!fillSamplesOnly || rowLimit > rowCount))
     {
         Q_ASSERT(rowCounter <= rowCount);
         if (rowCounter <= rowCount)

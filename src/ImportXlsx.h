@@ -72,8 +72,6 @@ private:
 
     static constexpr int NOT_SET_COLUMN{-1};
     static constexpr int DECIMAL_BASE{10};
-    /// Number of lines in sample data.
-    static constexpr int SAMPLE_SIZE{10};
 };
 
 #endif  // IMPORTXLSX_H
