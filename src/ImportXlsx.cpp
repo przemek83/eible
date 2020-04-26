@@ -817,7 +817,7 @@ std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getData(
-    const QString& sheetName, const QVector<int>& excludedColumns)
+    const QString& sheetName, const QVector<unsigned int>& excludedColumns)
 {
     auto [success, rowCount] = getRowCount(sheetName);
     if (!success)
@@ -826,7 +826,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getData(
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
-    const QString& sheetName, const QVector<int>& excludedColumns,
+    const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
 {
     //    const QString barTitle =
@@ -850,6 +850,18 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const unsigned int columnCount{columnCounts_[sheetName]};
     const unsigned int rowCount{rowCounts_[sheetName]};
     const bool fillSamplesOnly{rowCount != rowLimit};
+
+    auto it = std::find_if(
+        excludedColumns.begin(), excludedColumns.end(),
+        [=](unsigned int column) { return column >= columnCount; });
+    if (it != excludedColumns.end())
+    {
+        setError(__FUNCTION__,
+                 "Column to exclude number " + QString::number(*it) +
+                     " is invalid. Xlsx got only " +
+                     QString::number(columnCount) + " columns indexed from 0.");
+        return {false, {}};
+    }
 
     QuaZip zip(&ioDevice_);
 

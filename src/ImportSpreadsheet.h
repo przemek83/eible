@@ -33,10 +33,11 @@ public:
         const QString& sheetName) = 0;
 
     virtual std::pair<bool, QVector<QVector<QVariant>>> getData(
-        const QString& sheetName, const QVector<int>& excludedColumns) = 0;
+        const QString& sheetName,
+        const QVector<unsigned int>& excludedColumns) = 0;
 
     virtual std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
-        const QString& sheetName, const QVector<int>& excludedColumns,
+        const QString& sheetName, const QVector<unsigned int>& excludedColumns,
         unsigned int rowLimit) = 0;
 
 protected:

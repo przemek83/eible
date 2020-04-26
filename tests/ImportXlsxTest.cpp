@@ -552,3 +552,63 @@ void ImportXlsxTest::testGetDataLimitRows()
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
+
+void ImportXlsxTest::testGetDataExcludeColumns_data()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<QVector<unsigned int>>("excludedColumns");
+    QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
+
+    QString sheetName{sheets_[0].first};
+    QVector<QVector<QVariant>> expectedValues;
+    for (auto dataRow : sheetData_[0])
+    {
+        dataRow.remove(1);
+        expectedValues.append(dataRow);
+    }
+    QTest::newRow(("Get data with excluded column 1 in " + sheetName)
+                      .toStdString()
+                      .c_str())
+        << sheetName << QVector<unsigned int>{1} << expectedValues;
+
+    expectedValues.clear();
+    for (auto dataRow : sheetData_[0])
+    {
+        dataRow.remove(2);
+        dataRow.remove(0);
+        expectedValues.append(dataRow);
+    }
+    QTest::newRow(("Get data with excluded column 0 and 2 in " + sheetName)
+                      .toStdString()
+                      .c_str())
+        << sheetName << QVector<unsigned int>{0, 2} << expectedValues;
+}
+
+void ImportXlsxTest::testGetDataExcludeColumns()
+{
+    QFETCH(QString, sheetName);
+    QFETCH(QVector<unsigned int>, excludedColumns);
+    QFETCH(QVector<QVector<QVariant>>, expectedData);
+
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+    auto [success, actualData] = importXlsx.getData(sheetName, excludedColumns);
+    QCOMPARE(success, true);
+    QCOMPARE(actualData, expectedData);
+}
+
+void ImportXlsxTest::testGetDataExcludeInvalidColumn()
+{
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+    auto [success, actualData] = importXlsx.getData(sheets_[0].first, {3});
+    QCOMPARE(success, false);
+}

@@ -43,6 +43,10 @@ private Q_SLOTS:
     void testGetDataLimitRows_data();
     void testGetDataLimitRows();
 
+    void testGetDataExcludeColumns_data();
+    void testGetDataExcludeColumns();
+    void testGetDataExcludeInvalidColumn();
+
 private:
     static QList<std::pair<QString, QString>> sheets_;
     static QStringList sharedStrings_;
