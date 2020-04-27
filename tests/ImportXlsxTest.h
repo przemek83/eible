@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QSet>
 
+#include <ColumnType.h>
+
+class ImportXlsx;
+
 class ImportXlsxTest : public QObject
 {
     Q_OBJECT
@@ -52,6 +56,9 @@ private Q_SLOTS:
     void benchmarkGetData_clean();
 
 private:
+    QVector<QVector<QVariant>> getDataWithoutColumns(
+        const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
+    void setCommonData(ImportXlsx& importXlsx);
     static QList<std::pair<QString, QString>> sheets_;
     static QStringList sharedStrings_;
     static QList<int> dateStyles_;
@@ -59,6 +66,7 @@ private:
     static QList<QStringList> testColumnNames_;
     static std::vector<unsigned int> expectedRowCounts_;
     static QVector<QVector<QVector<QVariant>>> sheetData_;
+    static QVector<QVector<ColumnType>> columnTypes_;
     QByteArray benchmarkData_;
 };
 

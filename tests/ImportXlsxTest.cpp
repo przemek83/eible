@@ -5,8 +5,8 @@
 #include <QTest>
 
 #include <ExportXlsx.h>
-
 #include "ImportXlsx.h"
+
 #include "TestTableModel.h"
 
 QList<std::pair<QString, QString>> ImportXlsxTest::sheets_{
@@ -105,6 +105,22 @@ QList<QStringList> ImportXlsxTest::testColumnNames_ = {
 
 std::vector<unsigned int> ImportXlsxTest::expectedRowCounts_{2,  19, 0, 4,
                                                              30, 25, 20};
+
+QVector<QVector<ColumnType>> ImportXlsxTest::columnTypes_ = {
+    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE},
+    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
+     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+     ColumnType::STRING},
+    {},
+    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+     ColumnType::DATE, ColumnType::STRING},
+    {ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
+     ColumnType::NUMBER, ColumnType::STRING, ColumnType::NUMBER,
+     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
+     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
+    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
+    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER}};
 
 QVector<QVector<QVector<QVariant>>> ImportXlsxTest::sheetData_ = {
     {{3, 1., QDate(2020, 1, 3)}, {4, 2., QDate(2020, 1, 4)}},
@@ -345,36 +361,12 @@ void ImportXlsxTest::testGetColumnTypes_data()
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
 
-    QTest::newRow(("Column types in " + sheets_[0].first).toStdString().c_str())
-        << sheets_[0].first
-        << QVector({ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE});
-    QTest::newRow(("Column types in " + sheets_[1].first).toStdString().c_str())
-        << sheets_[1].first
-        << QVector({ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
-                    ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-                    ColumnType::STRING});
-    QTest::newRow(("Column types in " + sheets_[2].first).toStdString().c_str())
-        << sheets_[2].first << QVector<ColumnType>();
-    QTest::newRow(("Column types in " + sheets_[3].first).toStdString().c_str())
-        << sheets_[3].first
-        << QVector({ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-                    ColumnType::DATE, ColumnType::STRING});
-    QTest::newRow(("Column types in " + sheets_[4].first).toStdString().c_str())
-        << sheets_[4].first
-        << QVector({ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
-                    ColumnType::NUMBER, ColumnType::STRING, ColumnType::NUMBER,
-                    ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
-                    ColumnType::NUMBER, ColumnType::NUMBER,
-                    ColumnType::NUMBER});
-    QTest::newRow(("Column types in " + sheets_[5].first).toStdString().c_str())
-        << sheets_[5].first
-        << QVector(
-               {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER});
-    QTest::newRow(("Column types in " + sheets_[6].first).toStdString().c_str())
-        << sheets_[6].first
-        << QVector({ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-                    ColumnType::STRING, ColumnType::STRING,
-                    ColumnType::NUMBER});
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        const QString& sheetName{sheets_[i].first};
+        QTest::newRow(("Columns types in " + sheetName).toStdString().c_str())
+            << sheetName << columnTypes_[i];
+    }
 }
 
 void ImportXlsxTest::testGetColumnTypes()
@@ -384,11 +376,7 @@ void ImportXlsxTest::testGetColumnTypes()
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
-
+    setCommonData(importXlsx);
     auto [success, columnTypes] = importXlsx.getColumnTypes(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(columnTypes, expectedColumnTypes);
@@ -413,10 +401,7 @@ void ImportXlsxTest::testGetColumnCount()
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    setCommonData(importXlsx);
     auto [success, actualColumnCount] = importXlsx.getColumnCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
@@ -441,10 +426,7 @@ void ImportXlsxTest::testGetRowCount()
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    setCommonData(importXlsx);
     auto [success, actualRowCount] = importXlsx.getRowCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualRowCount, expectedRowCount);
@@ -475,10 +457,7 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    setCommonData(importXlsx);
     importXlsx.getColumnTypes(sheetName);
     auto [successRowCount, actualRowCount] = importXlsx.getRowCount(sheetName);
     QCOMPARE(successRowCount, true);
@@ -508,10 +487,7 @@ void ImportXlsxTest::testGetData()
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    setCommonData(importXlsx);
     auto [success, actualData] = importXlsx.getData(sheetName, {});
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
@@ -547,10 +523,7 @@ void ImportXlsxTest::testGetDataLimitRows()
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    setCommonData(importXlsx);
     auto [success, actualData] =
         importXlsx.getLimitedData(sheetName, {}, rowLimit);
     QCOMPARE(success, true);
@@ -564,28 +537,15 @@ void ImportXlsxTest::testGetDataExcludeColumns_data()
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
 
     QString sheetName{sheets_[0].first};
-    QVector<QVector<QVariant>> expectedValues;
-    for (auto dataRow : sheetData_[0])
-    {
-        dataRow.remove(1);
-        expectedValues.append(dataRow);
-    }
-    QTest::newRow(("Get data with excluded column 1 in " + sheetName)
-                      .toStdString()
-                      .c_str())
-        << sheetName << QVector<unsigned int>{1} << expectedValues;
+    QString testName{"Get data with excluded column 1 in " + sheetName};
+    QTest::newRow(qUtf8Printable(testName))
+        << sheetName << QVector<unsigned int>{1}
+        << getDataWithoutColumns(sheetData_[0], {1});
 
-    expectedValues.clear();
-    for (auto dataRow : sheetData_[0])
-    {
-        dataRow.remove(2);
-        dataRow.remove(0);
-        expectedValues.append(dataRow);
-    }
-    QTest::newRow(("Get data with excluded column 0 and 2 in " + sheetName)
-                      .toStdString()
-                      .c_str())
-        << sheetName << QVector<unsigned int>{0, 2} << expectedValues;
+    testName = "Get data with excluded column 0 and 2 in " + sheetName;
+    QTest::newRow(qUtf8Printable(testName))
+        << sheetName << QVector<unsigned int>{0, 2}
+        << getDataWithoutColumns(sheetData_[0], {2, 0});
 }
 
 void ImportXlsxTest::testGetDataExcludeColumns()
@@ -596,10 +556,7 @@ void ImportXlsxTest::testGetDataExcludeColumns()
 
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    setCommonData(importXlsx);
     auto [success, actualData] = importXlsx.getData(sheetName, excludedColumns);
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
@@ -609,10 +566,7 @@ void ImportXlsxTest::testGetDataExcludeInvalidColumn()
 {
     QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
     ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    setCommonData(importXlsx);
     auto [success, actualData] = importXlsx.getData(sheets_[0].first, {3});
     QCOMPARE(success, false);
 }
@@ -642,3 +596,24 @@ void ImportXlsxTest::benchmarkGetData()
 }
 
 void ImportXlsxTest::benchmarkGetData_clean() { benchmarkData_.clear(); }
+
+QVector<QVector<QVariant>> ImportXlsxTest::getDataWithoutColumns(
+    const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude)
+{
+    QVector<QVector<QVariant>> expectedValues;
+    for (auto dataRow : data)
+    {
+        for (int column : columnsToExclude)
+            dataRow.remove(column);
+        expectedValues.append(dataRow);
+    }
+    return expectedValues;
+}
+
+void ImportXlsxTest::setCommonData(ImportXlsx& importXlsx)
+{
+    importXlsx.setSharedStrings(sharedStrings_);
+    importXlsx.setDateStyles(dateStyles_);
+    importXlsx.setAllStyles(allStyles_);
+    importXlsx.setSheets(sheets_);
+}
