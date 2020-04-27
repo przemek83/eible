@@ -21,9 +21,9 @@ private Q_SLOTS:
 
     void testExportingViewWithMultiSelection();
 
-    void Benchmark_data();
+    void benchmark_data();
 
-    void Benchmark();
+    void benchmark();
 
     void cleanupTestCase();
 

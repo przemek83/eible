@@ -1,9 +1,13 @@
 #include "ImportXlsxTest.h"
 
 #include <QBuffer>
+#include <QTableView>
 #include <QTest>
 
+#include <ExportXlsx.h>
+
 #include "ImportXlsx.h"
+#include "TestTableModel.h"
 
 QList<std::pair<QString, QString>> ImportXlsxTest::sheets_{
     {"Sheet1", "xl/worksheets/sheet1.xml"},
@@ -612,3 +616,29 @@ void ImportXlsxTest::testGetDataExcludeInvalidColumn()
     auto [success, actualData] = importXlsx.getData(sheets_[0].first, {3});
     QCOMPARE(success, false);
 }
+
+void ImportXlsxTest::benchmarkGetData_data()
+{
+    QSKIP("Skip preparing benchmark data.");
+    TestTableModel model(100, 100000);
+    QTableView view;
+    view.setModel(&model);
+
+    QBuffer exportedFile(&benchmarkData_);
+    exportedFile.open(QIODevice::WriteOnly);
+    ExportXlsx exportXlsx;
+    exportXlsx.exportView(view, exportedFile);
+}
+
+void ImportXlsxTest::benchmarkGetData()
+{
+    QSKIP("Skip benchmark.");
+    QBuffer testFile(&benchmarkData_);
+    ImportXlsx importXlsx(testFile);
+    auto [success, sheetNames] = importXlsx.getSheetNames();
+    QCOMPARE(success, true);
+    QCOMPARE(sheetNames.size(), 1);
+    QBENCHMARK { importXlsx.getData(sheetNames.front(), {}); }
+}
+
+void ImportXlsxTest::benchmarkGetData_clean() { benchmarkData_.clear(); }

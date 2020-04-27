@@ -29,8 +29,8 @@ private Q_SLOTS:
 
     void testLocaleForNumbers();
 
-    void Benchmark_data();
-    void Benchmark();
+    void benchmark_data();
+    void benchmark();
 
     void cleanupTestCase();
 

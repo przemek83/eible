@@ -6,7 +6,6 @@
 
 #include <QBuffer>
 #include <QCryptographicHash>
-#include <QSignalSpy>
 #include <QTableView>
 #include <QTest>
 
@@ -159,14 +158,14 @@ void ExportXlsxTest::testExportingViewWithMultiSelection()
     compareWorkSheets(exportedZip, multiSelectionTableSheetData_);
 }
 
-void ExportXlsxTest::Benchmark_data()
+void ExportXlsxTest::benchmark_data()
 {
     tableModelForBenchmarking_ = new TestTableModel(100, 100000);
 }
 
-void ExportXlsxTest::Benchmark()
+void ExportXlsxTest::benchmark()
 {
-    // QSKIP("Skip benchmark.");
+    QSKIP("Skip benchmark.");
     QTableView view;
     view.setModel(tableModelForBenchmarking_);
     QBENCHMARK

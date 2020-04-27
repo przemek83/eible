@@ -47,6 +47,10 @@ private Q_SLOTS:
     void testGetDataExcludeColumns();
     void testGetDataExcludeInvalidColumn();
 
+    void benchmarkGetData_data();
+    void benchmarkGetData();
+    void benchmarkGetData_clean();
+
 private:
     static QList<std::pair<QString, QString>> sheets_;
     static QStringList sharedStrings_;
@@ -55,6 +59,7 @@ private:
     static QList<QStringList> testColumnNames_;
     static std::vector<unsigned int> expectedRowCounts_;
     static QVector<QVector<QVector<QVariant>>> sheetData_;
+    QByteArray benchmarkData_;
 };
 
 #endif  // IMPORTXLSXTEST_H

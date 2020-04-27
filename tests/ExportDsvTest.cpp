@@ -258,14 +258,14 @@ void ExportDsvTest::testLocaleForNumbers()
     QCOMPARE(exportedByteArray, localeForNumbersData_);
 }
 
-void ExportDsvTest::Benchmark_data()
+void ExportDsvTest::benchmark_data()
 {
     tableModelForBenchmarking_ = new TestTableModel(100, 100000);
 }
 
-void ExportDsvTest::Benchmark()
+void ExportDsvTest::benchmark()
 {
-    // QSKIP("Skip benchmark.");
+    QSKIP("Skip benchmark.");
     QTableView view;
     view.setModel(tableModelForBenchmarking_);
     QBENCHMARK
