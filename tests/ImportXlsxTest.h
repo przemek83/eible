@@ -59,14 +59,14 @@ private:
     QVector<QVector<QVariant>> getDataWithoutColumns(
         const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
     void setCommonData(ImportXlsx& importXlsx);
-    static QList<std::pair<QString, QString>> sheets_;
-    static QStringList sharedStrings_;
-    static QList<int> dateStyles_;
-    static QList<int> allStyles_;
-    static QList<QStringList> testColumnNames_;
-    static std::vector<unsigned int> expectedRowCounts_;
-    static QVector<QVector<QVector<QVariant>>> sheetData_;
-    static QVector<QVector<ColumnType>> columnTypes_;
+    static const QList<std::pair<QString, QString>> sheets_;
+    static const QStringList sharedStrings_;
+    static const QList<int> dateStyles_;
+    static const QList<int> allStyles_;
+    static const QList<QStringList> testColumnNames_;
+    static const std::vector<unsigned int> expectedRowCounts_;
+    static const QVector<QVector<QVector<QVariant>>> sheetData_;
+    static const QVector<QVector<ColumnType>> columnTypes_;
     QByteArray benchmarkData_;
 };
 

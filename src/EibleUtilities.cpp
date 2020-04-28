@@ -62,7 +62,7 @@ QVariant getDefaultVariantForFormat(ColumnType format)
     {
         case ColumnType::STRING:
         {
-            return QVariant(QVariant::Int);
+            return QVariant(QVariant::String);
         }
 
         case ColumnType::NUMBER:
