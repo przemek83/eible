@@ -53,7 +53,13 @@ private Q_SLOTS:
 
     void benchmarkGetData_data();
     void benchmarkGetData();
-    void benchmarkGetData_clean();
+
+    void testEmittingProgressPercentChangedEmptyFile();
+    void testEmittingProgressPercentChangedSmallFile();
+    void testEmittingProgressPercentChangedBigFile_data();
+    void testEmittingProgressPercentChangedBigFile();
+
+    void cleanup();
 
 private:
     QVector<QVector<QVariant>> getDataWithoutColumns(
@@ -67,7 +73,9 @@ private:
     static const std::vector<unsigned int> expectedRowCounts_;
     static const QVector<QVector<QVector<QVariant>>> sheetData_;
     static const QVector<QVector<ColumnType>> columnTypes_;
-    QByteArray benchmarkData_;
+    QByteArray generatedXlsx_;
+
+    static constexpr int NO_SIGNAL{0};
 };
 
 #endif  // IMPORTXLSXTEST_H

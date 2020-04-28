@@ -1,6 +1,7 @@
 #include "ImportXlsxTest.h"
 
 #include <QBuffer>
+#include <QSignalSpy>
 #include <QTableView>
 #include <QTest>
 
@@ -666,7 +667,7 @@ void ImportXlsxTest::benchmarkGetData_data()
     QTableView view;
     view.setModel(&model);
 
-    QBuffer exportedFile(&benchmarkData_);
+    QBuffer exportedFile(&generatedXlsx_);
     exportedFile.open(QIODevice::WriteOnly);
     ExportXlsx exportXlsx;
     exportXlsx.exportView(view, exportedFile);
@@ -675,7 +676,7 @@ void ImportXlsxTest::benchmarkGetData_data()
 void ImportXlsxTest::benchmarkGetData()
 {
     QSKIP("Skip benchmark.");
-    QBuffer testFile(&benchmarkData_);
+    QBuffer testFile(&generatedXlsx_);
     ImportXlsx importXlsx(testFile);
     auto [success, sheetNames] = importXlsx.getSheetNames();
     QCOMPARE(success, true);
@@ -683,7 +684,54 @@ void ImportXlsxTest::benchmarkGetData()
     QBENCHMARK { importXlsx.getData(sheetNames.front(), {}); }
 }
 
-void ImportXlsxTest::benchmarkGetData_clean() { benchmarkData_.clear(); }
+void ImportXlsxTest::testEmittingProgressPercentChangedEmptyFile()
+{
+    QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
+    QStringList sheetNames{importXlsx.getSheetNames().second};
+    auto [success, actualData] = importXlsx.getData(sheetNames.first(), {});
+    QCOMPARE(success, true);
+    QCOMPARE(spy.count(), NO_SIGNAL);
+}
+
+void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile()
+{
+    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    ImportXlsx importXlsx(xlsxTestFile);
+    QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
+    setCommonData(importXlsx);
+    const unsigned int sheetIndex{1};
+    auto [success, actualData] =
+        importXlsx.getData(sheets_[sheetIndex].first, {});
+    QCOMPARE(success, true);
+    QCOMPARE(spy.count(), expectedRowCounts_[sheetIndex]);
+}
+
+void ImportXlsxTest::testEmittingProgressPercentChangedBigFile_data()
+{
+    TestTableModel model(1, 250);
+    QTableView view;
+    view.setModel(&model);
+
+    QBuffer exportedFile(&generatedXlsx_);
+    exportedFile.open(QIODevice::WriteOnly);
+    ExportXlsx exportXlsx;
+    exportXlsx.exportView(view, exportedFile);
+}
+
+void ImportXlsxTest::testEmittingProgressPercentChangedBigFile()
+{
+    QBuffer testFile(&generatedXlsx_);
+    ImportXlsx importXlsx(testFile);
+    QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
+    QStringList sheetNames{importXlsx.getSheetNames().second};
+    auto [success, actualData] = importXlsx.getData(sheetNames.first(), {});
+    QCOMPARE(success, true);
+    QCOMPARE(spy.count(), 100);
+}
+
+void ImportXlsxTest::cleanup() { generatedXlsx_.clear(); }
 
 QVector<QVector<QVariant>> ImportXlsxTest::getDataWithoutColumns(
     const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude)
