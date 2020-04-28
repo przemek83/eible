@@ -829,20 +829,6 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
 {
-    //    const QString barTitle =
-    //        Constants::getProgressBarTitle(Constants::BarTitle::LOADING);
-    //    std::unique_ptr<ProgressBarCounter> bar =
-    //        (fillSamplesOnly ? nullptr
-    //                         : std::make_unique<ProgressBarCounter>(
-    //                               barTitle, rowsCount_, nullptr));
-    //    if (bar != nullptr)
-    //        bar->showDetached();
-
-    //    QApplication::processEvents();
-
-    //    QTime performanceTimer;
-    //    performanceTimer.start();
-
     const auto [success, columnTypes] = getColumnTypes(sheetName);
     if (!success)
         return {false, {}};
@@ -919,9 +905,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     // Protection from potential core related to empty rows.
     unsigned int containerSize = dataContainer.size();
     for (unsigned int i = 0; i < containerSize; ++i)
-    {
         dataContainer[i] = templateDataRow;
-    }
 
     // Current row data.
     QVector<QVariant> currentDataRow(templateDataRow);
@@ -938,6 +922,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const QString rTag(QStringLiteral("r"));
     const QString tTag(QStringLiteral("t"));
 
+    unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
            0 != xmlStreamReader.name().compare(sheetDataTag) &&
            rowCounter <= rowLimit)
@@ -956,22 +941,15 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
                 double power = pow(DECIMAL_BASE, charsToChopFromEndInCellName);
                 if (static_cast<unsigned int>(qRound(power)) <= rowCounter + 2)
-                {
                     charsToChopFromEndInCellName++;
-                }
             }
 
             rowCounter++;
 
-            //            if (!fillSamplesOnly)
-            //            {
-            //                bar->updateProgress(rowCounter);
-            //            }
+            updateProgress(rowCounter, rowLimit, lastEmittedPercent);
 
             if (fillSamplesOnly && rowCounter > containerSize)
-            {
                 break;
-            }
         }
 
         // When we encounter start of cell description.
@@ -988,9 +966,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
             // If cells missing than increment column number.
             while (expectedIndexCurrentColumn > column)
-            {
                 column++;
-            }
 
             // If we encounter column outside expected grid we move to row end.
             if (expectedIndexCurrentColumn == NOT_SET_COLUMN)
@@ -1018,15 +994,11 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                 {
                     // Strings.
                     if (0 == currentColType.compare(sTag))
-                    {
                         currentDataRow[activeColumnsMapping[column]] =
                             QVariant(xmlStreamReader.readElementText().toInt());
-                    }
                     else
-                    {
                         currentDataRow[activeColumnsMapping[column]] =
                             QVariant(xmlStreamReader.readElementText());
-                    }
                     break;
                 }
 
@@ -1044,11 +1016,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                 case ColumnType::NUMBER:
                 {
                     if (0 != currentColType.compare(sTag))
-                    {
                         currentDataRow[activeColumnsMapping[column]] = QVariant(
                             xmlStreamReader.readElementText().toDouble());
-                    }
-
                     break;
                 }
 
@@ -1066,23 +1035,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     {
         Q_ASSERT(rowCounter <= rowCount);
         if (rowCounter <= rowCount)
-        {
             dataContainer[rowCounter - 1] = currentDataRow;
-        }
     }
-
-    //    if (!fillSamplesOnly)
-    //    {
-    //        Q_ASSERT(rowCount == containerSize);
-
-    //        rebuildDefinitonUsingActiveColumnsOnly();
-
-    //        LOG(LogTypes::IMPORT_EXPORT,
-    //            "Loaded file having " + QString::number(rowsCount_) +
-    //                " rows in time " +
-    //                QString::number(performanceTimer.elapsed() * 1.0 /
-    //                1000) + " seconds.");
-    //    }
 
     return {true, dataContainer};
 }

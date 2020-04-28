@@ -43,6 +43,9 @@ public:
 protected:
     void setError(QString functionName, QString errorContent);
 
+    void updateProgress(unsigned int rowCounter, unsigned int rowLimit,
+                        unsigned int& lastEmittedPercent);
+
     QIODevice& ioDevice_;
 
     /// If empty column is encountered insert defined string.
@@ -52,7 +55,7 @@ private:
     std::pair<QString, QString> error_;
 
 Q_SIGNALS:
-    void updateProgress(int progress);
+    void progressPercentChanged(unsigned int progressPercent);
 };
 
 #endif  // IMPORTSPREADSHEET_H
