@@ -177,4 +177,4 @@ void ExportXlsxTest::benchmark()
     }
 }
 
-void ExportXlsxTest::cleanup() { delete tableModelForBenchmarking_; }
+void ExportXlsxTest::cleanupTestCase() { delete tableModelForBenchmarking_; }

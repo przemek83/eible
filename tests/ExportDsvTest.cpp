@@ -280,4 +280,4 @@ void ExportDsvTest::benchmark()
     }
 }
 
-void ExportDsvTest::cleanup() { delete tableModelForBenchmarking_; }
+void ExportDsvTest::cleanupTestCase() { delete tableModelForBenchmarking_; }
