@@ -37,6 +37,11 @@ protected:
 private:
     const QByteArray& getCellTypeTag(QVariant& cell);
 
+    static const QByteArray CELL_START;
+    static const QByteArray ROW_NUMBER_CLOSE;
+    static const QByteArray VALUE_START;
+    static const QByteArray CELL_END;
+
     QList<QByteArray> columnNames_{};
 };
 

@@ -9,6 +9,11 @@
 
 #include "EibleUtilities.h"
 
+const QByteArray ExportXlsx::CELL_START{QByteArrayLiteral("<c r=\"")};
+const QByteArray ExportXlsx::ROW_NUMBER_CLOSE{QByteArrayLiteral("\" ")};
+const QByteArray ExportXlsx::VALUE_START{QByteArrayLiteral("><v>")};
+const QByteArray ExportXlsx::CELL_END{QByteArrayLiteral("</v></c>")};
+
 bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
 {
     QFile xlsxTemplate(QStringLiteral(":/") +
@@ -99,21 +104,20 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
     rowContent.append(QByteArrayLiteral("<row r=\""));
     rowContent.append(rowNumber);
     rowContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
-
     for (int column = 0; column < model.columnCount(); ++column)
     {
-        QVariant cell = model.index(row, column).data();
+        QVariant cell{model.index(row, column).data()};
         if (cell.isNull())
             continue;
 
-        rowContent.append(QByteArrayLiteral("<c r=\""));
+        rowContent.append(CELL_START);
         rowContent.append(columnNames_.at(column));
         rowContent.append(rowNumber);
-        rowContent.append(QByteArrayLiteral("\" "));
+        rowContent.append(ROW_NUMBER_CLOSE);
         rowContent.append(getCellTypeTag(cell));
-        rowContent.append(QByteArrayLiteral("><v>"));
+        rowContent.append(VALUE_START);
         rowContent.append(cell.toByteArray());
-        rowContent.append(QByteArrayLiteral("</v></c>"));
+        rowContent.append(CELL_END);
     }
     rowContent.append(QByteArrayLiteral("</row>"));
     return rowContent;
