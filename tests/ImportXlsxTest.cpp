@@ -667,6 +667,7 @@ void ImportXlsxTest::benchmarkGetData_data()
     QTableView view;
     view.setModel(&model);
 
+    generatedXlsx_.clear();
     QBuffer exportedFile(&generatedXlsx_);
     exportedFile.open(QIODevice::WriteOnly);
     ExportXlsx exportXlsx;
@@ -714,6 +715,7 @@ void ImportXlsxTest::testEmittingProgressPercentChangedBigFile_data()
     QTableView view;
     view.setModel(&model);
 
+    generatedXlsx_.clear();
     QBuffer exportedFile(&generatedXlsx_);
     exportedFile.open(QIODevice::WriteOnly);
     ExportXlsx exportXlsx;
@@ -730,8 +732,6 @@ void ImportXlsxTest::testEmittingProgressPercentChangedBigFile()
     QCOMPARE(success, true);
     QCOMPARE(spy.count(), 100);
 }
-
-void ImportXlsxTest::cleanup() { generatedXlsx_.clear(); }
 
 QVector<QVector<QVariant>> ImportXlsxTest::getDataWithoutColumns(
     const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude)

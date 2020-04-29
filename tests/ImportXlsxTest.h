@@ -59,8 +59,6 @@ private Q_SLOTS:
     void testEmittingProgressPercentChangedBigFile_data();
     void testEmittingProgressPercentChangedBigFile();
 
-    void cleanup();
-
 private:
     QVector<QVector<QVariant>> getDataWithoutColumns(
         const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
