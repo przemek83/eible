@@ -260,6 +260,7 @@ void ExportDsvTest::testLocaleForNumbers()
 
 void ExportDsvTest::benchmark_data()
 {
+    QSKIP("Skip preparing benchmark data.");
     tableModelForBenchmarking_ = new TestTableModel(100, 100000);
 }
 
@@ -279,4 +280,4 @@ void ExportDsvTest::benchmark()
     }
 }
 
-void ExportDsvTest::cleanupTestCase() { delete tableModelForBenchmarking_; }
+void ExportDsvTest::cleanup() { delete tableModelForBenchmarking_; }

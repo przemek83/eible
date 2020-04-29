@@ -160,6 +160,7 @@ void ExportXlsxTest::testExportingViewWithMultiSelection()
 
 void ExportXlsxTest::benchmark_data()
 {
+    QSKIP("Skip preparing benchmark data.");
     tableModelForBenchmarking_ = new TestTableModel(100, 100000);
 }
 
@@ -176,4 +177,4 @@ void ExportXlsxTest::benchmark()
     }
 }
 
-void ExportXlsxTest::cleanupTestCase() { delete tableModelForBenchmarking_; }
+void ExportXlsxTest::cleanup() { delete tableModelForBenchmarking_; }

@@ -25,7 +25,7 @@ private Q_SLOTS:
 
     void benchmark();
 
-    void cleanupTestCase();
+    void cleanup();
 
 private:
     QByteArray retrieveFileFromZip(QBuffer& exportedZip,

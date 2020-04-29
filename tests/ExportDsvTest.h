@@ -32,7 +32,7 @@ private Q_SLOTS:
     void benchmark_data();
     void benchmark();
 
-    void cleanupTestCase();
+    void cleanup();
 
 private:
     static QString tableDataTsv_;
