@@ -35,7 +35,7 @@ protected:
     QByteArray getContentEnding() override;
 
 private:
-    const QByteArray& getCellTypeTag(QVariant& cell);
+    const QByteArray& getCellTypeTag(const QVariant& cell);
 
     static const QByteArray CELL_START;
     static const QByteArray ROW_NUMBER_CLOSE;

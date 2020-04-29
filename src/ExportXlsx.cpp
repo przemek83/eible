@@ -106,7 +106,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
     rowContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
     for (int column = 0; column < model.columnCount(); ++column)
     {
-        QVariant cell{model.index(row, column).data()};
+        const QVariant& cell{model.index(row, column).data()};
         if (cell.isNull())
             continue;
 
@@ -116,7 +116,12 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
         rowContent.append(ROW_NUMBER_CLOSE);
         rowContent.append(getCellTypeTag(cell));
         rowContent.append(VALUE_START);
-        rowContent.append(cell.toByteArray());
+        if (cell.type() == QVariant::Date || cell.type() == QVariant::DateTime)
+            rowContent.append(QByteArray::number(
+                -1 *
+                cell.toDate().daysTo(EibleUtilities::getStartOfExcelWorld())));
+        else
+            rowContent.append(cell.toByteArray());
         rowContent.append(CELL_END);
     }
     rowContent.append(QByteArrayLiteral("</row>"));
@@ -128,7 +133,7 @@ QByteArray ExportXlsx::getContentEnding()
     return QByteArrayLiteral("</sheetData>");
 }
 
-const QByteArray& ExportXlsx::getCellTypeTag(QVariant& cell)
+const QByteArray& ExportXlsx::getCellTypeTag(const QVariant& cell)
 {
     switch (cell.type())
     {
@@ -136,8 +141,6 @@ const QByteArray& ExportXlsx::getCellTypeTag(QVariant& cell)
         case QVariant::DateTime:
         {
             static const QByteArray dateTag{"s=\"3\""};
-            cell = QVariant(-1 * cell.toDate().daysTo(
-                                     EibleUtilities::getStartOfExcelWorld()));
             return dateTag;
         }
 
