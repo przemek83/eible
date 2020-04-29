@@ -186,7 +186,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     QStringList columnList;
     // Loading column names is using Excel names names. Set 600 temporary.
     // const int columnsCount = EibleUtilities::getMaxExcelColumns();
-    const QStringList excelColNames =
+    const QList<QByteArray> excelColNames =
         EibleUtilities::generateExcelColumnNames(columnCount);
 
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
@@ -238,8 +238,8 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
                                       .toString());
 
                 // If cells are missing add default name.
-                while (excelColNames.indexOf(rowNumber.remove(regExp)) >
-                       columnIndex)
+                while (excelColNames.indexOf(
+                           rowNumber.remove(regExp).toUtf8()) > columnIndex)
                 {
                     columnList << emptyColName_;
                     columnIndex++;
@@ -488,8 +488,9 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
 
     QVector<ColumnType> columnTypes;
 
-    const QStringList excelColNames = EibleUtilities::generateExcelColumnNames(
-        EibleUtilities::getMaxExcelColumns());
+    const QList<QByteArray> excelColNames =
+        EibleUtilities::generateExcelColumnNames(
+            EibleUtilities::getMaxExcelColumns());
 
     // Current column.
     int column = NOT_SET_COLUMN;
@@ -537,8 +538,8 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
                 xmlStreamReader.attributes().value(rTag).toString();
             int numberOfCharsToRemove =
                 stringToChop.size() - charsToChopFromEndInCellName;
-            int expectedIndexCurrentColumn =
-                excelColNames.indexOf(stringToChop.left(numberOfCharsToRemove));
+            int expectedIndexCurrentColumn = excelColNames.indexOf(
+                stringToChop.left(numberOfCharsToRemove).toUtf8());
 
             // If cells are missing increment column number.
             while (expectedIndexCurrentColumn > column)
@@ -743,8 +744,9 @@ bool ImportXlsx::analyzeSheet(const QString& sheetName)
     if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
         return false;
 
-    const QStringList excelColNames = EibleUtilities::generateExcelColumnNames(
-        EibleUtilities::getMaxExcelColumns());
+    const QList<QByteArray> excelColNames =
+        EibleUtilities::generateExcelColumnNames(
+            EibleUtilities::getMaxExcelColumns());
 
     const QString rowTag(QStringLiteral("row"));
     const QString cellTag(QStringLiteral("c"));
@@ -777,8 +779,8 @@ bool ImportXlsx::analyzeSheet(const QString& sheetName)
                 xmlStreamReader.attributes().value(rTag).toString();
             int numberOfCharsToRemove =
                 stringToChop.size() - charsToChopFromEndInCellName;
-            int expectedIndexCurrentColumn =
-                excelColNames.indexOf(stringToChop.left(numberOfCharsToRemove));
+            int expectedIndexCurrentColumn = excelColNames.indexOf(
+                stringToChop.left(numberOfCharsToRemove).toUtf8());
 
             // If cells are missing increment column number.
             while (expectedIndexCurrentColumn > column)
@@ -866,7 +868,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     if (!sheetFound)
         return {false, {}};
 
-    QStringList excelColNames =
+    QList<QByteArray> excelColNames =
         EibleUtilities::generateExcelColumnNames(columnCount);
 
     QuaZipFile zipFile;
@@ -964,9 +966,10 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
             QString stringToChop =
                 xmlStreamReader.attributes().value(rTag).toString();
-            int expectedIndexCurrentColumn =
-                excelColNames.indexOf(stringToChop.left(
-                    stringToChop.size() - charsToChopFromEndInCellName));
+            int expectedIndexCurrentColumn = excelColNames.indexOf(
+                stringToChop
+                    .left(stringToChop.size() - charsToChopFromEndInCellName)
+                    .toUtf8());
 
             // If cells missing than increment column number.
             while (expectedIndexCurrentColumn > column)

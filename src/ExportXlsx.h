@@ -37,8 +37,7 @@ protected:
 private:
     const QByteArray& getCellTypeTag(QVariant& cell);
 
-Q_SIGNALS:
-    void updateProgress(int progress);
+    QList<QByteArray> columnNames_{};
 };
 
 #endif  // EXPORTXLSX_H

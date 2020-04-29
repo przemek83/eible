@@ -8,8 +8,7 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
     const auto model = view.model();
     Q_ASSERT(model != nullptr);
 
-    const int proxyColumnCount = model->columnCount();
-    if (proxyColumnCount == 0)
+    if (model->columnCount() == 0)
         return writeContent(getEmptyContent(), ioDevice);
 
     QByteArray content{generateHeaderContent(*model)};

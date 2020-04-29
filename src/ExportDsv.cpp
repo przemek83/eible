@@ -91,7 +91,7 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QVariant::String:
         {
             // Following https://tools.ietf.org/html/rfc4180
-            QString value{variant.toString()};
+            QByteArray value{variant.toByteArray()};
             if (value.contains(separator) || value.contains('\"') ||
                 value.contains('\n'))
             {

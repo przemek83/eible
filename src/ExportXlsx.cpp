@@ -66,7 +66,7 @@ QByteArray ExportXlsx::getEmptyContent()
 
 QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
 {
-    const QStringList columnNames =
+    const QList<QByteArray> columnNames =
         EibleUtilities::generateExcelColumnNames(model.columnCount());
 
     QByteArray headersContent{QByteArrayLiteral("<sheetData>")};
@@ -90,8 +90,9 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
 QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
                                           int row, int skippedRowsCount)
 {
-    const QStringList columnNames =
-        EibleUtilities::generateExcelColumnNames(model.columnCount());
+    if (columnNames_.size() != model.columnCount())
+        columnNames_ =
+            EibleUtilities::generateExcelColumnNames(model.columnCount());
 
     QByteArray rowContent;
     const QByteArray rowNumber{QByteArray::number(row - skippedRowsCount + 2)};
@@ -106,7 +107,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
             continue;
 
         rowContent.append(QByteArrayLiteral("<c r=\""));
-        rowContent.append(columnNames.at(column));
+        rowContent.append(columnNames_.at(column));
         rowContent.append(rowNumber);
         rowContent.append(QByteArrayLiteral("\" "));
         rowContent.append(getCellTypeTag(cell));
