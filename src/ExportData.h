@@ -40,8 +40,11 @@ protected:
 
     virtual QByteArray getContentEnding();
 
+    virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
+                                unsigned int& lastEmittedPercent);
+
 Q_SIGNALS:
-    void updateProgress(int progress);
+    void progressPercentChanged(unsigned int currentPercent);
 };
 
 #endif  // EXPORTDATA_H
