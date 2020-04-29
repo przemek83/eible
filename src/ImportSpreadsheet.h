@@ -43,8 +43,8 @@ public:
 protected:
     void setError(QString functionName, QString errorContent);
 
-    void updateProgress(unsigned int rowCounter, unsigned int rowLimit,
-                        unsigned int& lastEmittedPercent);
+    virtual void updateProgress(unsigned int rowCounter, unsigned int rowLimit,
+                                unsigned int& lastEmittedPercent);
 
     QIODevice& ioDevice_;
 

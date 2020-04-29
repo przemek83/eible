@@ -455,6 +455,9 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     const QString& sheetName)
 {
+    if (const auto it = columnTypes_.find(sheetName); it != columnTypes_.end())
+        return {true, *it};
+
     if (!sheets_ && !getSheetNames().first)
         return {false, {}};
 
@@ -661,6 +664,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
 
     rowCounts_[sheetName] = rowCounter;
     columnCounts_[sheetName] = maxColumn + 1;
+    columnTypes_[sheetName] = columnTypes;
 
     return {true, columnTypes};
 }
