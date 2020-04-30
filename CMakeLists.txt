@@ -52,6 +52,8 @@ add_library(${PROJECT_NAME} SHARED
   src/ImportSpreadsheet.h
   src/ImportXlsx.cpp
   src/ImportXlsx.h
+  src/ImportOds.cpp
+  src/ImportOds.h
   src/ColumnType.h
   qrc_resources.cpp
 )
@@ -69,6 +71,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER
     src/ExportData.h
     src/ImportSpreadsheet.h
     src/ImportXlsx.h
+    src/ImportOds.h
     src/ColumnType.h)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 include(GNUInstallDirs)
