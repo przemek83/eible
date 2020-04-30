@@ -10,6 +10,9 @@ public:
     template <class T>
     void checkRetrievingSheetNames(const QString& fileName);
 
+    template <class T>
+    void checkRetrievingSheetNamesFromEmptyFile();
+
 private:
     static const QStringList sheetNames_;
 };

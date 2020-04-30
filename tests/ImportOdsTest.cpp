@@ -13,4 +13,7 @@ void ImportOdsTest::testRetrievingSheetNames()
     ImportCommon().checkRetrievingSheetNames<ImportOds>(testFileName_);
 }
 
-void ImportOdsTest::testRetrievingSheetNamesFromEmptyFile() {}
+void ImportOdsTest::testRetrievingSheetNamesFromEmptyFile()
+{
+    ImportCommon().checkRetrievingSheetNamesFromEmptyFile<ImportOds>();
+}

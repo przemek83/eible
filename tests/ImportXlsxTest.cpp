@@ -318,12 +318,7 @@ void ImportXlsxTest::testRetrievingSheetNames()
 
 void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
 {
-    QByteArray byteArray;
-    QBuffer emptyBuffer(&byteArray);
-    ImportXlsx importXlsx(emptyBuffer);
-    auto [success, actualNames] = importXlsx.getSheetNames();
-    QCOMPARE(success, false);
-    QCOMPARE(actualNames, {});
+    ImportCommon().checkRetrievingSheetNamesFromEmptyFile<ImportXlsx>();
 }
 
 void ImportXlsxTest::testGetDateStyles()
