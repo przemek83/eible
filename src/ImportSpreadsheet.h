@@ -51,6 +51,8 @@ protected:
     /// If empty column is encountered insert defined string.
     QString emptyColName_;
 
+    static constexpr int NOT_SET_COLUMN{-1};
+
 private:
     std::pair<QString, QString> error_;
 

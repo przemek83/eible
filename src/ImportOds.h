@@ -5,6 +5,12 @@
 
 #include "eible_global.h"
 
+#include <QHash>
+
+class QuaZip;
+class QuaZipFile;
+class QXmlStreamReader;
+
 class EIBLE_EXPORT ImportOds : public ImportSpreadsheet
 {
 public:
@@ -44,7 +50,18 @@ public:
         unsigned int rowLimit) override;
 
 private:
+    std::pair<bool, unsigned int> getCount(
+        const QString& sheetName, const QHash<QString, unsigned int>& countMap);
+
+    bool analyzeSheet(const QString& sheetName);
+
+    bool openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
+                                   QuaZipFile& zipFile,
+                                   QXmlStreamReader& xmlStreamReader);
+
     std::optional<QStringList> sheetNames_{std::nullopt};
+    QHash<QString, unsigned int> rowCounts_{};
+    QHash<QString, unsigned int> columnCounts_{};
 };
 
 #endif  // IMPORTODS_H

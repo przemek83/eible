@@ -72,7 +72,6 @@ private:
     QHash<QString, unsigned int> columnCounts_{};
     QHash<QString, QVector<ColumnType>> columnTypes_{};
 
-    static constexpr int NOT_SET_COLUMN{-1};
     static constexpr int DECIMAL_BASE{10};
 };
 
