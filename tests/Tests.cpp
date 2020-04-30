@@ -2,6 +2,7 @@
 
 #include "ExportDsvTest.h"
 #include "ExportXlsxTest.h"
+#include "ImportOdsTest.h"
 #include "ImportXlsxTest.h"
 
 int main(int argc, char* argv[])
@@ -17,6 +18,9 @@ int main(int argc, char* argv[])
 
     ImportXlsxTest importXlsxTest;
     QTest::qExec(&importXlsxTest);
+
+    ImportOdsTest importOdsTest;
+    QTest::qExec(&importOdsTest);
 
     return 0;
 }

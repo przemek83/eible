@@ -1,13 +1,13 @@
 #include "ImportXlsxTest.h"
 
+#include <ExportXlsx.h>
+#include <ImportXlsx.h>
 #include <QBuffer>
 #include <QSignalSpy>
 #include <QTableView>
 #include <QTest>
 
-#include <ExportXlsx.h>
-#include "ImportXlsx.h"
-
+#include "ImportCommon.h"
 #include "TestTableModel.h"
 
 const QList<std::pair<QString, QString>> ImportXlsxTest::sheets_{
@@ -309,14 +309,8 @@ const QVector<QVector<QVector<QVariant>>> ImportXlsxTest::sheetData_ = {
 
 void ImportXlsxTest::testRetrievingSheetNames()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
-    ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualNames] = importXlsx.getSheetNames();
-    QCOMPARE(success, true);
-    QStringList sheets;
-    for (const auto& [sheetName, sheetPath] : sheets_)
-        sheets << sheetName;
-    QCOMPARE(actualNames, sheets);
+    ImportCommon().checkRetrievingSheetNames<ImportXlsx>(
+        QStringLiteral(":/testXlsx.xlsx"));
 }
 
 void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()

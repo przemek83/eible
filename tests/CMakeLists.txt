@@ -16,6 +16,10 @@ set(${PROJECT_NAME}_SOURCES
     ExportDsvTest.h
     ImportXlsxTest.cpp
     ImportXlsxTest.h
+    ImportOdsTest.cpp
+    ImportOdsTest.h
+    ImportCommon.cpp
+    ImportCommon.h
     )
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
