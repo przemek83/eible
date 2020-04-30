@@ -9,6 +9,9 @@ class ImportOdsTest : public QObject
 private Q_SLOTS:
     void testRetrievingSheetNames();
     void testRetrievingSheetNamesFromEmptyFile();
+
+private:
+    static const QString testFileName_;
 };
 
 #endif  // IMPORTODSTEST_H

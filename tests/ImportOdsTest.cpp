@@ -6,10 +6,11 @@
 
 #include "ImportCommon.h"
 
+const QString ImportOdsTest::testFileName_{QStringLiteral(":/testOds.ods")};
+
 void ImportOdsTest::testRetrievingSheetNames()
 {
-    ImportCommon().checkRetrievingSheetNames<ImportOds>(
-        QStringLiteral(":/testOds.ods"));
+    ImportCommon().checkRetrievingSheetNames<ImportOds>(testFileName_);
 }
 
 void ImportOdsTest::testRetrievingSheetNamesFromEmptyFile() {}

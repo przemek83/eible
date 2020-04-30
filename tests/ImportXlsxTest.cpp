@@ -10,6 +10,10 @@
 #include "ImportCommon.h"
 #include "TestTableModel.h"
 
+const QString ImportXlsxTest::testFileName_{QStringLiteral(":/testXlsx.xlsx")};
+const QString ImportXlsxTest::templateFileName_{
+    QStringLiteral(":/template.xlsx")};
+
 const QList<std::pair<QString, QString>> ImportXlsxTest::sheets_{
     {"Sheet1", "xl/worksheets/sheet1.xml"},
     {"Sheet2", "xl/worksheets/sheet2.xml"},
@@ -309,8 +313,7 @@ const QVector<QVector<QVector<QVariant>>> ImportXlsxTest::sheetData_ = {
 
 void ImportXlsxTest::testRetrievingSheetNames()
 {
-    ImportCommon().checkRetrievingSheetNames<ImportXlsx>(
-        QStringLiteral(":/testXlsx.xlsx"));
+    ImportCommon().checkRetrievingSheetNames<ImportXlsx>(testFileName_);
 }
 
 void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
@@ -325,7 +328,7 @@ void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
 
 void ImportXlsxTest::testGetDateStyles()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     auto [success, actualDateStyle] = importXlsx.getDateStyles();
     QCOMPARE(success, true);
@@ -334,7 +337,7 @@ void ImportXlsxTest::testGetDateStyles()
 
 void ImportXlsxTest::testGetDateStylesNoContent()
 {
-    QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
+    QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     auto [success, actualDateStyle] = importXlsx.getDateStyles();
     QCOMPARE(success, true);
@@ -343,7 +346,7 @@ void ImportXlsxTest::testGetDateStylesNoContent()
 
 void ImportXlsxTest::testGetAllStyles()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     auto [success, actualAllStyle] = importXlsx.getAllStyles();
     QCOMPARE(success, true);
@@ -352,7 +355,7 @@ void ImportXlsxTest::testGetAllStyles()
 
 void ImportXlsxTest::testGetAllStylesNoContent()
 {
-    QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
+    QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     auto [success, actualAllStyle] = importXlsx.getAllStyles();
     QCOMPARE(success, true);
@@ -361,7 +364,7 @@ void ImportXlsxTest::testGetAllStylesNoContent()
 
 void ImportXlsxTest::testGetSharedStrings()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     auto [success, actualSharedStrings] = importXlsx.getSharedStrings();
     QCOMPARE(success, true);
@@ -370,7 +373,7 @@ void ImportXlsxTest::testGetSharedStrings()
 
 void ImportXlsxTest::testGetSharedStringsNoContent()
 {
-    QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
+    QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     auto [success, actualSharedStrings] = importXlsx.getSharedStrings();
     QCOMPARE(success, true);
@@ -393,7 +396,7 @@ void ImportXlsxTest::testGetColumnList()
 {
     QFETCH(QString, sheetName);
     QFETCH(QStringList, expectedColumnList);
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     importXlsx.setSharedStrings(sharedStrings_);
     importXlsx.setSheets(sheets_);
@@ -404,7 +407,7 @@ void ImportXlsxTest::testGetColumnList()
 
 void ImportXlsxTest::testSettingEmptyColumnName()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     const QString newEmptyColumnName{"<empty column>"};
     importXlsx.setNameForEmptyColumn(newEmptyColumnName);
@@ -424,7 +427,7 @@ void ImportXlsxTest::testSettingEmptyColumnName()
 
 void ImportXlsxTest::testGetColumnListTwoSheets()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     importXlsx.setSharedStrings(sharedStrings_);
     importXlsx.setSheets(sheets_);
@@ -457,7 +460,7 @@ void ImportXlsxTest::testGetColumnTypes()
     QFETCH(QString, sheetName);
     QFETCH(QVector<ColumnType>, expectedColumnTypes);
 
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     auto [success, columnTypes] = importXlsx.getColumnTypes(sheetName);
@@ -482,7 +485,7 @@ void ImportXlsxTest::testGetColumnCount()
     QFETCH(QString, sheetName);
     QFETCH(int, expectedColumnCount);
 
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     auto [success, actualColumnCount] = importXlsx.getColumnCount(sheetName);
@@ -507,7 +510,7 @@ void ImportXlsxTest::testGetRowCount()
     QFETCH(QString, sheetName);
     QFETCH(unsigned int, expectedRowCount);
 
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     auto [success, actualRowCount] = importXlsx.getRowCount(sheetName);
@@ -538,7 +541,7 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
     QFETCH(unsigned int, expectedRowCount);
     QFETCH(unsigned int, expectedColumnCount);
 
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     importXlsx.getColumnTypes(sheetName);
@@ -568,7 +571,7 @@ void ImportXlsxTest::testGetData()
     QFETCH(QString, sheetName);
     QFETCH(QVector<QVector<QVariant>>, expectedData);
 
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     auto [success, actualData] = importXlsx.getData(sheetName, {});
@@ -604,7 +607,7 @@ void ImportXlsxTest::testGetDataLimitRows()
     QFETCH(unsigned int, rowLimit);
     QFETCH(QVector<QVector<QVariant>>, expectedData);
 
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     auto [success, actualData] =
@@ -637,7 +640,7 @@ void ImportXlsxTest::testGetDataExcludeColumns()
     QFETCH(QVector<unsigned int>, excludedColumns);
     QFETCH(QVector<QVector<QVariant>>, expectedData);
 
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     auto [success, actualData] = importXlsx.getData(sheetName, excludedColumns);
@@ -647,7 +650,7 @@ void ImportXlsxTest::testGetDataExcludeColumns()
 
 void ImportXlsxTest::testGetDataExcludeInvalidColumn()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     setCommonData(importXlsx);
     auto [success, actualData] = importXlsx.getData(sheets_[0].first, {3});
@@ -681,7 +684,7 @@ void ImportXlsxTest::benchmarkGetData()
 
 void ImportXlsxTest::testEmittingProgressPercentChangedEmptyFile()
 {
-    QFile xlsxTestFile(QStringLiteral(":/template.xlsx"));
+    QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
     QStringList sheetNames{importXlsx.getSheetNames().second};
@@ -692,7 +695,7 @@ void ImportXlsxTest::testEmittingProgressPercentChangedEmptyFile()
 
 void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile()
 {
-    QFile xlsxTestFile(QStringLiteral(":/testXlsx.xlsx"));
+    QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
     QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
     setCommonData(importXlsx);

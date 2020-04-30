@@ -63,6 +63,9 @@ private:
     QVector<QVector<QVariant>> getDataWithoutColumns(
         const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
     void setCommonData(ImportXlsx& importXlsx);
+
+    static const QString testFileName_;
+    static const QString templateFileName_;
     static const QList<std::pair<QString, QString>> sheets_;
     static const QStringList sharedStrings_;
     static const QList<int> dateStyles_;
