@@ -42,6 +42,9 @@ public:
     std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
         const QString& sheetName, const QVector<unsigned int>& excludedColumns,
         unsigned int rowLimit) override;
+
+private:
+    std::optional<QStringList> sheetNames_{std::nullopt};
 };
 
 #endif  // IMPORTODS_H
