@@ -31,8 +31,8 @@ template <class T>
 void ImportCommon::checkRetrievingSheetNames(const QString& fileName)
 {
     QFile testFile(fileName);
-    T import(testFile);
-    auto [success, actualSheetNames] = import.getSheetNames();
+    T importer(testFile);
+    auto [success, actualSheetNames] = importer.getSheetNames();
     QCOMPARE(success, true);
     QCOMPARE(actualSheetNames, sheetNames_);
 }
@@ -46,14 +46,42 @@ void ImportCommon::checkRetrievingSheetNamesFromEmptyFile()
 {
     QByteArray byteArray;
     QBuffer emptyBuffer(&byteArray);
-    T import(emptyBuffer);
-    auto [success, actualNames] = import.getSheetNames();
+    T importer(emptyBuffer);
+    auto [success, actualNames] = importer.getSheetNames();
     QCOMPARE(success, false);
     QCOMPARE(actualNames, {});
 }
 template void
 ImportCommon::checkRetrievingSheetNamesFromEmptyFile<ImportXlsx>();
 template void ImportCommon::checkRetrievingSheetNamesFromEmptyFile<ImportOds>();
+
+void ImportCommon::prepareDataForGetColumnListTest()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<QStringList>("expectedColumnList");
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        const QString& sheetName{sheetNames_[i]};
+        QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
+            << sheetName << testColumnNames_[i];
+    }
+}
+
+template <class T>
+void ImportCommon::checkGetColumnList(const QString& fileName)
+{
+    QFETCH(QString, sheetName);
+    QFETCH(QStringList, expectedColumnList);
+    QFile testFile(fileName);
+    T importer(testFile);
+    auto [success, actualColumnList] = importer.getColumnNames(sheetName);
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, expectedColumnList);
+}
+template void ImportCommon::checkGetColumnList<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkGetColumnList<ImportOds>(
+    const QString& fileName);
 
 void ImportCommon::prepareDataForGetColumnCountTest()
 {
@@ -74,8 +102,8 @@ void ImportCommon::checkGetColumnCount(const QString& fileName)
     QFETCH(int, expectedColumnCount);
 
     QFile testFile(fileName);
-    T import(testFile);
-    auto [success, actualColumnCount] = import.getColumnCount(sheetName);
+    T importer(testFile);
+    auto [success, actualColumnCount] = importer.getColumnCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
 }
@@ -103,8 +131,8 @@ void ImportCommon::checkGetRowCount(const QString& fileName)
     QFETCH(unsigned int, expectedRowCount);
 
     QFile testFile(fileName);
-    T import(testFile);
-    auto [success, actualRowCount] = import.getRowCount(sheetName);
+    T importer(testFile);
+    auto [success, actualRowCount] = importer.getRowCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualRowCount, expectedRowCount);
 }

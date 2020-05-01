@@ -377,27 +377,12 @@ void ImportXlsxTest::testGetSharedStringsNoContent()
 
 void ImportXlsxTest::testGetColumnList_data()
 {
-    QTest::addColumn<QString>("sheetName");
-    QTest::addColumn<QStringList>("expectedColumnList");
-    for (int i = 0; i < testColumnNames_.size(); ++i)
-    {
-        const QString& sheetName{sheets_[i].first};
-        QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
-            << sheetName << testColumnNames_[i];
-    }
+    ImportCommon::prepareDataForGetColumnListTest();
 }
 
 void ImportXlsxTest::testGetColumnList()
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QStringList, expectedColumnList);
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setSheets(sheets_);
-    auto [success, actualColumnList] = importXlsx.getColumnNames(sheetName);
-    QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, expectedColumnList);
+    ImportCommon::checkGetColumnList<ImportXlsx>(testFileName_);
 }
 
 void ImportXlsxTest::testSettingEmptyColumnName()

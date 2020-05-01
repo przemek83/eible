@@ -13,6 +13,10 @@ public:
     template <class T>
     static void checkRetrievingSheetNamesFromEmptyFile();
 
+    static void prepareDataForGetColumnListTest();
+    template <class T>
+    static void checkGetColumnList(const QString& fileName);
+
     static void prepareDataForGetColumnCountTest();
     template <class T>
     static void checkGetColumnCount(const QString& fileName);

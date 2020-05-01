@@ -10,6 +10,11 @@ private Q_SLOTS:
     void testRetrievingSheetNames();
     void testRetrievingSheetNamesFromEmptyFile();
 
+    void testGetColumnList_data();
+    void testGetColumnList();
+    void testSettingEmptyColumnName();
+    void testGetColumnListTwoSheets();
+
     void testGetColumnCount_data();
     void testGetColumnCount();
 

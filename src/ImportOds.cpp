@@ -110,7 +110,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
     const auto it = columnCounts_.find(sheetName);
     if (it == columnCounts_.end() && !analyzeSheet(sheetName))
         return {false, {}};
-    const unsigned int columnCount{*it};
+    const unsigned int columnCount{columnCounts_[sheetName]};
 
     QuaZip zip(&ioDevice_);
 
