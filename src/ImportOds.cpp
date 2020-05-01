@@ -96,7 +96,130 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
 {
-    return {false, {}};
+    if (!sheetNames_ && !getSheetNames().first)
+        return {false, {}};
+
+    if (!sheetNames_->contains(sheetName))
+    {
+        setError(__FUNCTION__,
+                 "Sheet " + sheetName +
+                     " not found. Available sheets: " + sheetNames_->join(','));
+        return {false, {}};
+    }
+
+    const auto it = columnCounts_.find(sheetName);
+    if (it == columnCounts_.end() && !analyzeSheet(sheetName))
+        return {false, {}};
+    const unsigned int columnCount{*it};
+
+    QuaZip zip(&ioDevice_);
+
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return {false, {}};
+    }
+
+    QStringList columnNames{};
+
+    if (zip.setCurrentFile(QStringLiteral("content.xml")))
+    {
+        // Open file in zip archive.
+        QuaZipFile zipFile(&zip);
+        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            setError(__FUNCTION__,
+                     "Can not open file " + zipFile.getFileName() + ".");
+            return {false, {}};
+        }
+
+        QXmlStreamReader xmlStreamReader;
+        xmlStreamReader.setDevice(&zipFile);
+
+        // Move to first row in selected sheet.
+        while (!xmlStreamReader.atEnd() &&
+               xmlStreamReader.name() != "table:table" &&
+               xmlStreamReader.attributes().value(
+                   QLatin1String("table:name")) != sheetName)
+        {
+            xmlStreamReader.readNext();
+        }
+
+        while (!xmlStreamReader.atEnd() &&
+               xmlStreamReader.name() != "table-row")
+        {
+            xmlStreamReader.readNext();
+        }
+
+        xmlStreamReader.readNext();
+
+        // Actual column number.
+        int column = NOT_SET_COLUMN;
+        QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
+
+        const QString numberColumnsRepeated(
+            QStringLiteral("table:number-columns-repeated"));
+
+        // Parse first row.
+        while (!xmlStreamReader.atEnd() &&
+               xmlStreamReader.name() != "table-row")
+        {
+            // When we encounter first cell of worksheet.
+            if (xmlStreamReader.name().toString() ==
+                    QLatin1String("table-cell") &&
+                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+            {
+                QString emptyColNumber = xmlStreamReader.attributes()
+                                             .value(numberColumnsRepeated)
+                                             .toString();
+                if (!emptyColNumber.isEmpty())
+                {
+                    break;
+                }
+
+                // Add column number.
+                column++;
+            }
+
+            // If we encounter start of cell content we add it to list.
+            if (!xmlStreamReader.atEnd() &&
+                xmlStreamReader.name().toString() == QStringLiteral("p") &&
+                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+            {
+                while (xmlStreamReader.tokenType() !=
+                       QXmlStreamReader::Characters)
+                {
+                    xmlStreamReader.readNext();
+                }
+
+                columnNames.push_back(xmlStreamReader.text().toString());
+            }
+
+            // If we encounter empty cell we add it to list.
+            if (xmlStreamReader.name().toString() ==
+                    QLatin1String("table-cell") &&
+                xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
+                lastToken == QXmlStreamReader::StartElement)
+            {
+                columnNames << emptyColName_;
+            }
+
+            lastToken = xmlStreamReader.tokenType();
+            xmlStreamReader.readNext();
+        }
+    }
+    else
+    {
+        setError(__FUNCTION__,
+                 "Can not open file " + sheetName + " in archive.");
+        return {false, {}};
+    }
+
+    while (columnNames.count() < static_cast<int>(columnCount))
+        columnNames << emptyColName_;
+
+    return {true, columnNames};
 }
 
 std::pair<bool, unsigned int> ImportOds::getColumnCount(
