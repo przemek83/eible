@@ -143,7 +143,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
                xmlStreamReader.attributes().value(
                    QLatin1String("table:name")) != sheetName)
         {
-            xmlStreamReader.readNext();
+            xmlStreamReader.readNextStartElement();
         }
 
         while (!xmlStreamReader.atEnd() &&
@@ -380,12 +380,18 @@ bool ImportOds::openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
 
     xmlStreamReader.setDevice(&zipFile);
 
-    // Move to first row in selected sheet.
-    while (!xmlStreamReader.atEnd() &&
-           xmlStreamReader.name() != "table:table" &&
-           xmlStreamReader.attributes().value(QLatin1String("table:name")) !=
-               sheetName)
-        xmlStreamReader.readNext();
+    while (!xmlStreamReader.atEnd())
+    {
+        if (xmlStreamReader.name() == "table")
+        {
+            if (xmlStreamReader.attributes().value(
+                    QLatin1String("table:name")) != sheetName)
+                xmlStreamReader.skipCurrentElement();
+            else
+                break;
+        }
+        xmlStreamReader.readNextStartElement();
+    }
 
     bool secondRow = false;
     while (!xmlStreamReader.atEnd() &&
