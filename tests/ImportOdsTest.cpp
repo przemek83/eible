@@ -31,12 +31,10 @@ void ImportOdsTest::testGetColumnCount()
 
 void ImportOdsTest::testGetRowCount_data()
 {
-    QSKIP("TODO");
     ImportCommon::prepareDataForGetRowCountTest();
 }
 
 void ImportOdsTest::testGetRowCount()
 {
-    QSKIP("TODO");
     ImportCommon::checkGetRowCount<ImportOds>(testFileName_);
 }

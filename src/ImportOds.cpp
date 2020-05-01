@@ -189,20 +189,11 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
     {
         if (0 == xmlStreamReader.name().compare(tableRowTag) &&
             xmlStreamReader.isStartElement())
-        {
             column = NOT_SET_COLUMN;
 
-            if (!rowEmpty)
-            {
-                rowCounter++;
-                rowEmpty = true;
-            }
-        }
-
         if (0 == xmlStreamReader.name().compare(tableCellTag) &&
-            xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+            xmlStreamReader.isStartElement())
         {
-            rowEmpty = false;
             column++;
 
             currentColType = xmlStreamReader.attributes()
@@ -229,7 +220,14 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
             }
             column += repeatCount - 1;
         }
-        xmlStreamReader.readNextStartElement();
+        xmlStreamReader.readNext();
+        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+            xmlStreamReader.isEndElement())
+        {
+            if (!rowEmpty)
+                rowCounter++;
+            rowEmpty = true;
+        }
     }
 
     rowCounts_[sheetName] = rowCounter;
