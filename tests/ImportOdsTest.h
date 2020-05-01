@@ -10,6 +10,12 @@ private Q_SLOTS:
     void testRetrievingSheetNames();
     void testRetrievingSheetNamesFromEmptyFile();
 
+    void testGetColumnCount_data();
+    void testGetColumnCount();
+
+    void testGetRowCount_data();
+    void testGetRowCount();
+
 private:
     static const QString testFileName_;
 };

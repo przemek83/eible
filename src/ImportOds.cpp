@@ -168,14 +168,21 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
     int rowCounter = 0;
     int repeatCount = 1;
     int maxColumn = NOT_SET_COLUMN;
-
+    QString currentColType;
     bool rowEmpty = true;
 
     const QString tableTag(QStringLiteral("table"));
     const QString tableRowTag(QStringLiteral("table-row"));
     const QString tableCellTag(QStringLiteral("table-cell"));
+    const QString officeValueTypeTag(QStringLiteral("office:value-type"));
     const QString columnsRepeatedTag(
         QStringLiteral("table:number-columns-repeated"));
+    const QString stringTag(QStringLiteral("string"));
+    const QString dateTag(QStringLiteral("date"));
+    const QString floatTag(QStringLiteral("float"));
+    const QString percentageTag(QStringLiteral("percentage"));
+    const QString currencyTag(QStringLiteral("currency"));
+    const QString timeTag(QStringLiteral("time"));
 
     while (!xmlStreamReader.atEnd() &&
            xmlStreamReader.name().compare(tableTag) != 0)
@@ -195,13 +202,32 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
         if (0 == xmlStreamReader.name().compare(tableCellTag) &&
             xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
         {
+            rowEmpty = false;
             column++;
+
+            currentColType = xmlStreamReader.attributes()
+                                 .value(officeValueTypeTag)
+                                 .toString();
+
             repeatCount = std::max(1, xmlStreamReader.attributes()
                                           .value(columnsRepeatedTag)
                                           .toString()
                                           .toInt());
+
+            for (int i = 0; i < repeatCount; ++i)
+            {
+                if (0 == currentColType.compare(stringTag) ||
+                    0 == currentColType.compare(dateTag) ||
+                    0 == currentColType.compare(floatTag) ||
+                    0 == currentColType.compare(percentageTag) ||
+                    0 == currentColType.compare(currencyTag) ||
+                    0 == currentColType.compare(timeTag))
+                {
+                    maxColumn = std::max(maxColumn, column + i);
+                    rowEmpty = false;
+                }
+            }
             column += repeatCount - 1;
-            maxColumn = std::max(maxColumn, column);
         }
         xmlStreamReader.readNextStartElement();
     }
@@ -241,7 +267,9 @@ bool ImportOds::openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
         xmlStreamReader.readNext();
 
     bool secondRow = false;
-    while (!xmlStreamReader.atEnd())
+    while (!xmlStreamReader.atEnd() &&
+           !(xmlStreamReader.name() == "table" &&
+             xmlStreamReader.tokenType() == QXmlStreamReader::EndElement))
     {
         if (xmlStreamReader.name() == "table-row" &&
             xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
