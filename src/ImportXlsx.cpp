@@ -183,7 +183,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     }
 
     const unsigned int columnCount{columnCounts_.find(sheetName).value()};
-    QStringList columnList;
+    QStringList columnNames;
     // Loading column names is using Excel names names. Set 600 temporary.
     // const int columnsCount = EibleUtilities::getMaxExcelColumns();
     const QList<QByteArray> excelColNames =
@@ -241,7 +241,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
                 while (excelColNames.indexOf(
                            rowNumber.remove(regExp).toUtf8()) > columnIndex)
                 {
-                    columnList << emptyColName_;
+                    columnNames << emptyColName_;
                     columnIndex++;
                 }
                 // Remember column type.
@@ -258,14 +258,16 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
                 if (currentColType == QLatin1String("s"))
                 {
                     int value = xmlStreamReader.readElementText().toInt();
-                    columnList.push_back((*sharedStrings_)[value]);
+                    columnNames.push_back((*sharedStrings_)[value]);
                 }
                 else
                 {
                     if (currentColType == QLatin1String("str"))
-                        columnList.push_back(xmlStreamReader.readElementText());
+                        columnNames.push_back(
+                            xmlStreamReader.readElementText());
                     else
-                        columnList.push_back(xmlStreamReader.readElementText());
+                        columnNames.push_back(
+                            xmlStreamReader.readElementText());
                 }
             }
 
@@ -273,7 +275,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
             if (xmlStreamReader.name().toString() == QLatin1String("c") &&
                 xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
                 lastToken == QXmlStreamReader::StartElement)
-                columnList << emptyColName_;
+                columnNames << emptyColName_;
             lastToken = xmlStreamReader.tokenType();
             xmlStreamReader.readNext();
         }
@@ -285,10 +287,10 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
         return {false, {}};
     }
 
-    while (columnList.count() < static_cast<int>(columnCount))
-        columnList << emptyColName_;
+    while (columnNames.count() < static_cast<int>(columnCount))
+        columnNames << emptyColName_;
 
-    return {true, columnList};
+    return {true, columnNames};
 }
 
 std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
