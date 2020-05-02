@@ -29,9 +29,15 @@ void ImportOdsTest::testGetColumnList()
     ImportCommon::checkGetColumnList<ImportOds>(testFileName_);
 }
 
-void ImportOdsTest::testSettingEmptyColumnName() {}
+void ImportOdsTest::testSettingEmptyColumnName()
+{
+    ImportCommon::checkSettingEmptyColumnName<ImportOds>(testFileName_);
+}
 
-void ImportOdsTest::testGetColumnListTwoSheets() {}
+void ImportOdsTest::testGetColumnListTwoSheets()
+{
+    ImportCommon::checkGetColumnListTwoSheets<ImportOds>(testFileName_);
+}
 
 void ImportOdsTest::testGetColumnCount_data()
 {

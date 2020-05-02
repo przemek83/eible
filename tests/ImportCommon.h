@@ -17,6 +17,12 @@ public:
     template <class T>
     static void checkGetColumnList(const QString& fileName);
 
+    template <class T>
+    static void checkSettingEmptyColumnName(const QString& fileName);
+
+    template <class T>
+    static void checkGetColumnListTwoSheets(const QString& fileName);
+
     static void prepareDataForGetColumnCountTest();
     template <class T>
     static void checkGetColumnCount(const QString& fileName);

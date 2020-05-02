@@ -387,39 +387,12 @@ void ImportXlsxTest::testGetColumnList()
 
 void ImportXlsxTest::testSettingEmptyColumnName()
 {
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    const QString newEmptyColumnName{"<empty column>"};
-    importXlsx.setNameForEmptyColumn(newEmptyColumnName);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setSheets(sheets_);
-    auto [success, actualColumnList] =
-        importXlsx.getColumnNames(sheets_[4].first);
-
-    std::list<QString> expectedColumnList(testColumnNames_[4].size());
-    std::replace_copy(testColumnNames_[4].begin(), testColumnNames_[4].end(),
-                      expectedColumnList.begin(), QString("---"),
-                      newEmptyColumnName);
-
-    QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, QStringList::fromStdList(expectedColumnList));
+    ImportCommon::checkSettingEmptyColumnName<ImportXlsx>(testFileName_);
 }
 
 void ImportXlsxTest::testGetColumnListTwoSheets()
 {
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setSheets(sheets_);
-    auto [success, actualColumnList] =
-        importXlsx.getColumnNames(sheets_[4].first);
-    QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, testColumnNames_[4]);
-
-    std::tie(success, actualColumnList) =
-        importXlsx.getColumnNames(sheets_[0].first);
-    QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, testColumnNames_[0]);
+    ImportCommon::checkGetColumnListTwoSheets<ImportXlsx>(testFileName_);
 }
 
 void ImportXlsxTest::testGetColumnTypes_data()

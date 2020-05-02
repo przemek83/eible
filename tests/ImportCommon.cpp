@@ -140,3 +140,44 @@ template void ImportCommon::checkGetRowCount<ImportXlsx>(
     const QString& fileName);
 template void ImportCommon::checkGetRowCount<ImportOds>(
     const QString& fileName);
+
+template <class T>
+void ImportCommon::checkSettingEmptyColumnName(const QString& fileName)
+{
+    QFile testFile(fileName);
+    T importer(testFile);
+    const QString newEmptyColumnName{"<empty column>"};
+    importer.setNameForEmptyColumn(newEmptyColumnName);
+    auto [success, actualColumnList] = importer.getColumnNames(sheetNames_[4]);
+
+    std::list<QString> expectedColumnList(testColumnNames_[4].size());
+    std::replace_copy(testColumnNames_[4].begin(), testColumnNames_[4].end(),
+                      expectedColumnList.begin(), QString("---"),
+                      newEmptyColumnName);
+
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, QStringList::fromStdList(expectedColumnList));
+}
+template void ImportCommon::checkSettingEmptyColumnName<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkSettingEmptyColumnName<ImportOds>(
+    const QString& fileName);
+
+template <class T>
+void ImportCommon::checkGetColumnListTwoSheets(const QString& fileName)
+{
+    QFile testFile(fileName);
+    T importer(testFile);
+    auto [success, actualColumnList] = importer.getColumnNames(sheetNames_[4]);
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, testColumnNames_[4]);
+
+    std::tie(success, actualColumnList) =
+        importer.getColumnNames(sheetNames_[0]);
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, testColumnNames_[0]);
+}
+template void ImportCommon::checkGetColumnListTwoSheets<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkGetColumnListTwoSheets<ImportOds>(
+    const QString& fileName);
