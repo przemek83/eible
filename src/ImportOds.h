@@ -59,6 +59,9 @@ private:
                                    QuaZipFile& zipFile,
                                    QXmlStreamReader& xmlStreamReader);
 
+    void skipToSheet(QXmlStreamReader& xmlStreamReader,
+                     const QString& sheetName) const;
+
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};

@@ -136,21 +136,11 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
 
         QXmlStreamReader xmlStreamReader;
         xmlStreamReader.setDevice(&zipFile);
-
-        // Move to first row in selected sheet.
-        while (!xmlStreamReader.atEnd() &&
-               xmlStreamReader.name() != "table:table" &&
-               xmlStreamReader.attributes().value(
-                   QLatin1String("table:name")) != sheetName)
-        {
-            xmlStreamReader.readNextStartElement();
-        }
+        skipToSheet(xmlStreamReader, sheetName);
 
         while (!xmlStreamReader.atEnd() &&
                xmlStreamReader.name() != "table-row")
-        {
             xmlStreamReader.readNext();
-        }
 
         xmlStreamReader.readNext();
 
@@ -379,23 +369,11 @@ bool ImportOds::openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
     }
 
     xmlStreamReader.setDevice(&zipFile);
-
-    while (!xmlStreamReader.atEnd())
-    {
-        if (xmlStreamReader.name() == "table")
-        {
-            if (xmlStreamReader.attributes().value(
-                    QLatin1String("table:name")) != sheetName)
-                xmlStreamReader.skipCurrentElement();
-            else
-                break;
-        }
-        xmlStreamReader.readNextStartElement();
-    }
+    skipToSheet(xmlStreamReader, sheetName);
 
     bool secondRow = false;
     while (!xmlStreamReader.atEnd() &&
-           !(xmlStreamReader.name() == "table" &&
+           !(xmlStreamReader.qualifiedName() == "table:table" &&
              xmlStreamReader.tokenType() == QXmlStreamReader::EndElement))
     {
         if (xmlStreamReader.name() == "table-row" &&
@@ -409,4 +387,21 @@ bool ImportOds::openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
     }
 
     return true;
+}
+
+void ImportOds::skipToSheet(QXmlStreamReader& xmlStreamReader,
+                            const QString& sheetName) const
+{
+    while (!xmlStreamReader.atEnd())
+    {
+        if (xmlStreamReader.qualifiedName() == "table:table")
+        {
+            if (xmlStreamReader.attributes().value(
+                    QLatin1String("table:name")) != sheetName)
+                xmlStreamReader.skipCurrentElement();
+            else
+                break;
+        }
+        xmlStreamReader.readNextStartElement();
+    }
 }
