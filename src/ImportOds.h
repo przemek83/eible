@@ -65,6 +65,7 @@ private:
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
+    QHash<QString, QVector<ColumnType>> columnTypes_{};
 };
 
 #endif  // IMPORTODS_H

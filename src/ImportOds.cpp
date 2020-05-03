@@ -91,7 +91,173 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
 std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
     const QString& sheetName)
 {
-    return {false, {}};
+    if (const auto it = columnTypes_.find(sheetName); it != columnTypes_.end())
+        return {true, *it};
+
+    if (!sheetNames_ && !getSheetNames().first)
+        return {false, {}};
+
+    QuaZip zip(&ioDevice_);
+
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return {false, {}};
+    }
+
+    QuaZipFile zipFile;
+    QXmlStreamReader xmlStreamReader;
+
+    if (!openZipAndMoveToSecondRow(zip, sheetName, zipFile, xmlStreamReader))
+        return {false, {}};
+
+    QVector<ColumnType> columnTypes;
+
+    // Actual column number.
+    int column = NOT_SET_COLUMN;
+    int maxColumn = NOT_SET_COLUMN;
+
+    // Actual row number.
+    int rowCounter = 0;
+
+    // Actual data type in current cell (s, str, null).
+    QString currentColType(QStringLiteral("string"));
+
+    int repeatCount = 1;
+
+    const QString tableTag(QStringLiteral("table"));
+    const QString tableRowTag(QStringLiteral("table-row"));
+    const QString tableCellTag(QStringLiteral("table-cell"));
+    const QString officeValueTypeTag(QStringLiteral("office:value-type"));
+    const QString columnsRepeatedTag(
+        QStringLiteral("table:number-columns-repeated"));
+    const QString stringTag(QStringLiteral("string"));
+    const QString dateTag(QStringLiteral("date"));
+    const QString floatTag(QStringLiteral("float"));
+    const QString percentageTag(QStringLiteral("percentage"));
+    const QString currencyTag(QStringLiteral("currency"));
+    const QString timeTag(QStringLiteral("time"));
+
+    bool rowEmpty = true;
+
+    while (!xmlStreamReader.atEnd() &&
+           xmlStreamReader.name().compare(tableTag) != 0)
+    {
+        // If start of row encountered than reset column counter add increment
+        // row counter.
+        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+            xmlStreamReader.isStartElement())
+        {
+            column = NOT_SET_COLUMN;
+
+            if (!rowEmpty)
+            {
+                rowCounter++;
+                rowEmpty = true;
+            }
+        }
+
+        // When we encounter start of cell description.
+        if (0 == xmlStreamReader.name().compare(tableCellTag) &&
+            xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+        {
+            column++;
+            maxColumn = std::max(maxColumn, column);
+
+            // Remember column type.
+            currentColType = xmlStreamReader.attributes()
+                                 .value(officeValueTypeTag)
+                                 .toString();
+
+            // Number of repeats.
+            repeatCount = xmlStreamReader.attributes()
+                              .value(columnsRepeatedTag)
+                              .toString()
+                              .toInt();
+
+            if (0 == repeatCount)
+                repeatCount = 1;
+
+            for (int i = 0; i < repeatCount; ++i)
+            {
+                while (column + i >= columnTypes.size())
+                    columnTypes.push_back(ColumnType::UNKNOWN);
+
+                if (0 == currentColType.compare(stringTag))
+                {
+                    rowEmpty = false;
+                    if (columnTypes.at(column + i) == ColumnType::UNKNOWN)
+                    {
+                        columnTypes[column + i] = ColumnType::STRING;
+                    }
+                    else
+                    {
+                        if (columnTypes.at(column + i) != ColumnType::STRING)
+                        {
+                            columnTypes[column + i] = ColumnType::STRING;
+                        }
+                    }
+                }
+                else
+                {
+                    if (0 == currentColType.compare(dateTag))
+                    {
+                        rowEmpty = false;
+                        if (columnTypes.at(column + i) == ColumnType::UNKNOWN)
+                        {
+                            columnTypes[column + i] = ColumnType::DATE;
+                        }
+                        else
+                        {
+                            if (columnTypes.at(column + i) != ColumnType::DATE)
+                            {
+                                columnTypes[column + i] = ColumnType::STRING;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (0 == currentColType.compare(floatTag) ||
+                            0 == currentColType.compare(percentageTag) ||
+                            0 == currentColType.compare(currencyTag) ||
+                            0 == currentColType.compare(timeTag))
+                        {
+                            rowEmpty = false;
+                            if (columnTypes.at(column + i) ==
+                                ColumnType::UNKNOWN)
+                            {
+                                columnTypes[column + i] = ColumnType::NUMBER;
+                            }
+                            else
+                            {
+                                if (columnTypes.at(column + i) !=
+                                    ColumnType::NUMBER)
+                                {
+                                    columnTypes[column + i] =
+                                        ColumnType::STRING;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            column += repeatCount - 1;
+        }
+        xmlStreamReader.readNextStartElement();
+    }
+
+    for (int i = 0; i < columnTypes.size(); ++i)
+    {
+        if (ColumnType::UNKNOWN == columnTypes.at(i))
+            columnTypes[i] = ColumnType::STRING;
+    }
+
+    rowCounts_[sheetName] = rowCounter;
+    columnCounts_[sheetName] = maxColumn + 1;
+    columnTypes_[sheetName] = columnTypes;
+
+    return {true, columnTypes};
 }
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
