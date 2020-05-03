@@ -23,6 +23,10 @@ public:
     template <class T>
     static void checkGetColumnListTwoSheets(const QString& fileName);
 
+    static void prepareDataForGetColumnTypes();
+    template <class T>
+    static void checkGetColumnTypes(const QString& fileName);
+
     static void prepareDataForGetColumnCountTest();
     template <class T>
     static void checkGetColumnCount(const QString& fileName);
@@ -35,6 +39,7 @@ private:
     static const QStringList sheetNames_;
     static const QList<QStringList> testColumnNames_;
     static const std::vector<unsigned int> expectedRowCounts_;
+    static const QVector<QVector<ColumnType>> columnTypes_;
 };
 
 #endif  // IMPORTCOMMON_H

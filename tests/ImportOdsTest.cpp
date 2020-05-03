@@ -39,6 +39,16 @@ void ImportOdsTest::testGetColumnListTwoSheets()
     ImportCommon::checkGetColumnListTwoSheets<ImportOds>(testFileName_);
 }
 
+void ImportOdsTest::testGetColumnTypes_data()
+{
+    ImportCommon::prepareDataForGetColumnTypes();
+}
+
+void ImportOdsTest::testGetColumnTypes()
+{
+    ImportCommon::checkGetColumnTypes<ImportOds>(testFileName_);
+}
+
 void ImportOdsTest::testGetColumnCount_data()
 {
     ImportCommon::prepareDataForGetColumnCountTest();

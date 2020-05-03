@@ -27,6 +27,24 @@ const QList<QStringList> ImportCommon::testColumnNames_ = {
 const std::vector<unsigned int> ImportCommon::expectedRowCounts_{2,  19, 0,  4,
                                                                  30, 25, 20, 3};
 
+const QVector<QVector<ColumnType>> ImportCommon::columnTypes_ = {
+    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE},
+    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
+     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+     ColumnType::STRING},
+    {},
+    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+     ColumnType::DATE, ColumnType::STRING},
+    {ColumnType::STRING, ColumnType::DATE, ColumnType::NUMBER,
+     ColumnType::NUMBER, ColumnType::DATE, ColumnType::NUMBER,
+     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
+     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
+    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
+    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER},
+    {ColumnType::STRING, ColumnType::STRING, ColumnType::STRING,
+     ColumnType::STRING}};
+
 template <class T>
 void ImportCommon::checkRetrievingSheetNames(const QString& fileName)
 {
@@ -66,6 +84,36 @@ void ImportCommon::prepareDataForGetColumnListTest()
             << sheetName << testColumnNames_[i];
     }
 }
+
+void ImportCommon::prepareDataForGetColumnTypes()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
+
+    for (int i = 0; i < testColumnNames_.size(); ++i)
+    {
+        const QString& sheetName{sheetNames_[i]};
+        QTest::newRow(("Columns types in " + sheetName).toStdString().c_str())
+            << sheetName << columnTypes_[i];
+    }
+}
+
+template <class T>
+void ImportCommon::checkGetColumnTypes(const QString& fileName)
+{
+    QFETCH(QString, sheetName);
+    QFETCH(QVector<ColumnType>, expectedColumnTypes);
+
+    QFile testFile(fileName);
+    T importer(testFile);
+    auto [success, columnTypes] = importer.getColumnTypes(sheetName);
+    QCOMPARE(success, true);
+    QCOMPARE(columnTypes, expectedColumnTypes);
+}
+template void ImportCommon::checkGetColumnTypes<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkGetColumnTypes<ImportOds>(
+    const QString& fileName);
 
 template <class T>
 void ImportCommon::checkGetColumnList(const QString& fileName)

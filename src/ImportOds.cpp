@@ -181,12 +181,12 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
 
             for (int i = 0; i < repeatCount; ++i)
             {
-                while (column + i >= columnTypes.size())
-                    columnTypes.push_back(ColumnType::UNKNOWN);
 
                 if (0 == currentColType.compare(stringTag))
                 {
                     rowEmpty = false;
+                    while (column + i >= columnTypes.size())
+                        columnTypes.push_back(ColumnType::UNKNOWN);
                     if (columnTypes.at(column + i) == ColumnType::UNKNOWN)
                     {
                         columnTypes[column + i] = ColumnType::STRING;
@@ -204,6 +204,8 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
                     if (0 == currentColType.compare(dateTag))
                     {
                         rowEmpty = false;
+                        while (column + i >= columnTypes.size())
+                            columnTypes.push_back(ColumnType::UNKNOWN);
                         if (columnTypes.at(column + i) == ColumnType::UNKNOWN)
                         {
                             columnTypes[column + i] = ColumnType::DATE;
@@ -224,6 +226,8 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
                             0 == currentColType.compare(timeTag))
                         {
                             rowEmpty = false;
+                            while (column + i >= columnTypes.size())
+                                columnTypes.push_back(ColumnType::UNKNOWN);
                             if (columnTypes.at(column + i) ==
                                 ColumnType::UNKNOWN)
                             {

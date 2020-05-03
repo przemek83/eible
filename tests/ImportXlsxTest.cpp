@@ -104,9 +104,9 @@ const QStringList ImportXlsxTest::sharedStrings_{"Text",
                                                  "test3"};
 
 const QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22,
-                                             165, 167, 169, 170, 171};
+                                             165, 167, 170, 171, 172};
 const QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 164, 166, 167, 168,
-                                            168, 169, 164, 164, 170, 171};
+                                            169, 169, 170, 164, 164, 171, 172};
 
 const QList<QStringList> ImportXlsxTest::testColumnNames_ = {
     {"Text", "Numeric", "Date"},
@@ -167,93 +167,91 @@ const QVector<QVector<QVector<QVariant>>> ImportXlsxTest::sheetData_ = {
      {200001., 52., 3846.17307692308, QDate(), 40},
      {200002., 53., 3773.62264150943, QDate(2012, 02, 04), 40},
      {200003., 54., 3703.75925925926, QDate(2012, 02, 05), 41}},
-    {{QVariant(QVariant::String), "25569", 52.21, 1.47, "25569", 0., 46, "105",
-      24.76, 0., 2725.8841, 0},
-     {QVariant(QVariant::String), "25570", 53.12, 1.5,
-      QVariant(QVariant::String), 1., 47, "931.17", 931.17, 1., 2821.7344,
-      53.12},
-     {QVariant(QVariant::String), "25571", 54.48, 1.52,
-      QVariant(QVariant::String), 2., 48, "1015", 41.0532, 4., 2968.0704,
-      108.96},
-     {QVariant(QVariant::String), "25572", 55.84, 1.55,
-      QVariant(QVariant::String), 3., 49, "58498.5439", 58498.5439, 9.,
-      3118.1056, 167.52},
-     {QVariant(QVariant::String), "25573", 57.2, 1.57,
-      QVariant(QVariant::String), 4., 50, "6956.82", 1548.2453, 16., 3271.84,
+    {{QVariant(QVariant::String), QDate(1970, 1, 1), 52.21, 1.47,
+      QDate(1970, 1, 1), 0., 46, "105", 24.76, 0., 2725.8841, 0},
+     {QVariant(QVariant::String), QDate(1970, 1, 2), 53.12, 1.5,
+      QVariant(QVariant::Date), 1., 47, "931.17", 931.17, 1., 2821.7344, 53.12},
+     {QVariant(QVariant::String), QDate(1970, 1, 3), 54.48, 1.52,
+      QVariant(QVariant::Date), 2., 48, "1015", 41.0532, 4., 2968.0704, 108.96},
+     {QVariant(QVariant::String), QDate(1970, 1, 4), 55.84, 1.55,
+      QVariant(QVariant::Date), 3., 49, "58498.5439", 58498.5439, 9., 3118.1056,
+      167.52},
+     {QVariant(QVariant::String), QDate(1970, 1, 5), 57.2, 1.57,
+      QVariant(QVariant::Date), 4., 50, "6956.82", 1548.2453, 16., 3271.84,
       228.8},
-     {QVariant(QVariant::String), "25574", 58.57, 1.6,
-      QVariant(QVariant::String), 5., 51, "15", 15, 25., 3430.4449, 292.85},
-     {QVariant(QVariant::String), "25575", 59.93, 1.63,
-      QVariant(QVariant::String), 6., 52, "1.56653571428571", 61.2721865421088,
+     {QVariant(QVariant::String), QDate(1970, 1, 6), 58.57, 1.6,
+      QVariant(QVariant::Date), 5., 51, "15", 15, 25., 3430.4449, 292.85},
+     {QVariant(QVariant::String), QDate(1970, 1, 7), 59.93, 1.63,
+      QVariant(QVariant::Date), 6., 52, "1.56653571428571", 61.2721865421088,
       36., 3591.6049, 359.58},
-     {QVariant(QVariant::String), "25576", 61.29, 1.65,
-      QVariant(QVariant::String), 7., 53, "51.11225", -39.0619559188409, 49.,
+     {QVariant(QVariant::String), QDate(1970, 1, 8), 61.29, 1.65,
+      QVariant(QVariant::Date), 7., 53, "51.11225", -39.0619559188409, 49.,
       3756.4641, 429.03},
-     {QVariant(QVariant::String), "25577", 63.11, 1.68,
-      QVariant(QVariant::String), 8., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QDate(1970, 1, 9), 63.11, 1.68,
+      QVariant(QVariant::Date), 8., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 64., 3982.8721, 504.88},
-     {QVariant(QVariant::String), "25578", 64.47, 1.7,
-      QVariant(QVariant::String), 9., QVariant(QVariant::String), 54, 0., 81.,
+     {QVariant(QVariant::String), QDate(1970, 1, 10), 64.47, 1.7,
+      QVariant(QVariant::Date), 9., QVariant(QVariant::String), 54, 0., 81.,
       4156.3809, 580.23},
-     {QVariant(QVariant::String), "25579", 66.28, 1.73,
-      QVariant(QVariant::String), 10., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QDate(1970, 1, 11), 66.28, 1.73,
+      QVariant(QVariant::Date), 10., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 100., 4393.0384, 662.8},
-     {QVariant(QVariant::String), "25580", 68.1, 1.75,
-      QVariant(QVariant::String), 11., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QDate(1970, 1, 12), 68.1, 1.75,
+      QVariant(QVariant::Date), 11., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 121., 4637.61, 749.1},
-     {QVariant(QVariant::String), "25581", 69.92, 1.78,
-      QVariant(QVariant::String), 12., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QDate(1970, 1, 13), 69.92, 1.78,
+      QVariant(QVariant::Date), 12., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 144., 4888.8064, 839.04},
-     {QVariant(QVariant::String), "25582", 72.19, 1.8,
-      QVariant(QVariant::String), 13., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QDate(1970, 1, 14), 72.19, 1.8,
+      QVariant(QVariant::Date), 13., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 169., 5211.3961, 938.47},
-     {QVariant(QVariant::String), "25583", 74.46, 1.83,
-      QVariant(QVariant::String), 14., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QDate(1970, 1, 15), 74.46, 1.83,
+      QVariant(QVariant::Date), 14., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 196., 5544.2916, 1042.44},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.1609, 2725.8841, 76.7487},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.25, 2821.7344, 79.68},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.3104, 2968.0704, 82.8096},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.4025, 3118.1056, 86.552},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.4649, 3271.84, 89.804},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.56, 3430.4449, 93.712},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.6569, 3591.6049, 97.6859},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.7225, 3756.4641, 101.1285},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.8224, 3982.8721, 106.0248},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.89, 4156.3809, 109.599},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 2.9929, 4393.0384, 114.6644},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 3.0625, 4637.61, 119.175},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 3.1684, 4888.8064, 124.4576},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 3.24, 5211.3961, 129.942},
-     {QVariant(QVariant::String), QVariant(QVariant::String), 0., 0.,
-      QVariant(QVariant::String), 0., QVariant(QVariant::String),
+     {QVariant(QVariant::String), QVariant(QVariant::Date), 0., 0.,
+      QVariant(QVariant::Date), 0., QVariant(QVariant::String),
       QVariant(QVariant::String), 0., 3.3489, 5544.2916, 136.2618}},
     {{0., 5.6494487, 0.0795697},  {0.1, 5.9721082, 0.0841142},
      {0.2, 6.3006678, 0.0887418}, {0.3, 6.634098, 0.093438},
@@ -397,28 +395,12 @@ void ImportXlsxTest::testGetColumnListTwoSheets()
 
 void ImportXlsxTest::testGetColumnTypes_data()
 {
-    QTest::addColumn<QString>("sheetName");
-    QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
-
-    for (int i = 0; i < testColumnNames_.size(); ++i)
-    {
-        const QString& sheetName{sheets_[i].first};
-        QTest::newRow(("Columns types in " + sheetName).toStdString().c_str())
-            << sheetName << columnTypes_[i];
-    }
+    ImportCommon::prepareDataForGetColumnTypes();
 }
 
 void ImportXlsxTest::testGetColumnTypes()
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QVector<ColumnType>, expectedColumnTypes);
-
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    setCommonData(importXlsx);
-    auto [success, columnTypes] = importXlsx.getColumnTypes(sheetName);
-    QCOMPARE(success, true);
-    QCOMPARE(columnTypes, expectedColumnTypes);
+    ImportCommon::checkGetColumnTypes<ImportXlsx>(testFileName_);
 }
 
 void ImportXlsxTest::testGetColumnCount_data()

@@ -15,6 +15,9 @@ private Q_SLOTS:
     void testSettingEmptyColumnName();
     void testGetColumnListTwoSheets();
 
+    void testGetColumnTypes_data();
+    void testGetColumnTypes();
+
     void testGetColumnCount_data();
     void testGetColumnCount();
 

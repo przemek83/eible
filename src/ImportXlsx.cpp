@@ -648,7 +648,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
                         }
                         else
                         {
-                            if (columnTypes.at(column) != ColumnType::NUMBER)
+                            if (columnTypes.at(column) == ColumnType::UNKNOWN)
                                 columnTypes[column] = ColumnType::STRING;
                         }
                     }
