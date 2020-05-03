@@ -1,13 +1,15 @@
 #include "ImportOds.h"
 
-#include <QXmlStreamReader>
 #include <utility>
 
 #include <quazip5/quazip.h>
 #include <quazip5/quazipfile.h>
 #include <QVariant>
 #include <QVector>
+#include <QXmlStreamReader>
 #include <QtXml/QDomDocument>
+
+#include "EibleUtilities.h"
 
 ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
@@ -88,7 +90,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
     return {true, *sheetNames_};
 }
 
-std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
+std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     const QString& sheetName)
 {
     if (const auto it = columnTypes_.find(sheetName); it != columnTypes_.end())
@@ -393,17 +395,248 @@ std::pair<bool, unsigned int> ImportOds::getRowCount(const QString& sheetName)
     return getCount(sheetName, rowCounts_);
 }
 
-std::pair<bool, QVector<QVector<QVariant> > > ImportOds::getData(
-    const QString& sheetName, const QVector<unsigned int>& excludedColumns)
-{
-    return {false, {}};
-}
-
-std::pair<bool, QVector<QVector<QVariant> > > ImportOds::getLimitedData(
+std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
 {
-    return {false, {}};
+    const auto [success, columnTypes] = getColumnTypes(sheetName);
+    if (!success)
+        return {false, {}};
+
+    const unsigned int columnCount{columnCounts_[sheetName]};
+    const unsigned int rowCount{rowCounts_[sheetName]};
+    const bool fillSamplesOnly{rowCount != rowLimit};
+
+    auto it = std::find_if(
+        excludedColumns.begin(), excludedColumns.end(),
+        [=](unsigned int column) { return column >= columnCount; });
+    if (it != excludedColumns.end())
+    {
+        setError(__FUNCTION__, "Column to exclude " + QString::number(*it) +
+                                   " is invalid. Xlsx got only " +
+                                   QString::number(columnCount) +
+                                   " columns indexed from 0.");
+        return {false, {}};
+    }
+
+    QuaZip zip(&ioDevice_);
+
+    if (!zip.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip.getZipName() + ".");
+        return {false, {}};
+    }
+
+    QuaZipFile zipFile;
+    QXmlStreamReader xmlStreamReader;
+
+    if (!openZipAndMoveToSecondRow(zip, sheetName, zipFile, xmlStreamReader))
+        return {false, {}};
+
+    // Null elements row.
+    QVector<QVariant> templateDataRow;
+
+    QMap<int, int> activeColumnsMapping;
+
+    int columnToFill = 0;
+
+    templateDataRow.resize(
+        fillSamplesOnly ? columnCount : columnCount - excludedColumns.size());
+    for (unsigned int i = 0; i < columnCount; ++i)
+    {
+        if (fillSamplesOnly || !excludedColumns.contains(i))
+        {
+            templateDataRow[columnToFill] =
+                EibleUtilities::getDefaultVariantForFormat(columnTypes[i]);
+            activeColumnsMapping[i] = columnToFill;
+            columnToFill++;
+        }
+    }
+
+    QVector<QVector<QVariant>> dataContainer(
+        std::min(getRowCount(sheetName).second, rowLimit));
+
+    // Protection from potential core related to empty rows.
+    unsigned int containerSize = dataContainer.size();
+    for (unsigned int i = 0; i < containerSize; ++i)
+        dataContainer[i] = templateDataRow;
+
+    // Current row data.
+    QVector<QVariant> currentDataRow(templateDataRow);
+
+    // Actual column number.
+    int column = NOT_SET_COLUMN;
+
+    // Actual data type in cell (s, str, null).
+    QString currentColType = QStringLiteral("string");
+
+    // Current row number.
+    unsigned int rowCounter = 0;
+
+    int repeatCount = 1;
+
+    int cellsFilledInRow = 0;
+
+    // Optimization.
+    const QString tableTag(QStringLiteral("table"));
+    const QString tableRowTag(QStringLiteral("table-row"));
+    const QString tableCellTag(QStringLiteral("table-cell"));
+    const QString officeValueTypeTag(QStringLiteral("office:value-type"));
+    const QString columnsRepeatedTag(
+        QStringLiteral("table:number-columns-repeated"));
+    const QString pTag(QStringLiteral("p"));
+    const QString officeDateValueTag(QStringLiteral("office:date-value"));
+    const QString officeValueTag(QStringLiteral("office:value"));
+    const QString dateFormat(QStringLiteral("yyyy-MM-dd"));
+
+    const QString emptyString(QLatin1String(""));
+
+    while (!xmlStreamReader.atEnd() &&
+           0 != xmlStreamReader.name().compare(tableTag) &&
+           rowCounter <= rowLimit)
+    {
+        // If start of row encountered than reset column counter add
+        // increment row counter.
+        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+            xmlStreamReader.isStartElement())
+        {
+            column = NOT_SET_COLUMN;
+
+            if (0 != cellsFilledInRow)
+            {
+                dataContainer[rowCounter] = currentDataRow;
+                currentDataRow = QVector<QVariant>(templateDataRow);
+                cellsFilledInRow = 0;
+                rowCounter++;
+            }
+        }
+
+        // When we encounter start of cell description.
+        if (0 == xmlStreamReader.name().compare(tableCellTag) &&
+            xmlStreamReader.isStartElement())
+        {
+            column++;
+
+            // If we encounter column outside expected grid we move to row end.
+            if (column >= static_cast<int>(columnCount))
+            {
+                while (!xmlStreamReader.atEnd() &&
+                       !(0 == xmlStreamReader.name().compare(tableRowTag) &&
+                         xmlStreamReader.isEndElement()))
+                {
+                    xmlStreamReader.readNext();
+                }
+                continue;
+            }
+
+            // Remember cell type.
+            currentColType = xmlStreamReader.attributes()
+                                 .value(officeValueTypeTag)
+                                 .toString();
+
+            // Number of repeats.
+            repeatCount = xmlStreamReader.attributes()
+                              .value(columnsRepeatedTag)
+                              .toString()
+                              .toInt();
+
+            if (0 == repeatCount)
+            {
+                repeatCount = 1;
+            }
+
+            if (column + repeatCount - 1 >= static_cast<int>(columnCount))
+            {
+                repeatCount = columnCount - column;
+            }
+
+            if (!currentColType.isEmpty())
+            {
+                QVariant value;
+                ColumnType format = columnTypes.at(column);
+
+                switch (format)
+                {
+                    case ColumnType::STRING:
+                    {
+                        while (!xmlStreamReader.atEnd() &&
+                               0 != xmlStreamReader.name().compare(pTag))
+
+                        {
+                            xmlStreamReader.readNext();
+                        }
+
+                        while (xmlStreamReader.tokenType() !=
+                                   QXmlStreamReader::Characters &&
+                               0 !=
+                                   xmlStreamReader.name().compare(tableCellTag))
+                        {
+                            xmlStreamReader.readNext();
+                        }
+
+                        const QString* stringPointer =
+                            xmlStreamReader.text().string();
+                        value =
+                            QVariant(stringPointer == nullptr ? emptyString
+                                                              : *stringPointer);
+                        break;
+                    }
+
+                    case ColumnType::DATE:
+                    {
+                        static const int odsStringDateLength{10};
+                        value = QVariant(
+                            QDate::fromString(xmlStreamReader.attributes()
+                                                  .value(officeDateValueTag)
+                                                  .toString()
+                                                  .left(odsStringDateLength),
+                                              dateFormat));
+
+                        break;
+                    }
+
+                    case ColumnType::NUMBER:
+                    {
+                        value = QVariant(xmlStreamReader.attributes()
+                                             .value(officeValueTag)
+                                             .toDouble());
+                        break;
+                    }
+
+                    case ColumnType::UNKNOWN:
+                    {
+                        Q_ASSERT(false);
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < repeatCount; ++i)
+                {
+                    if (!fillSamplesOnly &&
+                        excludedColumns.contains(column + i))
+                    {
+                        continue;
+                    }
+
+                    cellsFilledInRow++;
+                    currentDataRow[activeColumnsMapping[column + i]] = value;
+                }
+            }
+
+            column += repeatCount - 1;
+        }
+        xmlStreamReader.readNextStartElement();
+    }
+
+    if (rowCounter != 0 && (!fillSamplesOnly || rowLimit > rowCount))
+    {
+        Q_ASSERT(rowCounter <= rowCount);
+        if (rowCounter <= rowCount)
+            dataContainer[rowCounter - 1] = currentDataRow;
+    }
+
+    return {true, dataContainer};
 }
 
 std::pair<bool, unsigned int> ImportOds::getCount(

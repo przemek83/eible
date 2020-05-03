@@ -824,15 +824,6 @@ std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
     return getCount(sheetName, rowCounts_);
 }
 
-std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getData(
-    const QString& sheetName, const QVector<unsigned int>& excludedColumns)
-{
-    auto [success, rowCount] = getRowCount(sheetName);
-    if (!success)
-        return {false, {}};
-    return getLimitedData(sheetName, excludedColumns, rowCount);
-}
-
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
@@ -850,10 +841,10 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         [=](unsigned int column) { return column >= columnCount; });
     if (it != excludedColumns.end())
     {
-        setError(__FUNCTION__,
-                 "Column to exclude number " + QString::number(*it) +
-                     " is invalid. Xlsx got only " +
-                     QString::number(columnCount) + " columns indexed from 0.");
+        setError(__FUNCTION__, "Column to exclude " + QString::number(*it) +
+                                   " is invalid. Xlsx got only " +
+                                   QString::number(columnCount) +
+                                   " columns indexed from 0.");
         return {false, {}};
     }
 

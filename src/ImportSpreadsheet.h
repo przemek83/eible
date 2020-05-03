@@ -32,9 +32,8 @@ public:
     virtual std::pair<bool, unsigned int> getRowCount(
         const QString& sheetName) = 0;
 
-    virtual std::pair<bool, QVector<QVector<QVariant>>> getData(
-        const QString& sheetName,
-        const QVector<unsigned int>& excludedColumns) = 0;
+    std::pair<bool, QVector<QVector<QVariant>>> getData(
+        const QString& sheetName, const QVector<unsigned int>& excludedColumns);
 
     virtual std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
         const QString& sheetName, const QVector<unsigned int>& excludedColumns,

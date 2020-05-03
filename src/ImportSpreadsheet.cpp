@@ -2,6 +2,8 @@
 
 #include <QCoreApplication>
 #include <QIODevice>
+#include <QVariant>
+#include <QVector>
 
 ImportSpreadsheet::ImportSpreadsheet(QIODevice& ioDevice)
     : ioDevice_(ioDevice), emptyColName_("---")
@@ -16,6 +18,15 @@ std::pair<QString, QString> ImportSpreadsheet::getError() const
 void ImportSpreadsheet::setNameForEmptyColumn(const QString& name)
 {
     emptyColName_ = name;
+}
+
+std::pair<bool, QVector<QVector<QVariant> > > ImportSpreadsheet::getData(
+    const QString& sheetName, const QVector<unsigned int>& excludedColumns)
+{
+    auto [success, rowCount] = getRowCount(sheetName);
+    if (!success)
+        return {false, {}};
+    return getLimitedData(sheetName, excludedColumns, rowCount);
 }
 
 void ImportSpreadsheet::setError(QString functionName, QString errorContent)
