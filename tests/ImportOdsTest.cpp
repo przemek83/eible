@@ -68,3 +68,14 @@ void ImportOdsTest::testGetRowCount()
 {
     ImportCommon::checkGetRowCount<ImportOds>(testFileName_);
 }
+
+void ImportOdsTest::testGetRowAndColumnCountViaGetColumnTypes_data()
+{
+    ImportCommon::prepareDataForGetRowAndColumnCountViaGetColumnTypes();
+}
+
+void ImportOdsTest::testGetRowAndColumnCountViaGetColumnTypes()
+{
+    ImportCommon::testGetRowAndColumnCountViaGetColumnTypes<ImportOds>(
+        testFileName_);
+}

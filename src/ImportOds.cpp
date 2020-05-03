@@ -148,22 +148,13 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
         // row counter.
         if (0 == xmlStreamReader.name().compare(tableRowTag) &&
             xmlStreamReader.isStartElement())
-        {
             column = NOT_SET_COLUMN;
-
-            if (!rowEmpty)
-            {
-                rowCounter++;
-                rowEmpty = true;
-            }
-        }
 
         // When we encounter start of cell description.
         if (0 == xmlStreamReader.name().compare(tableCellTag) &&
             xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
         {
             column++;
-            maxColumn = std::max(maxColumn, column);
 
             // Remember column type.
             currentColType = xmlStreamReader.attributes()
@@ -181,9 +172,9 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
 
             for (int i = 0; i < repeatCount; ++i)
             {
-
                 if (0 == currentColType.compare(stringTag))
                 {
+                    maxColumn = std::max(maxColumn, column + i);
                     rowEmpty = false;
                     while (column + i >= columnTypes.size())
                         columnTypes.push_back(ColumnType::UNKNOWN);
@@ -203,6 +194,7 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
                 {
                     if (0 == currentColType.compare(dateTag))
                     {
+                        maxColumn = std::max(maxColumn, column + i);
                         rowEmpty = false;
                         while (column + i >= columnTypes.size())
                             columnTypes.push_back(ColumnType::UNKNOWN);
@@ -225,6 +217,7 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
                             0 == currentColType.compare(currencyTag) ||
                             0 == currentColType.compare(timeTag))
                         {
+                            maxColumn = std::max(maxColumn, column + i);
                             rowEmpty = false;
                             while (column + i >= columnTypes.size())
                                 columnTypes.push_back(ColumnType::UNKNOWN);
@@ -248,7 +241,14 @@ std::pair<bool, QVector<ColumnType> > ImportOds::getColumnTypes(
             }
             column += repeatCount - 1;
         }
-        xmlStreamReader.readNextStartElement();
+        xmlStreamReader.readNext();
+        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+            xmlStreamReader.isEndElement())
+        {
+            if (!rowEmpty)
+                rowCounter++;
+            rowEmpty = true;
+        }
     }
 
     for (int i = 0; i < columnTypes.size(); ++i)

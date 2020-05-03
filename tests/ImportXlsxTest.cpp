@@ -425,38 +425,13 @@ void ImportXlsxTest::testGetRowCount()
 
 void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes_data()
 {
-    QTest::addColumn<QString>("sheetName");
-    QTest::addColumn<unsigned int>("expectedRowCount");
-    QTest::addColumn<unsigned int>("expectedColumnCount");
-
-    for (int i = 0; i < testColumnNames_.size(); ++i)
-    {
-        const QString& sheetName{sheets_[i].first};
-        QTest::newRow(("Rows and columns via GetColumnTypes() in " + sheetName)
-                          .toStdString()
-                          .c_str())
-            << sheetName << expectedRowCounts_[i]
-            << static_cast<unsigned int>(testColumnNames_[i].size());
-    }
+    ImportCommon::prepareDataForGetRowAndColumnCountViaGetColumnTypes();
 }
 
 void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
 {
-    QFETCH(QString, sheetName);
-    QFETCH(unsigned int, expectedRowCount);
-    QFETCH(unsigned int, expectedColumnCount);
-
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    setCommonData(importXlsx);
-    importXlsx.getColumnTypes(sheetName);
-    auto [successRowCount, actualRowCount] = importXlsx.getRowCount(sheetName);
-    QCOMPARE(successRowCount, true);
-    QCOMPARE(actualRowCount, expectedRowCount);
-    auto [successColumnCount, actualColumnCount] =
-        importXlsx.getColumnCount(sheetName);
-    QCOMPARE(successColumnCount, true);
-    QCOMPARE(actualColumnCount, expectedColumnCount);
+    ImportCommon::testGetRowAndColumnCountViaGetColumnTypes<ImportXlsx>(
+        testFileName_);
 }
 
 void ImportXlsxTest::testGetData_data()
