@@ -30,6 +30,9 @@ private Q_SLOTS:
     void testGetData_data();
     void testGetData();
 
+    void testGetDataLimitRows_data();
+    void testGetDataLimitRows();
+
 private:
     static const QString testFileName_;
 };

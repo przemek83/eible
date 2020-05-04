@@ -44,6 +44,10 @@ public:
     template <class T>
     static void checkGetData(const QString& fileName);
 
+    static void prepareDataForGetDataLimitRows();
+    template <class T>
+    static void checkGetDataLimitRows(const QString& fileName);
+
     static QVector<QVector<QVariant>> getDataForSheet(const QString& fileName);
 
 private:

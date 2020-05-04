@@ -440,15 +440,18 @@ void ImportXlsxTest::testGetDataLimitRows_data()
     QTest::addColumn<unsigned int>("rowLimit");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
     QString sheetName{sheets_[0].first};
+    QVector<QVector<QVariant>> sheetData{convertDataToUseSharedStrings(
+        ImportCommon::getDataForSheet(sheetName))};
     QTest::newRow(("Limited data to 10 in " + sheetName).toStdString().c_str())
-        << sheetName << 10u << sheetData_[0];
+        << sheetName << 10u << sheetData;
     QTest::newRow(("Limited data to 2 in " + sheetName).toStdString().c_str())
-        << sheetName << 2u << sheetData_[0];
+        << sheetName << 2u << sheetData;
     sheetName = sheets_[5].first;
     QVector<QVector<QVariant>> expectedValues;
     const unsigned int rowLimit{12u};
     for (unsigned int i = 0; i < rowLimit; ++i)
         expectedValues.append(sheetData_[5][i]);
+    expectedValues = convertDataToUseSharedStrings(expectedValues);
     QTest::newRow(
         ("Limited data to " + QString::number(rowLimit) + " in " + sheetName)
             .toStdString()
@@ -458,17 +461,7 @@ void ImportXlsxTest::testGetDataLimitRows_data()
 
 void ImportXlsxTest::testGetDataLimitRows()
 {
-    QFETCH(QString, sheetName);
-    QFETCH(unsigned int, rowLimit);
-    QFETCH(QVector<QVector<QVariant>>, expectedData);
-
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    setCommonData(importXlsx);
-    auto [success, actualData] =
-        importXlsx.getLimitedData(sheetName, {}, rowLimit);
-    QCOMPARE(success, true);
-    QCOMPARE(actualData, expectedData);
+    ImportCommon::checkGetDataLimitRows<ImportXlsx>(testFileName_);
 }
 
 void ImportXlsxTest::testGetDataExcludeColumns_data()

@@ -89,3 +89,13 @@ void ImportOdsTest::testGetData()
 {
     ImportCommon::checkGetData<ImportOds>(testFileName_);
 }
+
+void ImportOdsTest::testGetDataLimitRows_data()
+{
+    ImportCommon::prepareDataForGetDataLimitRows();
+}
+
+void ImportOdsTest::testGetDataLimitRows()
+{
+    ImportCommon::checkGetDataLimitRows<ImportOds>(testFileName_);
+}

@@ -460,14 +460,55 @@ void ImportCommon::checkGetData(const QString& fileName)
     QFETCH(QString, sheetName);
     QFETCH(QVector<QVector<QVariant>>, expectedData);
 
-    QFile xlsxTestFile(fileName);
-    T importer(xlsxTestFile);
+    QFile testFile(fileName);
+    T importer(testFile);
     auto [success, actualData] = importer.getData(sheetName, {});
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
 template void ImportCommon::checkGetData<ImportXlsx>(const QString& fileName);
 template void ImportCommon::checkGetData<ImportOds>(const QString& fileName);
+
+void ImportCommon::prepareDataForGetDataLimitRows()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<unsigned int>("rowLimit");
+    QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
+    QString sheetName{sheetNames_[0]};
+    QTest::newRow(("Limited data to 10 in " + sheetName).toStdString().c_str())
+        << sheetName << 10u << sheetData_[0];
+    QTest::newRow(("Limited data to 2 in " + sheetName).toStdString().c_str())
+        << sheetName << 2u << sheetData_[0];
+    sheetName = sheetNames_[5];
+    QVector<QVector<QVariant>> expectedValues;
+    const unsigned int rowLimit{12u};
+    for (unsigned int i = 0; i < rowLimit; ++i)
+        expectedValues.append(sheetData_[5][i]);
+    QTest::newRow(
+        ("Limited data to " + QString::number(rowLimit) + " in " + sheetName)
+            .toStdString()
+            .c_str())
+        << sheetName << rowLimit << expectedValues;
+}
+
+template <class T>
+void ImportCommon::checkGetDataLimitRows(const QString& fileName)
+{
+    QFETCH(QString, sheetName);
+    QFETCH(unsigned int, rowLimit);
+    QFETCH(QVector<QVector<QVariant>>, expectedData);
+
+    QFile testFile(fileName);
+    T importer(testFile);
+    auto [success, actualData] =
+        importer.getLimitedData(sheetName, {}, rowLimit);
+    QCOMPARE(success, true);
+    QCOMPARE(actualData, expectedData);
+}
+template void ImportCommon::checkGetDataLimitRows<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkGetDataLimitRows<ImportOds>(
+    const QString& fileName);
 
 QVector<QVector<QVariant>> ImportCommon::getDataForSheet(
     const QString& fileName)

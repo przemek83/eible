@@ -497,7 +497,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
            0 != xmlStreamReader.name().compare(tableTag) &&
-           rowCounter <= rowLimit)
+           rowCounter < rowLimit)
     {
         // If start of row encountered than reset column counter add
         // increment row counter.
