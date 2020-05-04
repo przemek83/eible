@@ -60,8 +60,6 @@ private Q_SLOTS:
     void testEmittingProgressPercentChangedBigFile();
 
 private:
-    QVector<QVector<QVariant>> getDataWithoutColumns(
-        const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
     void setCommonData(ImportXlsx& importXlsx);
 
     QVector<QVector<QVariant>> convertDataToUseSharedStrings(
@@ -73,7 +71,6 @@ private:
     static const QStringList sharedStrings_;
     static const QList<int> dateStyles_;
     static const QList<int> allStyles_;
-    static const QVector<QVector<QVector<QVariant>>> sheetData_;
     QByteArray generatedXlsx_;
 
     static constexpr int NO_SIGNAL{0};

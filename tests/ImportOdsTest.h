@@ -33,6 +33,10 @@ private Q_SLOTS:
     void testGetDataLimitRows_data();
     void testGetDataLimitRows();
 
+    void testGetDataExcludeColumns_data();
+    void testGetDataExcludeColumns();
+    void testGetDataExcludeInvalidColumn();
+
 private:
     static const QString testFileName_;
 };

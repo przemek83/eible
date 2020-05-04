@@ -99,3 +99,18 @@ void ImportOdsTest::testGetDataLimitRows()
 {
     ImportCommon::checkGetDataLimitRows<ImportOds>(testFileName_);
 }
+
+void ImportOdsTest::testGetDataExcludeColumns_data()
+{
+    ImportCommon::prepareDataForGetGetDataExcludeColumns();
+}
+
+void ImportOdsTest::testGetDataExcludeColumns()
+{
+    ImportCommon::checkGetDataExcludeColumns<ImportOds>(testFileName_);
+}
+
+void ImportOdsTest::testGetDataExcludeInvalidColumn()
+{
+    ImportCommon::checkGetDataExcludeInvalidColumn<ImportOds>(testFileName_);
+}

@@ -510,8 +510,70 @@ template void ImportCommon::checkGetDataLimitRows<ImportXlsx>(
 template void ImportCommon::checkGetDataLimitRows<ImportOds>(
     const QString& fileName);
 
+void ImportCommon::prepareDataForGetGetDataExcludeColumns()
+{
+    QTest::addColumn<QString>("sheetName");
+    QTest::addColumn<QVector<unsigned int>>("excludedColumns");
+    QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
+
+    QString sheetName{sheetNames_[0]};
+    QString testName{"Get data with excluded column 1 in " + sheetName};
+    QTest::newRow(qUtf8Printable(testName))
+        << sheetName << QVector<unsigned int>{1}
+        << getDataWithoutColumns(sheetData_[0], {1});
+
+    testName = "Get data with excluded column 0 and 2 in " + sheetName;
+    QTest::newRow(qUtf8Printable(testName))
+        << sheetName << QVector<unsigned int>{0, 2}
+        << getDataWithoutColumns(sheetData_[0], {2, 0});
+}
+
+template <class T>
+void ImportCommon::checkGetDataExcludeColumns(const QString& fileName)
+{
+    QFETCH(QString, sheetName);
+    QFETCH(QVector<unsigned int>, excludedColumns);
+    QFETCH(QVector<QVector<QVariant>>, expectedData);
+
+    QFile testFile(fileName);
+    T importer(testFile);
+    auto [success, actualData] = importer.getData(sheetName, excludedColumns);
+    QCOMPARE(success, true);
+    QCOMPARE(actualData, expectedData);
+}
+template void ImportCommon::checkGetDataExcludeColumns<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkGetDataExcludeColumns<ImportOds>(
+    const QString& fileName);
+
+template <class T>
+void ImportCommon::checkGetDataExcludeInvalidColumn(const QString& fileName)
+{
+    QFile testFile(fileName);
+    T importer(testFile);
+    auto [success, actualData] = importer.getData(sheetNames_[0], {3});
+    QCOMPARE(success, false);
+}
+template void ImportCommon::checkGetDataExcludeInvalidColumn<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkGetDataExcludeInvalidColumn<ImportOds>(
+    const QString& fileName);
+
 QVector<QVector<QVariant>> ImportCommon::getDataForSheet(
     const QString& fileName)
 {
     return sheetData_[sheetNames_.indexOf(fileName)];
+}
+
+QVector<QVector<QVariant>> ImportCommon::getDataWithoutColumns(
+    const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude)
+{
+    QVector<QVector<QVariant>> expectedValues;
+    for (auto dataRow : data)
+    {
+        for (int column : columnsToExclude)
+            dataRow.remove(column);
+        expectedValues.append(dataRow);
+    }
+    return expectedValues;
 }

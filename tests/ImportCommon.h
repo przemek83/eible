@@ -48,7 +48,16 @@ public:
     template <class T>
     static void checkGetDataLimitRows(const QString& fileName);
 
+    static void prepareDataForGetGetDataExcludeColumns();
+    template <class T>
+    static void checkGetDataExcludeColumns(const QString& fileName);
+    template <class T>
+    static void checkGetDataExcludeInvalidColumn(const QString& fileName);
+
     static QVector<QVector<QVariant>> getDataForSheet(const QString& fileName);
+
+    static QVector<QVector<QVariant>> getDataWithoutColumns(
+        const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
 
 private:
     static const QStringList sheetNames_;
