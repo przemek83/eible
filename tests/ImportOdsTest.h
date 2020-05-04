@@ -37,7 +37,6 @@ private Q_SLOTS:
     void testGetDataExcludeColumns();
     void testGetDataExcludeInvalidColumn();
 
-    void benchmarkGetData_data();
     void benchmarkGetData();
 
     void testEmittingProgressPercentChangedEmptyFile();

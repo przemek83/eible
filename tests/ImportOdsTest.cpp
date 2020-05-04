@@ -117,9 +117,20 @@ void ImportOdsTest::testGetDataExcludeInvalidColumn()
     ImportCommon::checkGetDataExcludeInvalidColumn<ImportOds>(testFileName_);
 }
 
-void ImportOdsTest::benchmarkGetData_data() { QSKIP("TODO"); }
-
-void ImportOdsTest::benchmarkGetData() { QSKIP("TODO"); }
+void ImportOdsTest::benchmarkGetData()
+{
+    QSKIP("Skip benchmark.");
+    QFile testFile(":/bigFile.ods");
+    ImportOds importOds(testFile);
+    auto [success, sheetNames] = importOds.getSheetNames();
+    QCOMPARE(success, true);
+    QCOMPARE(sheetNames.size(), 1);
+    QBENCHMARK
+    {
+        for (int i = 0; i < 10; ++i)
+            importOds.getData(sheetNames.front(), {});
+    }
+}
 
 void ImportOdsTest::testEmittingProgressPercentChangedEmptyFile()
 {
