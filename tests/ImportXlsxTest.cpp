@@ -354,56 +354,18 @@ void ImportXlsxTest::benchmarkGetData()
 
 void ImportXlsxTest::testEmittingProgressPercentChangedEmptyFile()
 {
-    QFile xlsxTestFile(templateFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
-    QStringList sheetNames{importXlsx.getSheetNames().second};
-    auto [success, actualData] = importXlsx.getData(sheetNames.first(), {});
-    QCOMPARE(success, true);
-    QCOMPARE(spy.count(), NO_SIGNAL);
+    ImportCommon::checkEmittingProgressPercentChangedEmptyFile<ImportXlsx>(
+        templateFileName_);
 }
 
 void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile()
 {
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
-    setCommonData(importXlsx);
-    const unsigned int sheetIndex{1};
-    auto [success, actualData] =
-        importXlsx.getData(sheets_[sheetIndex].first, {});
-    QCOMPARE(success, true);
-    QCOMPARE(spy.count(), 19);
-}
-
-void ImportXlsxTest::testEmittingProgressPercentChangedBigFile_data()
-{
-    TestTableModel model(1, 250);
-    QTableView view;
-    view.setModel(&model);
-
-    generatedXlsx_.clear();
-    QBuffer exportedFile(&generatedXlsx_);
-    exportedFile.open(QIODevice::WriteOnly);
-    ExportXlsx exportXlsx;
-    exportXlsx.exportView(view, exportedFile);
+    ImportCommon::checkEmittingProgressPercentChangedSmallFile<ImportXlsx>(
+        testFileName_);
 }
 
 void ImportXlsxTest::testEmittingProgressPercentChangedBigFile()
 {
-    QBuffer testFile(&generatedXlsx_);
-    ImportXlsx importXlsx(testFile);
-    QSignalSpy spy(&importXlsx, &ImportSpreadsheet::progressPercentChanged);
-    QStringList sheetNames{importXlsx.getSheetNames().second};
-    auto [success, actualData] = importXlsx.getData(sheetNames.first(), {});
-    QCOMPARE(success, true);
-    QCOMPARE(spy.count(), 100);
-}
-
-void ImportXlsxTest::setCommonData(ImportXlsx& importXlsx)
-{
-    importXlsx.setSharedStrings(sharedStrings_);
-    importXlsx.setDateStyles(dateStyles_);
-    importXlsx.setAllStyles(allStyles_);
-    importXlsx.setSheets(sheets_);
+    ImportCommon::checkEmittingProgressPercentChangedBigFile<ImportXlsx>(
+        ":/mediumFile.xlsx");
 }

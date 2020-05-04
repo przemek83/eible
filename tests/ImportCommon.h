@@ -59,12 +59,24 @@ public:
     static QVector<QVector<QVariant>> getDataWithoutColumns(
         const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
 
+    template <class T>
+    static void checkEmittingProgressPercentChangedEmptyFile(
+        const QString& fileName);
+    template <class T>
+    static void checkEmittingProgressPercentChangedSmallFile(
+        const QString& fileName);
+    template <class T>
+    static void checkEmittingProgressPercentChangedBigFile(
+        const QString& fileName);
+
 private:
     static const QStringList sheetNames_;
     static const QList<QStringList> testColumnNames_;
     static const std::vector<unsigned int> expectedRowCounts_;
     static const QVector<QVector<ColumnType>> columnTypes_;
     static const QVector<QVector<QVector<QVariant>>> sheetData_;
+
+    static constexpr int NO_SIGNAL{0};
 };
 
 #endif  // IMPORTCOMMON_H

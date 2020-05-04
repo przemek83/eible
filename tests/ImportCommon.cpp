@@ -1,12 +1,12 @@
 #include "ImportCommon.h"
 
 #include <ImportOds.h>
+#include <ImportSpreadsheet.h>
 #include <ImportXlsx.h>
 #include <QBuffer>
 #include <QFile>
+#include <QSignalSpy>
 #include <QTest>
-
-#include "ImportSpreadsheet.h"
 
 const QStringList ImportCommon::sheetNames_{
     "Sheet1", "Sheet2", "Sheet3(empty)", "Sheet4",
@@ -577,3 +577,54 @@ QVector<QVector<QVariant>> ImportCommon::getDataWithoutColumns(
     }
     return expectedValues;
 }
+
+template <class T>
+void ImportCommon::checkEmittingProgressPercentChangedEmptyFile(
+    const QString& fileName)
+{
+    QFile testFile(fileName);
+    T importer(testFile);
+    QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
+    QStringList sheetNames{importer.getSheetNames().second};
+    auto [success, actualData] = importer.getData(sheetNames.first(), {});
+    QCOMPARE(success, true);
+    QCOMPARE(spy.count(), NO_SIGNAL);
+}
+template void ImportCommon::checkEmittingProgressPercentChangedEmptyFile<
+    ImportXlsx>(const QString& fileName);
+template void ImportCommon::checkEmittingProgressPercentChangedEmptyFile<
+    ImportOds>(const QString& fileName);
+
+template <class T>
+void ImportCommon::checkEmittingProgressPercentChangedSmallFile(
+    const QString& fileName)
+{
+    QFile testFile(fileName);
+    T importer(testFile);
+    QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
+    const unsigned int sheetIndex{1};
+    auto [success, actualData] = importer.getData(sheetNames_[sheetIndex], {});
+    QCOMPARE(success, true);
+    QCOMPARE(spy.count(), 19);
+}
+template void ImportCommon::checkEmittingProgressPercentChangedSmallFile<
+    ImportXlsx>(const QString& fileName);
+template void ImportCommon::checkEmittingProgressPercentChangedSmallFile<
+    ImportOds>(const QString& fileName);
+
+template <class T>
+void ImportCommon::checkEmittingProgressPercentChangedBigFile(
+    const QString& fileName)
+{
+    QFile testFile(fileName);
+    T importer(testFile);
+    QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
+    QStringList sheetNames{importer.getSheetNames().second};
+    auto [success, actualData] = importer.getData(sheetNames.first(), {});
+    QCOMPARE(success, true);
+    QCOMPARE(spy.count(), 100);
+}
+template void ImportCommon::checkEmittingProgressPercentChangedBigFile<
+    ImportXlsx>(const QString& fileName);
+template void ImportCommon::checkEmittingProgressPercentChangedBigFile<
+    ImportOds>(const QString& fileName);

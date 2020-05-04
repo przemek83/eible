@@ -8,6 +8,8 @@
 #include "ImportCommon.h"
 
 const QString ImportOdsTest::testFileName_{QStringLiteral(":/testOds.ods")};
+const QString ImportOdsTest::templateFileName_{
+    QStringLiteral(":/emptyOds.ods")};
 
 void ImportOdsTest::testRetrievingSheetNames()
 {
@@ -113,4 +115,26 @@ void ImportOdsTest::testGetDataExcludeColumns()
 void ImportOdsTest::testGetDataExcludeInvalidColumn()
 {
     ImportCommon::checkGetDataExcludeInvalidColumn<ImportOds>(testFileName_);
+}
+
+void ImportOdsTest::benchmarkGetData_data() { QSKIP("TODO"); }
+
+void ImportOdsTest::benchmarkGetData() { QSKIP("TODO"); }
+
+void ImportOdsTest::testEmittingProgressPercentChangedEmptyFile()
+{
+    ImportCommon::checkEmittingProgressPercentChangedEmptyFile<ImportOds>(
+        templateFileName_);
+}
+
+void ImportOdsTest::testEmittingProgressPercentChangedSmallFile()
+{
+    ImportCommon::checkEmittingProgressPercentChangedSmallFile<ImportOds>(
+        testFileName_);
+}
+
+void ImportOdsTest::testEmittingProgressPercentChangedBigFile()
+{
+    ImportCommon::checkEmittingProgressPercentChangedBigFile<ImportOds>(
+        ":/mediumFile.ods");
 }

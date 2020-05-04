@@ -56,12 +56,9 @@ private Q_SLOTS:
 
     void testEmittingProgressPercentChangedEmptyFile();
     void testEmittingProgressPercentChangedSmallFile();
-    void testEmittingProgressPercentChangedBigFile_data();
     void testEmittingProgressPercentChangedBigFile();
 
 private:
-    void setCommonData(ImportXlsx& importXlsx);
-
     QVector<QVector<QVariant>> convertDataToUseSharedStrings(
         QVector<QVector<QVariant>> inputData);
 

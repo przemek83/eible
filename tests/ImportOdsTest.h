@@ -37,8 +37,16 @@ private Q_SLOTS:
     void testGetDataExcludeColumns();
     void testGetDataExcludeInvalidColumn();
 
+    void benchmarkGetData_data();
+    void benchmarkGetData();
+
+    void testEmittingProgressPercentChangedEmptyFile();
+    void testEmittingProgressPercentChangedSmallFile();
+    void testEmittingProgressPercentChangedBigFile();
+
 private:
     static const QString testFileName_;
+    static const QString templateFileName_;
 };
 
 #endif  // IMPORTODSTEST_H

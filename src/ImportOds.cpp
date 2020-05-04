@@ -510,10 +510,9 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                 dataContainer[rowCounter] = currentDataRow;
                 currentDataRow = templateDataRow;
                 rowCounter++;
+                updateProgress(rowCounter, rowLimit, lastEmittedPercent);
             }
             rowEmpty = true;
-
-            updateProgress(rowCounter, rowLimit, lastEmittedPercent);
 
             if (fillSamplesOnly && rowCounter > containerSize)
                 break;
