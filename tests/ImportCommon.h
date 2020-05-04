@@ -40,11 +40,18 @@ public:
     static void testGetRowAndColumnCountViaGetColumnTypes(
         const QString& fileName);
 
+    static void prepareDataForGetData();
+    template <class T>
+    static void checkGetData(const QString& fileName);
+
+    static QVector<QVector<QVariant>> getDataForSheet(const QString& fileName);
+
 private:
     static const QStringList sheetNames_;
     static const QList<QStringList> testColumnNames_;
     static const std::vector<unsigned int> expectedRowCounts_;
     static const QVector<QVector<ColumnType>> columnTypes_;
+    static const QVector<QVector<QVector<QVariant>>> sheetData_;
 };
 
 #endif  // IMPORTCOMMON_H

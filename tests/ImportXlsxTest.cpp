@@ -108,39 +108,6 @@ const QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22,
 const QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 164, 166, 167, 168,
                                             169, 169, 170, 164, 164, 171, 172};
 
-const QList<QStringList> ImportXlsxTest::testColumnNames_ = {
-    {"Text", "Numeric", "Date"},
-    {"Trait #1", "Value #1", "Transaction date", "Units", "Price",
-     "Price per unit", "Another trait"},
-    {},
-    {"cena nier", "pow", "cena metra", "data transakcji", "text"},
-    {"name", "date", "mass (kg)", "height", "---", "---", "---", "---", "---",
-     "---", "---", "---"},
-    {"modificator", "x", "y"},
-    {"Pow", "Cena", "cena_m", "---", "---", "---"},
-    {"user", "pass", "lic_exp", "uwagi"}};
-
-const std::vector<unsigned int> ImportXlsxTest::expectedRowCounts_{
-    2, 19, 0, 4, 30, 25, 20, 3};
-
-const QVector<QVector<ColumnType>> ImportXlsxTest::columnTypes_ = {
-    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE},
-    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
-     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-     ColumnType::STRING},
-    {},
-    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-     ColumnType::DATE, ColumnType::STRING},
-    {ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
-     ColumnType::NUMBER, ColumnType::STRING, ColumnType::NUMBER,
-     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
-     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
-    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
-    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER},
-    {ColumnType::STRING, ColumnType::STRING, ColumnType::STRING,
-     ColumnType::STRING}};
-
 const QVector<QVector<QVector<QVariant>>> ImportXlsxTest::sheetData_ = {
     {{3, 1., QDate(2020, 1, 3)}, {4, 2., QDate(2020, 1, 4)}},
     {{12, 1., QDate(2010, 1, 7), 48.49, 550060.8, 11343.8, 13},
@@ -434,29 +401,37 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
         testFileName_);
 }
 
+QVector<QVector<QVariant>> ImportXlsxTest::convertDataToUseSharedStrings(
+    QVector<QVector<QVariant>> inputData)
+{
+    QVector<QVector<QVariant>> outputData{inputData};
+    for (auto& row : outputData)
+        for (auto& item : row)
+            if (item.type() == QVariant::String && !item.isNull())
+                item = (sharedStrings_.contains(item.toString())
+                            ? QVariant(sharedStrings_.indexOf(item.toString()))
+                            : item);
+    return outputData;
+}
+
 void ImportXlsxTest::testGetData_data()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
-    for (int i = 0; i < testColumnNames_.size(); ++i)
+    for (int i = 0; i < sheets_.size(); ++i)
     {
         const QString& sheetName{sheets_[i].first};
+        QVector<QVector<QVariant>> sheetData{
+            ImportCommon::getDataForSheet(sheetName)};
+        sheetData = convertDataToUseSharedStrings(sheetData);
         QTest::newRow(("Data in " + sheetName).toStdString().c_str())
-            << sheetName << sheetData_[i];
+            << sheetName << sheetData;
     }
 }
 
 void ImportXlsxTest::testGetData()
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QVector<QVector<QVariant>>, expectedData);
-
-    QFile xlsxTestFile(testFileName_);
-    ImportXlsx importXlsx(xlsxTestFile);
-    setCommonData(importXlsx);
-    auto [success, actualData] = importXlsx.getData(sheetName, {});
-    QCOMPARE(success, true);
-    QCOMPARE(actualData, expectedData);
+    ImportCommon::checkGetData<ImportXlsx>(testFileName_);
 }
 
 void ImportXlsxTest::testGetDataLimitRows_data()
@@ -583,7 +558,7 @@ void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile()
     auto [success, actualData] =
         importXlsx.getData(sheets_[sheetIndex].first, {});
     QCOMPARE(success, true);
-    QCOMPARE(spy.count(), expectedRowCounts_[sheetIndex]);
+    QCOMPARE(spy.count(), 19);
 }
 
 void ImportXlsxTest::testEmittingProgressPercentChangedBigFile_data()

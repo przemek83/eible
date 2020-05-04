@@ -470,6 +470,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 
     // Actual data type in cell (s, str, null).
     QString currentColType = QStringLiteral("string");
+    QString currentDateValue{};
 
     // Current row number.
     unsigned int rowCounter = 0;
@@ -489,9 +490,11 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     const QString officeDateValueTag(QStringLiteral("office:date-value"));
     const QString officeValueTag(QStringLiteral("office:value"));
     const QString dateFormat(QStringLiteral("yyyy-MM-dd"));
+    const QString dateTag(QStringLiteral("date"));
 
     const QString emptyString(QLatin1String(""));
-
+    bool rowEmpty = true;
+    unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
            0 != xmlStreamReader.name().compare(tableTag) &&
            rowCounter <= rowLimit)
@@ -502,14 +505,18 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             xmlStreamReader.isStartElement())
         {
             column = NOT_SET_COLUMN;
-
-            if (0 != cellsFilledInRow)
+            if (!rowEmpty)
             {
                 dataContainer[rowCounter] = currentDataRow;
-                currentDataRow = QVector<QVariant>(templateDataRow);
-                cellsFilledInRow = 0;
+                currentDataRow = templateDataRow;
                 rowCounter++;
             }
+            rowEmpty = true;
+
+            updateProgress(rowCounter, rowLimit, lastEmittedPercent);
+
+            if (fillSamplesOnly && rowCounter > containerSize)
+                break;
         }
 
         // When we encounter start of cell description.
@@ -560,6 +567,10 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                 {
                     case ColumnType::STRING:
                     {
+                        currentDateValue = xmlStreamReader.attributes()
+                                               .value(officeDateValueTag)
+                                               .toString();
+
                         while (!xmlStreamReader.atEnd() &&
                                0 != xmlStreamReader.name().compare(pTag))
 
@@ -574,18 +585,26 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                         {
                             xmlStreamReader.readNext();
                         }
-
-                        const QString* stringPointer =
-                            xmlStreamReader.text().string();
-                        value =
-                            QVariant(stringPointer == nullptr ? emptyString
-                                                              : *stringPointer);
+                        rowEmpty = false;
+                        if (currentColType.compare(dateTag) == 0)
+                        {
+                            value = QVariant(currentDateValue);
+                        }
+                        else
+                        {
+                            const QString* stringPointer =
+                                xmlStreamReader.text().string();
+                            value = QVariant(stringPointer == nullptr
+                                                 ? emptyString
+                                                 : *stringPointer);
+                        }
                         break;
                     }
 
                     case ColumnType::DATE:
                     {
                         static const int odsStringDateLength{10};
+                        rowEmpty = false;
                         value = QVariant(
                             QDate::fromString(xmlStreamReader.attributes()
                                                   .value(officeDateValueTag)
@@ -598,6 +617,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 
                     case ColumnType::NUMBER:
                     {
+                        rowEmpty = false;
                         value = QVariant(xmlStreamReader.attributes()
                                              .value(officeValueTag)
                                              .toDouble());
@@ -629,12 +649,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         xmlStreamReader.readNextStartElement();
     }
 
-    if (rowCounter != 0 && (!fillSamplesOnly || rowLimit > rowCount))
-    {
-        Q_ASSERT(rowCounter <= rowCount);
-        if (rowCounter <= rowCount)
-            dataContainer[rowCounter - 1] = currentDataRow;
-    }
+    if (currentDataRow != templateDataRow)
+        dataContainer[dataContainer.size() - 1] = currentDataRow;
 
     return {true, dataContainer};
 }

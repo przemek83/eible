@@ -874,6 +874,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
     // Actual data type in cell (s, str, null).
     QString currentColType = QStringLiteral("s");
+    QString actualSTagValue{};
 
     // Actual row number.
     unsigned int rowCounter = 0;
@@ -978,6 +979,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
             // Remember cell type.
             currentColType =
                 xmlStreamReader.attributes().value(tTag).toString();
+            actualSTagValue =
+                xmlStreamReader.attributes().value(sTag).toString();
         }
 
         // Insert data into table.
@@ -997,8 +1000,24 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                         currentDataRow[activeColumnsMapping[column]] =
                             QVariant(xmlStreamReader.readElementText().toInt());
                     else
-                        currentDataRow[activeColumnsMapping[column]] =
-                            QVariant(xmlStreamReader.readElementText());
+                    {
+                        if (!actualSTagValue.isEmpty() &&
+                            dateStyles_->contains(
+                                allStyles_->at(actualSTagValue.toInt())))
+                        {
+                            int daysToAdd = static_cast<int>(
+                                xmlStreamReader.readElementText().toInt());
+                            currentDataRow[activeColumnsMapping[column]] =
+                                QVariant(EibleUtilities::getStartOfExcelWorld()
+                                             .addDays(daysToAdd)
+                                             .toString(Qt::ISODate));
+                        }
+                        else
+                        {
+                            currentDataRow[activeColumnsMapping[column]] =
+                                QVariant(xmlStreamReader.readElementText());
+                        }
+                    }
                     break;
                 }
 

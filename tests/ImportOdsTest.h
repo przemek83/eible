@@ -27,6 +27,9 @@ private Q_SLOTS:
     void testGetRowAndColumnCountViaGetColumnTypes_data();
     void testGetRowAndColumnCountViaGetColumnTypes();
 
+    void testGetData_data();
+    void testGetData();
+
 private:
     static const QString testFileName_;
 };

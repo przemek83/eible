@@ -64,16 +64,16 @@ private:
         const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
     void setCommonData(ImportXlsx& importXlsx);
 
+    QVector<QVector<QVariant>> convertDataToUseSharedStrings(
+        QVector<QVector<QVariant>> inputData);
+
     static const QString testFileName_;
     static const QString templateFileName_;
     static const QList<std::pair<QString, QString>> sheets_;
     static const QStringList sharedStrings_;
     static const QList<int> dateStyles_;
     static const QList<int> allStyles_;
-    static const QList<QStringList> testColumnNames_;
-    static const std::vector<unsigned int> expectedRowCounts_;
     static const QVector<QVector<QVector<QVariant>>> sheetData_;
-    static const QVector<QVector<ColumnType>> columnTypes_;
     QByteArray generatedXlsx_;
 
     static constexpr int NO_SIGNAL{0};
