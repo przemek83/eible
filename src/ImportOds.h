@@ -61,6 +61,15 @@ private:
     bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
     bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
 
+    bool sheetNameValid(const QString& sheetName);
+
+    bool columnsToExcludeAreValid(const QVector<unsigned int>& excludedColumns,
+                                  unsigned int columnCount);
+
+    QVector<QVariant> createTemplateDataRow(
+        const QVector<unsigned int>& excludedColumns,
+        const QVector<ColumnType>& columnTypes) const;
+
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
