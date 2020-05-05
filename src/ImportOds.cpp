@@ -32,39 +32,19 @@ const QString ImportOds::DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
 const QString ImportOds::TABLE_QUALIFIED_NAME{"table:table"};
 const QString ImportOds::TABLE_NAME_TAG{QLatin1String("table:name")};
 
-ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
+ImportOds::ImportOds(QIODevice& ioDevice)
+    : ImportSpreadsheet(ioDevice), zip_(&ioDevice_)
+{
+}
 
 std::pair<bool, QStringList> ImportOds::getSheetNames()
 {
     if (sheetNames_)
         return {true, *sheetNames_};
 
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
+    QuaZipFile zipFile;
+    if (!openZipFile(zipFile, QStringLiteral("settings.xml")))
         return {false, {}};
-    }
-
-    QStringList sheetNames{};
-    const QString innerFileToOpen{QStringLiteral("settings.xml")};
-    if (!zip.setCurrentFile(innerFileToOpen))
-    {
-        setError(__FUNCTION__,
-                 "Can not open file " + innerFileToOpen + " in archive.");
-        return {false, {}};
-    }
-
-    // Open file in zip archive.
-    QuaZipFile zipFile(&zip);
-    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        setError(__FUNCTION__,
-                 "Can not open file " + zipFile.getFileName() + ".");
-        return {false, {}};
-    }
 
     // Create, set content and read DOM.
     QDomDocument xmlDocument(__FUNCTION__);
@@ -73,7 +53,6 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
         setError(__FUNCTION__, "Xml file is damaged.");
         return {false, {}};
     }
-    zipFile.close();
 
     QDomElement root = xmlDocument.documentElement();
 
@@ -85,6 +64,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
     const QString tables(QStringLiteral("Tables"));
 
     int elementsCount = root.elementsByTagName(configMapNamed).size();
+    QStringList sheetNames{};
     for (int i = 0; i < elementsCount; i++)
     {
         QDomElement currentElement =
@@ -118,19 +98,12 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     if (!sheetNames_ && !getSheetNames().first)
         return {false, {}};
 
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
-        return {false, {}};
-    }
-
     QuaZipFile zipFile;
-    QXmlStreamReader xmlStreamReader;
+    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
+        return {false, {}};
 
-    if (!openZipAndMoveToSecondRow(zip, sheetName, zipFile, xmlStreamReader))
+    QXmlStreamReader xmlStreamReader;
+    if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return {false, {}};
 
     QVector<ColumnType> columnTypes;
@@ -290,93 +263,66 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
         return {false, {}};
     const unsigned int columnCount{columnCounts_[sheetName]};
 
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
+    QuaZipFile zipFile;
+    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
         return {false, {}};
-    }
 
-    QStringList columnNames{};
+    QXmlStreamReader xmlStreamReader;
+    xmlStreamReader.setDevice(&zipFile);
+    skipToSheet(xmlStreamReader, sheetName);
 
-    if (zip.setCurrentFile(QStringLiteral("content.xml")))
-    {
-        // Open file in zip archive.
-        QuaZipFile zipFile(&zip);
-        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            setError(__FUNCTION__,
-                     "Can not open file " + zipFile.getFileName() + ".");
-            return {false, {}};
-        }
-
-        QXmlStreamReader xmlStreamReader;
-        xmlStreamReader.setDevice(&zipFile);
-        skipToSheet(xmlStreamReader, sheetName);
-
-        while (!xmlStreamReader.atEnd() &&
-               xmlStreamReader.name() != TABLE_ROW_TAG)
-            xmlStreamReader.readNext();
-
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != TABLE_ROW_TAG)
         xmlStreamReader.readNext();
 
-        // Actual column number.
-        int column = NOT_SET_COLUMN;
-        QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
+    xmlStreamReader.readNext();
 
-        // Parse first row.
-        while (!xmlStreamReader.atEnd() &&
-               xmlStreamReader.name() != TABLE_ROW_TAG)
-        {
-            // When we encounter first cell of worksheet.
-            if (xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
-                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
-            {
-                QString emptyColNumber = xmlStreamReader.attributes()
-                                             .value(COLUMNS_REPEATED_TAG)
-                                             .toString();
-                if (!emptyColNumber.isEmpty())
-                {
-                    break;
-                }
+    // Actual column number.
+    int column = NOT_SET_COLUMN;
+    QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
+    QStringList columnNames{};
 
-                // Add column number.
-                column++;
-            }
-
-            // If we encounter start of cell content we add it to list.
-            if (!xmlStreamReader.atEnd() &&
-                xmlStreamReader.name().toString() == P_TAG &&
-                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
-            {
-                while (xmlStreamReader.tokenType() !=
-                       QXmlStreamReader::Characters)
-                {
-                    xmlStreamReader.readNext();
-                }
-
-                columnNames.push_back(xmlStreamReader.text().toString());
-            }
-
-            // If we encounter empty cell we add it to list.
-            if (xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
-                xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
-                lastToken == QXmlStreamReader::StartElement)
-            {
-                columnNames << emptyColName_;
-            }
-
-            lastToken = xmlStreamReader.tokenType();
-            xmlStreamReader.readNext();
-        }
-    }
-    else
+    // Parse first row.
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != TABLE_ROW_TAG)
     {
-        setError(__FUNCTION__,
-                 "Can not open file " + sheetName + " in archive.");
-        return {false, {}};
+        // When we encounter first cell of worksheet.
+        if (xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
+            xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+        {
+            QString emptyColNumber = xmlStreamReader.attributes()
+                                         .value(COLUMNS_REPEATED_TAG)
+                                         .toString();
+            if (!emptyColNumber.isEmpty())
+            {
+                break;
+            }
+
+            // Add column number.
+            column++;
+        }
+
+        // If we encounter start of cell content we add it to list.
+        if (!xmlStreamReader.atEnd() &&
+            xmlStreamReader.name().toString() == P_TAG &&
+            xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+        {
+            while (xmlStreamReader.tokenType() != QXmlStreamReader::Characters)
+            {
+                xmlStreamReader.readNext();
+            }
+
+            columnNames.push_back(xmlStreamReader.text().toString());
+        }
+
+        // If we encounter empty cell we add it to list.
+        if (xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
+            xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
+            lastToken == QXmlStreamReader::StartElement)
+        {
+            columnNames << emptyColName_;
+        }
+
+        lastToken = xmlStreamReader.tokenType();
+        xmlStreamReader.readNext();
     }
 
     while (columnNames.count() < static_cast<int>(columnCount))
@@ -420,19 +366,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         return {false, {}};
     }
 
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
-        return {false, {}};
-    }
-
     QuaZipFile zipFile;
-    QXmlStreamReader xmlStreamReader;
+    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
+        return {false, {}};
 
-    if (!openZipAndMoveToSecondRow(zip, sheetName, zipFile, xmlStreamReader))
+    QXmlStreamReader xmlStreamReader;
+    if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return {false, {}};
 
     // Null elements row.
@@ -668,19 +607,12 @@ std::pair<bool, unsigned int> ImportOds::getCount(
 
 bool ImportOds::analyzeSheet(const QString& sheetName)
 {
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
-        return false;
-    }
-
     QuaZipFile zipFile;
-    QXmlStreamReader xmlStreamReader;
+    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
+        return false;
 
-    if (!openZipAndMoveToSecondRow(zip, sheetName, zipFile, xmlStreamReader))
+    QXmlStreamReader xmlStreamReader;
+    if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return false;
 
     int column = NOT_SET_COLUMN;
@@ -742,29 +674,13 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
     return true;
 }
 
-bool ImportOds::openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
-                                          QuaZipFile& zipFile,
-                                          QXmlStreamReader& xmlStreamReader)
+bool ImportOds::moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
+                                QXmlStreamReader& xmlStreamReader)
 {
-    // Open file in zip archive.
-    if (!zip.setCurrentFile(QStringLiteral("content.xml")))
-    {
-        setError(__FUNCTION__,
-                 "Can not open file " + sheetName + " in archive.");
-        return false;
-    }
-    zipFile.setZip(&zip);
-    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        setError(__FUNCTION__,
-                 "Can not open file " + zipFile.getFileName() + ".");
-        return false;
-    }
-
     xmlStreamReader.setDevice(&zipFile);
     skipToSheet(xmlStreamReader, sheetName);
 
-    bool secondRow = false;
+    bool secondRow{false};
     while (!xmlStreamReader.atEnd() &&
            !(xmlStreamReader.qualifiedName() == TABLE_QUALIFIED_NAME &&
              xmlStreamReader.tokenType() == QXmlStreamReader::EndElement))
@@ -778,7 +694,6 @@ bool ImportOds::openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
         }
         xmlStreamReader.readNext();
     }
-
     return true;
 }
 
@@ -796,4 +711,31 @@ void ImportOds::skipToSheet(QXmlStreamReader& xmlStreamReader,
         }
         xmlStreamReader.readNextStartElement();
     }
+}
+
+bool ImportOds::openZipFile(QuaZipFile& zipFile, const QString& zipFileName)
+{
+    if (!zip_.isOpen() && !zip_.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip_.getZipName() + ".");
+        return false;
+    }
+
+    if (!zip_.setCurrentFile(zipFileName))
+    {
+        setError(__FUNCTION__,
+                 "Can not find file " + zipFileName + " in archive.");
+        return false;
+    }
+
+    zipFile.setZip(&zip_);
+    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        setError(__FUNCTION__,
+                 "Can not open file " + zipFile.getFileName() + ".");
+        return false;
+    }
+
+    return true;
 }

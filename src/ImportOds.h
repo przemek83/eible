@@ -3,11 +3,11 @@
 
 #include "ImportSpreadsheet.h"
 
-#include "eible_global.h"
-
+#include <quazip5/quazip.h>
 #include <QHash>
 
-class QuaZip;
+#include "eible_global.h"
+
 class QuaZipFile;
 class QXmlStreamReader;
 
@@ -40,17 +40,19 @@ private:
 
     bool analyzeSheet(const QString& sheetName);
 
-    bool openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
-                                   QuaZipFile& zipFile,
-                                   QXmlStreamReader& xmlStreamReader);
+    bool moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
+                         QXmlStreamReader& xmlStreamReader);
 
     void skipToSheet(QXmlStreamReader& xmlStreamReader,
                      const QString& sheetName) const;
+
+    bool openZipFile(QuaZipFile& zipFile, const QString& zipFileName);
 
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
     QHash<QString, QVector<ColumnType>> columnTypes_{};
+    QuaZip zip_;
 
     static const QString TABLE_TAG;
     static const QString TABLE_ROW_TAG;
