@@ -583,11 +583,11 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
         return false;
 
     std::tie(rowCounts_[sheetName], columnCounts_[sheetName]) =
-        getColumnAndRowCount(xmlStreamReader);
+        getRowAndColumnCount(xmlStreamReader);
     return true;
 }
 
-std::pair<unsigned int, unsigned int> ImportOds::getColumnAndRowCount(
+std::pair<unsigned int, unsigned int> ImportOds::getRowAndColumnCount(
     QXmlStreamReader& xmlStreamReader) const
 {
     int column = NOT_SET_COLUMN;
