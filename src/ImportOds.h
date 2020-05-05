@@ -70,6 +70,10 @@ private:
         const QVector<unsigned int>& excludedColumns,
         const QVector<ColumnType>& columnTypes) const;
 
+    QMap<unsigned int, unsigned int> createActiveColumnMapping(
+        const QVector<unsigned int>& excludedColumns,
+        unsigned int columnCount) const;
+
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};

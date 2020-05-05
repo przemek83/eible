@@ -342,26 +342,11 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     QVector<QVariant> templateDataRow{
         createTemplateDataRow(excludedColumns, columnTypes)};
 
-    QMap<int, int> activeColumnsMapping;
-
-    int columnToFill = 0;
-
-    for (unsigned int i = 0; i < columnCount; ++i)
-    {
-        if (!excludedColumns.contains(i))
-        {
-            activeColumnsMapping[i] = columnToFill;
-            columnToFill++;
-        }
-    }
+    QMap<unsigned int, unsigned int> activeColumnsMapping{
+        createActiveColumnMapping(excludedColumns, columnCount)};
 
     QVector<QVector<QVariant>> dataContainer(
         std::min(getRowCount(sheetName).second, rowLimit));
-
-    // Protection from potential core related to empty rows.
-    unsigned int containerSize = dataContainer.size();
-    for (unsigned int i = 0; i < containerSize; ++i)
-        dataContainer[i] = templateDataRow;
 
     // Current row data.
     QVector<QVariant> currentDataRow(templateDataRow);
@@ -400,7 +385,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             }
             rowEmpty = true;
 
-            if (fillSamplesOnly && rowCounter > containerSize)
+            if (fillSamplesOnly &&
+                rowCounter > static_cast<unsigned int>(dataContainer.size()))
                 break;
         }
 
@@ -746,4 +732,21 @@ QVector<QVariant> ImportOds::createTemplateDataRow(
         }
     }
     return templateDataRow;
+}
+
+QMap<unsigned int, unsigned int> ImportOds::createActiveColumnMapping(
+    const QVector<unsigned int>& excludedColumns,
+    unsigned int columnCount) const
+{
+    QMap<unsigned int, unsigned int> activeColumnsMapping;
+    int columnToFill = 0;
+    for (unsigned int i = 0; i < columnCount; ++i)
+    {
+        if (!excludedColumns.contains(i))
+        {
+            activeColumnsMapping[i] = columnToFill;
+            columnToFill++;
+        }
+    }
+    return activeColumnsMapping;
 }
