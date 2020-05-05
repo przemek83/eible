@@ -11,6 +11,27 @@
 
 #include "EibleUtilities.h"
 
+const QString ImportOds::TABLE_TAG{QStringLiteral("table")};
+const QString ImportOds::TABLE_ROW_TAG{QStringLiteral("table-row")};
+const QString ImportOds::TABLE_CELL_TAG{QStringLiteral("table-cell")};
+const QString ImportOds::OFFICE_VALUE_TYPE_TAG{
+    QStringLiteral("office:value-type")};
+const QString ImportOds::COLUMNS_REPEATED_TAG{
+    QStringLiteral("table:number-columns-repeated")};
+const QString ImportOds::STRING_TAG{QStringLiteral("string")};
+const QString ImportOds::DATE_TAG{QStringLiteral("date")};
+const QString ImportOds::FLOAT_TAG{QStringLiteral("float")};
+const QString ImportOds::PERCENTAGE_TAG{QStringLiteral("percentage")};
+const QString ImportOds::CURRENCY_TAG{QStringLiteral("currency")};
+const QString ImportOds::TIME_TAG{QStringLiteral("time")};
+const QString ImportOds::P_TAG{QStringLiteral("p")};
+const QString ImportOds::OFFICE_DATE_VALUE_TAG{
+    QStringLiteral("office:date-value")};
+const QString ImportOds::OFFICE_VALUE_TAG{QStringLiteral("office:value")};
+const QString ImportOds::DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
+const QString ImportOds::TABLE_QUALIFIED_NAME{"table:table"};
+const QString ImportOds::TABLE_NAME_TAG{QLatin1String("table:name")};
+
 ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
 std::pair<bool, QStringList> ImportOds::getSheetNames()
@@ -29,61 +50,59 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
 
     QStringList sheetNames{};
     const QString innerFileToOpen{QStringLiteral("settings.xml")};
-    if (zip.setCurrentFile(innerFileToOpen))
-    {
-        // Open file in zip archive.
-        QuaZipFile zipFile(&zip);
-        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            setError(__FUNCTION__,
-                     "Can not open file " + zipFile.getFileName() + ".");
-            return {false, {}};
-        }
-
-        // Create, set content and read DOM.
-        QDomDocument xmlDocument(__FUNCTION__);
-        if (!xmlDocument.setContent(zipFile.readAll()))
-        {
-            setError(__FUNCTION__, "Xml file is damaged.");
-            return {false, {}};
-        }
-        zipFile.close();
-
-        QDomElement root = xmlDocument.documentElement();
-
-        const QString configMapNamed(
-            QStringLiteral("config:config-item-map-named"));
-        const QString configName(QStringLiteral("config:name"));
-        const QString configMapEntry(
-            QStringLiteral("config:config-item-map-entry"));
-        const QString tables(QStringLiteral("Tables"));
-
-        int elementsCount = root.elementsByTagName(configMapNamed).size();
-        for (int i = 0; i < elementsCount; i++)
-        {
-            QDomElement currentElement =
-                root.elementsByTagName(configMapNamed).at(i).toElement();
-            if (currentElement.hasAttribute(configName) &&
-                currentElement.attribute(configName) == tables)
-            {
-                int innerElementsCount =
-                    currentElement.elementsByTagName(configMapEntry).size();
-                for (int j = 0; j < innerElementsCount; j++)
-                {
-                    QDomElement element =
-                        currentElement.elementsByTagName(configMapEntry)
-                            .at(j)
-                            .toElement();
-                    sheetNames.push_back(element.attribute(configName));
-                }
-            }
-        }
-    }
-    else
+    if (!zip.setCurrentFile(innerFileToOpen))
     {
         setError(__FUNCTION__,
                  "Can not open file " + innerFileToOpen + " in archive.");
         return {false, {}};
+    }
+
+    // Open file in zip archive.
+    QuaZipFile zipFile(&zip);
+    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        setError(__FUNCTION__,
+                 "Can not open file " + zipFile.getFileName() + ".");
+        return {false, {}};
+    }
+
+    // Create, set content and read DOM.
+    QDomDocument xmlDocument(__FUNCTION__);
+    if (!xmlDocument.setContent(zipFile.readAll()))
+    {
+        setError(__FUNCTION__, "Xml file is damaged.");
+        return {false, {}};
+    }
+    zipFile.close();
+
+    QDomElement root = xmlDocument.documentElement();
+
+    const QString configMapNamed(
+        QStringLiteral("config:config-item-map-named"));
+    const QString configName(QStringLiteral("config:name"));
+    const QString configMapEntry(
+        QStringLiteral("config:config-item-map-entry"));
+    const QString tables(QStringLiteral("Tables"));
+
+    int elementsCount = root.elementsByTagName(configMapNamed).size();
+    for (int i = 0; i < elementsCount; i++)
+    {
+        QDomElement currentElement =
+            root.elementsByTagName(configMapNamed).at(i).toElement();
+        if (currentElement.hasAttribute(configName) &&
+            currentElement.attribute(configName) == tables)
+        {
+            int innerElementsCount =
+                currentElement.elementsByTagName(configMapEntry).size();
+            for (int j = 0; j < innerElementsCount; j++)
+            {
+                QDomElement element =
+                    currentElement.elementsByTagName(configMapEntry)
+                        .at(j)
+                        .toElement();
+                sheetNames.push_back(element.attribute(configName));
+            }
+        }
     }
 
     sheetNames_ = std::move(sheetNames);
@@ -124,48 +143,35 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     int rowCounter = 0;
 
     // Actual data type in current cell (s, str, null).
-    QString currentColType(QStringLiteral("string"));
+    QString currentColType;
 
     int repeatCount = 1;
-
-    const QString tableTag(QStringLiteral("table"));
-    const QString tableRowTag(QStringLiteral("table-row"));
-    const QString tableCellTag(QStringLiteral("table-cell"));
-    const QString officeValueTypeTag(QStringLiteral("office:value-type"));
-    const QString columnsRepeatedTag(
-        QStringLiteral("table:number-columns-repeated"));
-    const QString stringTag(QStringLiteral("string"));
-    const QString dateTag(QStringLiteral("date"));
-    const QString floatTag(QStringLiteral("float"));
-    const QString percentageTag(QStringLiteral("percentage"));
-    const QString currencyTag(QStringLiteral("currency"));
-    const QString timeTag(QStringLiteral("time"));
 
     bool rowEmpty = true;
 
     while (!xmlStreamReader.atEnd() &&
-           xmlStreamReader.name().compare(tableTag) != 0)
+           xmlStreamReader.name().compare(TABLE_TAG) != 0)
     {
         // If start of row encountered than reset column counter add increment
         // row counter.
-        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
             xmlStreamReader.isStartElement())
             column = NOT_SET_COLUMN;
 
         // When we encounter start of cell description.
-        if (0 == xmlStreamReader.name().compare(tableCellTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_CELL_TAG) &&
             xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
         {
             column++;
 
             // Remember column type.
             currentColType = xmlStreamReader.attributes()
-                                 .value(officeValueTypeTag)
+                                 .value(OFFICE_VALUE_TYPE_TAG)
                                  .toString();
 
             // Number of repeats.
             repeatCount = xmlStreamReader.attributes()
-                              .value(columnsRepeatedTag)
+                              .value(COLUMNS_REPEATED_TAG)
                               .toString()
                               .toInt();
 
@@ -174,7 +180,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
 
             for (int i = 0; i < repeatCount; ++i)
             {
-                if (0 == currentColType.compare(stringTag))
+                if (0 == currentColType.compare(STRING_TAG))
                 {
                     maxColumn = std::max(maxColumn, column + i);
                     rowEmpty = false;
@@ -194,7 +200,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
                 }
                 else
                 {
-                    if (0 == currentColType.compare(dateTag))
+                    if (0 == currentColType.compare(DATE_TAG))
                     {
                         maxColumn = std::max(maxColumn, column + i);
                         rowEmpty = false;
@@ -214,10 +220,10 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
                     }
                     else
                     {
-                        if (0 == currentColType.compare(floatTag) ||
-                            0 == currentColType.compare(percentageTag) ||
-                            0 == currentColType.compare(currencyTag) ||
-                            0 == currentColType.compare(timeTag))
+                        if (0 == currentColType.compare(FLOAT_TAG) ||
+                            0 == currentColType.compare(PERCENTAGE_TAG) ||
+                            0 == currentColType.compare(CURRENCY_TAG) ||
+                            0 == currentColType.compare(TIME_TAG))
                         {
                             maxColumn = std::max(maxColumn, column + i);
                             rowEmpty = false;
@@ -244,7 +250,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
             column += repeatCount - 1;
         }
         xmlStreamReader.readNext();
-        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
             xmlStreamReader.isEndElement())
         {
             if (!rowEmpty)
@@ -311,7 +317,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
         skipToSheet(xmlStreamReader, sheetName);
 
         while (!xmlStreamReader.atEnd() &&
-               xmlStreamReader.name() != "table-row")
+               xmlStreamReader.name() != TABLE_ROW_TAG)
             xmlStreamReader.readNext();
 
         xmlStreamReader.readNext();
@@ -320,20 +326,16 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
         int column = NOT_SET_COLUMN;
         QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
 
-        const QString numberColumnsRepeated(
-            QStringLiteral("table:number-columns-repeated"));
-
         // Parse first row.
         while (!xmlStreamReader.atEnd() &&
-               xmlStreamReader.name() != "table-row")
+               xmlStreamReader.name() != TABLE_ROW_TAG)
         {
             // When we encounter first cell of worksheet.
-            if (xmlStreamReader.name().toString() ==
-                    QLatin1String("table-cell") &&
+            if (xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
                 xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
             {
                 QString emptyColNumber = xmlStreamReader.attributes()
-                                             .value(numberColumnsRepeated)
+                                             .value(COLUMNS_REPEATED_TAG)
                                              .toString();
                 if (!emptyColNumber.isEmpty())
                 {
@@ -346,7 +348,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
 
             // If we encounter start of cell content we add it to list.
             if (!xmlStreamReader.atEnd() &&
-                xmlStreamReader.name().toString() == QStringLiteral("p") &&
+                xmlStreamReader.name().toString() == P_TAG &&
                 xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
             {
                 while (xmlStreamReader.tokenType() !=
@@ -359,8 +361,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
             }
 
             // If we encounter empty cell we add it to list.
-            if (xmlStreamReader.name().toString() ==
-                    QLatin1String("table-cell") &&
+            if (xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
                 xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
                 lastToken == QXmlStreamReader::StartElement)
             {
@@ -469,7 +470,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     int column = NOT_SET_COLUMN;
 
     // Actual data type in cell (s, str, null).
-    QString currentColType = QStringLiteral("string");
+    QString currentColType;
     QString currentDateValue{};
 
     // Current row number.
@@ -479,29 +480,16 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 
     int cellsFilledInRow = 0;
 
-    // Optimization.
-    const QString tableTag(QStringLiteral("table"));
-    const QString tableRowTag(QStringLiteral("table-row"));
-    const QString tableCellTag(QStringLiteral("table-cell"));
-    const QString officeValueTypeTag(QStringLiteral("office:value-type"));
-    const QString columnsRepeatedTag(
-        QStringLiteral("table:number-columns-repeated"));
-    const QString pTag(QStringLiteral("p"));
-    const QString officeDateValueTag(QStringLiteral("office:date-value"));
-    const QString officeValueTag(QStringLiteral("office:value"));
-    const QString dateFormat(QStringLiteral("yyyy-MM-dd"));
-    const QString dateTag(QStringLiteral("date"));
-
     const QString emptyString(QLatin1String(""));
     bool rowEmpty = true;
     unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
-           0 != xmlStreamReader.name().compare(tableTag) &&
+           0 != xmlStreamReader.name().compare(TABLE_TAG) &&
            rowCounter < rowLimit)
     {
         // If start of row encountered than reset column counter add
         // increment row counter.
-        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
             xmlStreamReader.isStartElement())
         {
             column = NOT_SET_COLUMN;
@@ -519,7 +507,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         }
 
         // When we encounter start of cell description.
-        if (0 == xmlStreamReader.name().compare(tableCellTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_CELL_TAG) &&
             xmlStreamReader.isStartElement())
         {
             column++;
@@ -528,7 +516,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             if (column >= static_cast<int>(columnCount))
             {
                 while (!xmlStreamReader.atEnd() &&
-                       !(0 == xmlStreamReader.name().compare(tableRowTag) &&
+                       !(0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
                          xmlStreamReader.isEndElement()))
                 {
                     xmlStreamReader.readNext();
@@ -538,12 +526,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 
             // Remember cell type.
             currentColType = xmlStreamReader.attributes()
-                                 .value(officeValueTypeTag)
+                                 .value(OFFICE_VALUE_TYPE_TAG)
                                  .toString();
 
             // Number of repeats.
             repeatCount = xmlStreamReader.attributes()
-                              .value(columnsRepeatedTag)
+                              .value(COLUMNS_REPEATED_TAG)
                               .toString()
                               .toInt();
 
@@ -567,25 +555,25 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                     case ColumnType::STRING:
                     {
                         currentDateValue = xmlStreamReader.attributes()
-                                               .value(officeDateValueTag)
+                                               .value(OFFICE_DATE_VALUE_TAG)
                                                .toString();
 
                         while (!xmlStreamReader.atEnd() &&
-                               0 != xmlStreamReader.name().compare(pTag))
+                               0 != xmlStreamReader.name().compare(P_TAG))
 
                         {
                             xmlStreamReader.readNext();
                         }
 
-                        while (xmlStreamReader.tokenType() !=
-                                   QXmlStreamReader::Characters &&
-                               0 !=
-                                   xmlStreamReader.name().compare(tableCellTag))
+                        while (
+                            xmlStreamReader.tokenType() !=
+                                QXmlStreamReader::Characters &&
+                            0 != xmlStreamReader.name().compare(TABLE_CELL_TAG))
                         {
                             xmlStreamReader.readNext();
                         }
                         rowEmpty = false;
-                        if (currentColType.compare(dateTag) == 0)
+                        if (currentColType.compare(DATE_TAG) == 0)
                         {
                             value = QVariant(currentDateValue);
                         }
@@ -606,10 +594,10 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                         rowEmpty = false;
                         value = QVariant(
                             QDate::fromString(xmlStreamReader.attributes()
-                                                  .value(officeDateValueTag)
+                                                  .value(OFFICE_DATE_VALUE_TAG)
                                                   .toString()
                                                   .left(odsStringDateLength),
-                                              dateFormat));
+                                              DATE_FORMAT));
 
                         break;
                     }
@@ -618,7 +606,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                     {
                         rowEmpty = false;
                         value = QVariant(xmlStreamReader.attributes()
-                                             .value(officeValueTag)
+                                             .value(OFFICE_VALUE_TAG)
                                              .toDouble());
                         break;
                     }
@@ -702,48 +690,35 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
     QString currentColType;
     bool rowEmpty = true;
 
-    const QString tableTag(QStringLiteral("table"));
-    const QString tableRowTag(QStringLiteral("table-row"));
-    const QString tableCellTag(QStringLiteral("table-cell"));
-    const QString officeValueTypeTag(QStringLiteral("office:value-type"));
-    const QString columnsRepeatedTag(
-        QStringLiteral("table:number-columns-repeated"));
-    const QString stringTag(QStringLiteral("string"));
-    const QString dateTag(QStringLiteral("date"));
-    const QString floatTag(QStringLiteral("float"));
-    const QString percentageTag(QStringLiteral("percentage"));
-    const QString currencyTag(QStringLiteral("currency"));
-    const QString timeTag(QStringLiteral("time"));
-
     while (!xmlStreamReader.atEnd() &&
-           xmlStreamReader.name().compare(tableTag) != 0)
+           xmlStreamReader.name().compare(TABLE_TAG) != 0)
     {
-        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
             xmlStreamReader.isStartElement())
             column = NOT_SET_COLUMN;
 
-        if (0 == xmlStreamReader.name().compare(tableCellTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_CELL_TAG) &&
             xmlStreamReader.isStartElement())
         {
             column++;
 
             currentColType = xmlStreamReader.attributes()
-                                 .value(officeValueTypeTag)
+                                 .value(OFFICE_VALUE_TYPE_TAG)
                                  .toString();
 
             repeatCount = std::max(1, xmlStreamReader.attributes()
-                                          .value(columnsRepeatedTag)
+                                          .value(COLUMNS_REPEATED_TAG)
                                           .toString()
                                           .toInt());
 
             for (int i = 0; i < repeatCount; ++i)
             {
-                if (0 == currentColType.compare(stringTag) ||
-                    0 == currentColType.compare(dateTag) ||
-                    0 == currentColType.compare(floatTag) ||
-                    0 == currentColType.compare(percentageTag) ||
-                    0 == currentColType.compare(currencyTag) ||
-                    0 == currentColType.compare(timeTag))
+                if (0 == currentColType.compare(STRING_TAG) ||
+                    0 == currentColType.compare(DATE_TAG) ||
+                    0 == currentColType.compare(FLOAT_TAG) ||
+                    0 == currentColType.compare(PERCENTAGE_TAG) ||
+                    0 == currentColType.compare(CURRENCY_TAG) ||
+                    0 == currentColType.compare(TIME_TAG))
                 {
                     maxColumn = std::max(maxColumn, column + i);
                     rowEmpty = false;
@@ -752,7 +727,7 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
             column += repeatCount - 1;
         }
         xmlStreamReader.readNext();
-        if (0 == xmlStreamReader.name().compare(tableRowTag) &&
+        if (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
             xmlStreamReader.isEndElement())
         {
             if (!rowEmpty)
@@ -791,10 +766,10 @@ bool ImportOds::openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
 
     bool secondRow = false;
     while (!xmlStreamReader.atEnd() &&
-           !(xmlStreamReader.qualifiedName() == "table:table" &&
+           !(xmlStreamReader.qualifiedName() == TABLE_QUALIFIED_NAME &&
              xmlStreamReader.tokenType() == QXmlStreamReader::EndElement))
     {
-        if (xmlStreamReader.name() == "table-row" &&
+        if (xmlStreamReader.name() == TABLE_ROW_TAG &&
             xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
         {
             if (secondRow)
@@ -812,10 +787,9 @@ void ImportOds::skipToSheet(QXmlStreamReader& xmlStreamReader,
 {
     while (!xmlStreamReader.atEnd())
     {
-        if (xmlStreamReader.qualifiedName() == "table:table")
+        if (xmlStreamReader.qualifiedName() == TABLE_QUALIFIED_NAME)
         {
-            if (xmlStreamReader.attributes().value(
-                    QLatin1String("table:name")) != sheetName)
+            if (xmlStreamReader.attributes().value(TABLE_NAME_TAG) != sheetName)
                 xmlStreamReader.skipCurrentElement();
             else
                 break;

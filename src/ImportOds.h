@@ -51,6 +51,24 @@ private:
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
     QHash<QString, QVector<ColumnType>> columnTypes_{};
+
+    static const QString TABLE_TAG;
+    static const QString TABLE_ROW_TAG;
+    static const QString TABLE_CELL_TAG;
+    static const QString OFFICE_VALUE_TYPE_TAG;
+    static const QString COLUMNS_REPEATED_TAG;
+    static const QString STRING_TAG;
+    static const QString DATE_TAG;
+    static const QString FLOAT_TAG;
+    static const QString PERCENTAGE_TAG;
+    static const QString CURRENCY_TAG;
+    static const QString TIME_TAG;
+    static const QString P_TAG;
+    static const QString OFFICE_DATE_VALUE_TAG;
+    static const QString OFFICE_VALUE_TAG;
+    static const QString DATE_FORMAT;
+    static const QString TABLE_QUALIFIED_NAME;
+    static const QString TABLE_NAME_TAG;
 };
 
 #endif  // IMPORTODS_H
