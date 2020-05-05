@@ -10,6 +10,7 @@
 
 class QuaZipFile;
 class QXmlStreamReader;
+class QXmlStreamAttributes;
 
 class EIBLE_EXPORT ImportOds : public ImportSpreadsheet
 {
@@ -47,6 +48,15 @@ private:
                      const QString& sheetName) const;
 
     bool openZipFile(QuaZipFile& zipFile, const QString& zipFileName);
+
+    bool isRecognizedColumnType(const QXmlStreamAttributes& attributes) const;
+
+    int getColumnRepeatCount(const QXmlStreamAttributes& attributes) const;
+
+    bool isRowStart(const QXmlStreamReader& xmlStreamReader) const;
+    bool isRowEnd(const QXmlStreamReader& xmlStreamReader) const;
+    bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
+    bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
 
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
