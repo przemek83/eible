@@ -617,9 +617,7 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
 
     int column = NOT_SET_COLUMN;
     int rowCounter = 0;
-    int repeatCount = 1;
-    int maxColumn = NOT_SET_COLUMN;
-    QString currentColType;
+    int maxColumn = 0;
     bool rowEmpty = true;
 
     while (!xmlStreamReader.atEnd() &&
@@ -633,28 +631,24 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
             xmlStreamReader.isStartElement())
         {
             column++;
+            QString currentColType = xmlStreamReader.attributes()
+                                         .value(OFFICE_VALUE_TYPE_TAG)
+                                         .toString();
 
-            currentColType = xmlStreamReader.attributes()
-                                 .value(OFFICE_VALUE_TYPE_TAG)
-                                 .toString();
+            int repeatCount = std::max(1, xmlStreamReader.attributes()
+                                              .value(COLUMNS_REPEATED_TAG)
+                                              .toString()
+                                              .toInt());
 
-            repeatCount = std::max(1, xmlStreamReader.attributes()
-                                          .value(COLUMNS_REPEATED_TAG)
-                                          .toString()
-                                          .toInt());
-
-            for (int i = 0; i < repeatCount; ++i)
+            if (0 == currentColType.compare(STRING_TAG) ||
+                0 == currentColType.compare(DATE_TAG) ||
+                0 == currentColType.compare(FLOAT_TAG) ||
+                0 == currentColType.compare(PERCENTAGE_TAG) ||
+                0 == currentColType.compare(CURRENCY_TAG) ||
+                0 == currentColType.compare(TIME_TAG))
             {
-                if (0 == currentColType.compare(STRING_TAG) ||
-                    0 == currentColType.compare(DATE_TAG) ||
-                    0 == currentColType.compare(FLOAT_TAG) ||
-                    0 == currentColType.compare(PERCENTAGE_TAG) ||
-                    0 == currentColType.compare(CURRENCY_TAG) ||
-                    0 == currentColType.compare(TIME_TAG))
-                {
-                    maxColumn = std::max(maxColumn, column + i);
-                    rowEmpty = false;
-                }
+                maxColumn = std::max(maxColumn, column + repeatCount);
+                rowEmpty = false;
             }
             column += repeatCount - 1;
         }
@@ -669,7 +663,7 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
     }
 
     rowCounts_[sheetName] = rowCounter;
-    columnCounts_[sheetName] = maxColumn + 1;
+    columnCounts_[sheetName] = maxColumn;
 
     return true;
 }
