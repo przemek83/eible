@@ -41,6 +41,9 @@ private:
 
     bool analyzeSheet(const QString& sheetName);
 
+    std::pair<unsigned int, unsigned int> getColumnAndRowCount(
+        QXmlStreamReader& xmlStreamReader) const;
+
     bool moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
                          QXmlStreamReader& xmlStreamReader);
 

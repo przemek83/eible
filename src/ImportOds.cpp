@@ -582,6 +582,14 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
     if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return false;
 
+    std::tie(rowCounts_[sheetName], columnCounts_[sheetName]) =
+        getColumnAndRowCount(xmlStreamReader);
+    return true;
+}
+
+std::pair<unsigned int, unsigned int> ImportOds::getColumnAndRowCount(
+    QXmlStreamReader& xmlStreamReader) const
+{
     int column = NOT_SET_COLUMN;
     int rowCounter = 0;
     int maxColumn = NOT_SET_COLUMN;
@@ -596,8 +604,7 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
         if (isCellStart(xmlStreamReader))
         {
             const QXmlStreamAttributes attributes{xmlStreamReader.attributes()};
-            const int repeats{getColumnRepeatCount(attributes)};
-            column += repeats;
+            column += getColumnRepeatCount(attributes);
             if (isRecognizedColumnType(attributes))
             {
                 maxColumn = std::max(maxColumn, column);
@@ -605,17 +612,14 @@ bool ImportOds::analyzeSheet(const QString& sheetName)
             }
         }
         xmlStreamReader.readNext();
-        if (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
-            xmlStreamReader.isEndElement())
+        if (isRowEnd(xmlStreamReader))
         {
             if (!rowEmpty)
                 rowCounter++;
             rowEmpty = true;
         }
     }
-    rowCounts_[sheetName] = rowCounter;
-    columnCounts_[sheetName] = maxColumn + 1;
-    return true;
+    return {rowCounter, maxColumn + 1};
 }
 
 bool ImportOds::moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
