@@ -202,96 +202,88 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!sheetFound)
         return {false, {}};
 
-    if (zip.setCurrentFile(sheetPath))
-    {
-        QuaZipFile zipFile(&zip);
-
-        // Opening file.
-        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            setError(__FUNCTION__,
-                     "Can not open file " + zipFile.getFileName() + ".");
-            return {false, {}};
-        }
-
-        QXmlStreamReader xmlStreamReader;
-        xmlStreamReader.setDevice(&zipFile);
-
-        // Variable with actual type of data in cell (s, str, null).
-        QString currentColType = S_TAG;
-
-        // Go to first row.
-        while (!xmlStreamReader.atEnd() &&
-               xmlStreamReader.name() != SHEET_DATA_TAG)
-            xmlStreamReader.readNext();
-
-        xmlStreamReader.readNext();
-        xmlStreamReader.readNext();
-
-        // Actual column number.
-        int columnIndex = -1;
-        QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
-
-        const QRegExp regExp(QLatin1String("[0-9]"));
-
-        // Parse first row.
-        while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != ROW_TAG)
-        {
-            // If we encounter start of cell content we add it to list.
-            if (xmlStreamReader.name().toString() == CELL_TAG &&
-                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
-            {
-                columnIndex++;
-                QString rowNumber(
-                    xmlStreamReader.attributes().value(R_TAG).toString());
-
-                // If cells are missing add default name.
-                while (excelColNames.indexOf(
-                           rowNumber.remove(regExp).toUtf8()) > columnIndex)
-                {
-                    columnNames << emptyColName_;
-                    columnIndex++;
-                }
-                // Remember column type.
-                currentColType =
-                    xmlStreamReader.attributes().value(T_TAG).toString();
-            }
-
-            // If we encounter start of cell content than add it to list.
-            if (!xmlStreamReader.atEnd() &&
-                xmlStreamReader.name().toString() == V_TAG &&
-                xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
-            {
-                if (currentColType == S_TAG)
-                {
-                    int value = xmlStreamReader.readElementText().toInt();
-                    columnNames.push_back((*sharedStrings_)[value]);
-                }
-                else
-                {
-                    if (currentColType == STR_TAG)
-                        columnNames.push_back(
-                            xmlStreamReader.readElementText());
-                    else
-                        columnNames.push_back(
-                            xmlStreamReader.readElementText());
-                }
-            }
-
-            // If we encounter empty cell than add it to list.
-            if (xmlStreamReader.name().toString() == CELL_TAG &&
-                xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
-                lastToken == QXmlStreamReader::StartElement)
-                columnNames << emptyColName_;
-            lastToken = xmlStreamReader.tokenType();
-            xmlStreamReader.readNext();
-        }
-    }
-    else
+    if (!zip.setCurrentFile(sheetPath))
     {
         setError(__FUNCTION__,
                  "File named " + sheetName + " not found in archive.");
         return {false, {}};
+    }
+    QuaZipFile zipFile(&zip);
+    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        setError(__FUNCTION__,
+                 "Can not open file " + zipFile.getFileName() + ".");
+        return {false, {}};
+    }
+
+    QXmlStreamReader xmlStreamReader;
+    xmlStreamReader.setDevice(&zipFile);
+
+    // Variable with actual type of data in cell (s, str, null).
+    QString currentColType = S_TAG;
+
+    // Go to first row.
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
+        xmlStreamReader.readNext();
+
+    xmlStreamReader.readNext();
+    xmlStreamReader.readNext();
+
+    // Actual column number.
+    int columnIndex = -1;
+    QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
+
+    const QRegExp regExp(QLatin1String("[0-9]"));
+
+    // Parse first row.
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != ROW_TAG)
+    {
+        // If we encounter start of cell content we add it to list.
+        if (xmlStreamReader.name().toString() == CELL_TAG &&
+            xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+        {
+            columnIndex++;
+            QString rowNumber(
+                xmlStreamReader.attributes().value(R_TAG).toString());
+
+            // If cells are missing add default name.
+            while (excelColNames.indexOf(rowNumber.remove(regExp).toUtf8()) >
+                   columnIndex)
+            {
+                columnNames << emptyColName_;
+                columnIndex++;
+            }
+            // Remember column type.
+            currentColType =
+                xmlStreamReader.attributes().value(T_TAG).toString();
+        }
+
+        // If we encounter start of cell content than add it to list.
+        if (!xmlStreamReader.atEnd() &&
+            xmlStreamReader.name().toString() == V_TAG &&
+            xmlStreamReader.tokenType() == QXmlStreamReader::StartElement)
+        {
+            if (currentColType == S_TAG)
+            {
+                int value = xmlStreamReader.readElementText().toInt();
+                columnNames.push_back((*sharedStrings_)[value]);
+            }
+            else
+            {
+                if (currentColType == STR_TAG)
+                    columnNames.push_back(xmlStreamReader.readElementText());
+                else
+                    columnNames.push_back(xmlStreamReader.readElementText());
+            }
+        }
+
+        // If we encounter empty cell than add it to list.
+        if (xmlStreamReader.name().toString() == CELL_TAG &&
+            xmlStreamReader.tokenType() == QXmlStreamReader::EndElement &&
+            lastToken == QXmlStreamReader::StartElement)
+            columnNames << emptyColName_;
+        lastToken = xmlStreamReader.tokenType();
+        xmlStreamReader.readNext();
     }
 
     while (columnNames.count() < static_cast<int>(columnCount))
