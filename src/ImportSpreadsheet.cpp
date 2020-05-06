@@ -5,8 +5,10 @@
 #include <QVariant>
 #include <QVector>
 
+#include <quazip5/quazipfile.h>
+
 ImportSpreadsheet::ImportSpreadsheet(QIODevice& ioDevice)
-    : ioDevice_(ioDevice), emptyColName_("---")
+    : ioDevice_(ioDevice), emptyColName_("---"), zip_(&ioDevice_)
 {
 }
 
@@ -46,4 +48,32 @@ void ImportSpreadsheet::updateProgress(unsigned int currentRow,
         lastEmittedPercent = currentPercent;
         QCoreApplication::processEvents();
     }
+}
+
+bool ImportSpreadsheet::openZipFile(QuaZipFile& zipFile,
+                                    const QString& zipFileName)
+{
+    if (!zip_.isOpen() && !zip_.open(QuaZip::mdUnzip))
+    {
+        setError(__FUNCTION__,
+                 "Can not open zip file " + zip_.getZipName() + ".");
+        return false;
+    }
+
+    if (!zip_.setCurrentFile(zipFileName))
+    {
+        setError(__FUNCTION__,
+                 "Can not find file " + zipFileName + " in archive.");
+        return false;
+    }
+
+    zipFile.setZip(&zip_);
+    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        setError(__FUNCTION__,
+                 "Can not open file " + zipFile.getFileName() + ".");
+        return false;
+    }
+
+    return true;
 }

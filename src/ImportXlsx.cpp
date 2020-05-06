@@ -35,118 +35,80 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
         return {true, sheets};
     }
 
-    QuaZip zip(&ioDevice_);
+    QuaZipFile zipFile;
+    if (!openZipFile(zipFile, QStringLiteral("xl/workbook.xml")))
+        return {false, {}};
 
-    if (!zip.open(QuaZip::mdUnzip))
+    // Create, set content and read DOM.
+    QDomDocument xmlDocument(__FUNCTION__);
+    if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
+        setError(__FUNCTION__, "File is corrupted.");
+        return {false, {}};
+    }
+    zipFile.close();
+
+    QDomElement root = xmlDocument.documentElement();
+    QDomNodeList sheetNodes =
+        root.firstChildElement(QStringLiteral("sheets")).childNodes();
+
+    if (sheetNodes.size() <= 0)
+    {
+        setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
         return {false, {}};
     }
 
     QMap<QString, QString> sheetIdToUserFriendlyNameMap;
+    for (int i = 0; i < sheetNodes.size(); ++i)
+    {
+        QDomElement sheet = sheetNodes.at(i).toElement();
+
+        if (!sheet.isNull())
+        {
+            sheetIdToUserFriendlyNameMap[sheet.attribute(QStringLiteral(
+                "r:id"))] = sheet.attribute(QStringLiteral("name"));
+        }
+    }
+
+    if (!openZipFile(zipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
+        return {false, {}};
+
+    // Create, set content and read DOM.
+    xmlDocument = QDomDocument(__FUNCTION__);
+    if (!xmlDocument.setContent(zipFile.readAll()))
+    {
+        setError(__FUNCTION__, "File is corrupted.");
+        return {false, {}};
+    }
+    zipFile.close();
+
+    root = xmlDocument.documentElement();
+    sheetNodes = root.childNodes();
+
+    if (sheetNodes.size() <= 0)
+    {
+        setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
+        return {false, {}};
+    }
+
     QList<std::pair<QString, QString>> sheets;
-
-    if (zip.setCurrentFile(QStringLiteral("xl/workbook.xml")))
+    for (int i = 0; i < sheetNodes.size(); ++i)
     {
-        // Open file in archive.
-        QuaZipFile zipFile(&zip);
-        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        QDomElement sheet = sheetNodes.at(i).toElement();
+
+        if (!sheet.isNull())
         {
-            setError(__FUNCTION__,
-                     "Can not open file " + zipFile.getFileName() + ".");
-            return {false, {}};
-        }
+            QMap<QString, QString>::const_iterator iterator =
+                sheetIdToUserFriendlyNameMap.constFind(
+                    sheet.attribute(QStringLiteral("Id")));
 
-        // Create, set content and read DOM.
-        QDomDocument xmlDocument(__FUNCTION__);
-        if (!xmlDocument.setContent(zipFile.readAll()))
-        {
-            setError(__FUNCTION__, "File is corrupted.");
-            return {false, {}};
-        }
-        zipFile.close();
-
-        QDomElement root = xmlDocument.documentElement();
-        QDomNodeList sheetNodes =
-            root.firstChildElement(QStringLiteral("sheets")).childNodes();
-
-        if (sheetNodes.size() <= 0)
-        {
-            setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
-            return {false, {}};
-        }
-
-        for (int i = 0; i < sheetNodes.size(); ++i)
-        {
-            QDomElement sheet = sheetNodes.at(i).toElement();
-
-            if (!sheet.isNull())
+            if (sheetIdToUserFriendlyNameMap.constEnd() != iterator)
             {
-                sheetIdToUserFriendlyNameMap[sheet.attribute(QStringLiteral(
-                    "r:id"))] = sheet.attribute(QStringLiteral("name"));
+                sheets.append(
+                    {*iterator,
+                     "xl/" + sheet.attribute(QStringLiteral("Target"))});
             }
         }
-    }
-    else
-    {
-        setError(__FUNCTION__, "Can not open xl/workbook.xml file.");
-        return {false, {}};
-    }
-
-    if (zip.setCurrentFile(QStringLiteral("xl/_rels/workbook.xml.rels")))
-    {
-        // Open file in archive.
-        QuaZipFile zipFile(&zip);
-        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            setError(__FUNCTION__,
-                     "Can not open file " + zipFile.getFileName() + ".");
-            return {false, {}};
-        }
-
-        // Create, set content and read DOM.
-        QDomDocument xmlDocument(__FUNCTION__);
-        if (!xmlDocument.setContent(zipFile.readAll()))
-        {
-            setError(__FUNCTION__, "File is corrupted.");
-            return {false, {}};
-        }
-        zipFile.close();
-
-        QDomElement root = xmlDocument.documentElement();
-        QDomNodeList sheetNodes = root.childNodes();
-
-        if (sheetNodes.size() <= 0)
-        {
-            setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
-            return {false, {}};
-        }
-
-        for (int i = 0; i < sheetNodes.size(); ++i)
-        {
-            QDomElement sheet = sheetNodes.at(i).toElement();
-
-            if (!sheet.isNull())
-            {
-                QMap<QString, QString>::const_iterator iterator =
-                    sheetIdToUserFriendlyNameMap.constFind(
-                        sheet.attribute(QStringLiteral("Id")));
-
-                if (sheetIdToUserFriendlyNameMap.constEnd() != iterator)
-                {
-                    sheets.append(
-                        {*iterator,
-                         "xl/" + sheet.attribute(QStringLiteral("Target"))});
-                }
-            }
-        }
-    }
-    else
-    {
-        setError(__FUNCTION__,
-                 "No file named xl/_rels/workbook.xml.rels in archive.");
-        return {false, {}};
     }
 
     sheets_ = std::move(sheets);

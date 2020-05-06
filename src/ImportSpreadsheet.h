@@ -3,10 +3,13 @@
 
 #include <QObject>
 
+#include <quazip5/quazip.h>
+
 #include "ColumnType.h"
 #include "eible_global.h"
 
 class QIODevice;
+class QuaZipFile;
 
 class EIBLE_EXPORT ImportSpreadsheet : public QObject
 {
@@ -45,6 +48,8 @@ protected:
     virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
                                 unsigned int& lastEmittedPercent);
 
+    bool openZipFile(QuaZipFile& zipFile, const QString& zipFileName);
+
     QIODevice& ioDevice_;
 
     /// If empty column is encountered insert defined string.
@@ -54,6 +59,8 @@ protected:
 
 private:
     std::pair<QString, QString> error_;
+
+    QuaZip zip_;
 
 Q_SIGNALS:
     void progressPercentChanged(unsigned int progressPercent);

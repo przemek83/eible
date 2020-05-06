@@ -32,10 +32,7 @@ const QString ImportOds::DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
 const QString ImportOds::TABLE_QUALIFIED_NAME{"table:table"};
 const QString ImportOds::TABLE_NAME_TAG{QLatin1String("table:name")};
 
-ImportOds::ImportOds(QIODevice& ioDevice)
-    : ImportSpreadsheet(ioDevice), zip_(&ioDevice_)
-{
-}
+ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
 std::pair<bool, QStringList> ImportOds::getSheetNames()
 {
@@ -370,33 +367,6 @@ void ImportOds::skipToSheet(QXmlStreamReader& xmlStreamReader,
         }
         xmlStreamReader.readNextStartElement();
     }
-}
-
-bool ImportOds::openZipFile(QuaZipFile& zipFile, const QString& zipFileName)
-{
-    if (!zip_.isOpen() && !zip_.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip_.getZipName() + ".");
-        return false;
-    }
-
-    if (!zip_.setCurrentFile(zipFileName))
-    {
-        setError(__FUNCTION__,
-                 "Can not find file " + zipFileName + " in archive.");
-        return false;
-    }
-
-    zipFile.setZip(&zip_);
-    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        setError(__FUNCTION__,
-                 "Can not open file " + zipFile.getFileName() + ".");
-        return false;
-    }
-
-    return true;
 }
 
 bool ImportOds::isRecognizedColumnType(

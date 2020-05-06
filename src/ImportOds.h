@@ -3,7 +3,6 @@
 
 #include "ImportSpreadsheet.h"
 
-#include <quazip5/quazip.h>
 #include <QHash>
 
 #include "eible_global.h"
@@ -50,7 +49,7 @@ private:
     void skipToSheet(QXmlStreamReader& xmlStreamReader,
                      const QString& sheetName) const;
 
-    bool openZipFile(QuaZipFile& zipFile, const QString& zipFileName);
+    //    bool openZipFile(QuaZipFile& zipFile, const QString& zipFileName);
 
     bool isRecognizedColumnType(const QXmlStreamAttributes& attributes) const;
 
@@ -89,7 +88,6 @@ private:
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
     QHash<QString, QVector<ColumnType>> columnTypes_{};
-    QuaZip zip_;
 
     static const QString TABLE_TAG;
     static const QString TABLE_ROW_TAG;
