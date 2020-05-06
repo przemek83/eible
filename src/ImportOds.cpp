@@ -110,7 +110,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
 
     // Actual column number.
     int column = NOT_SET_COLUMN;
-    int maxColumn = NOT_SET_COLUMN;
+    int maxColumnIndex = NOT_SET_COLUMN;
 
     // Actual row number.
     int rowCounter = 0;
@@ -137,78 +137,18 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
             currentColType = xmlStreamReader.attributes()
                                  .value(OFFICE_VALUE_TYPE_TAG)
                                  .toString();
-
             const int repeats{
                 getColumnRepeatCount(xmlStreamReader.attributes())};
-
-            for (int i = 0; i < repeats; ++i)
+            if (isRecognizedColumnType(xmlStreamReader.attributes()))
             {
-                if (0 == currentColType.compare(STRING_TAG))
-                {
-                    maxColumn = std::max(maxColumn, column + i);
-                    rowEmpty = false;
-                    while (column + i >= columnTypes.size())
-                        columnTypes.push_back(ColumnType::UNKNOWN);
-                    if (columnTypes.at(column + i) == ColumnType::UNKNOWN)
-                    {
-                        columnTypes[column + i] = ColumnType::STRING;
-                    }
-                    else
-                    {
-                        if (columnTypes.at(column + i) != ColumnType::STRING)
-                        {
-                            columnTypes[column + i] = ColumnType::STRING;
-                        }
-                    }
-                }
-                else
-                {
-                    if (0 == currentColType.compare(DATE_TAG))
-                    {
-                        maxColumn = std::max(maxColumn, column + i);
-                        rowEmpty = false;
-                        while (column + i >= columnTypes.size())
-                            columnTypes.push_back(ColumnType::UNKNOWN);
-                        if (columnTypes.at(column + i) == ColumnType::UNKNOWN)
-                        {
-                            columnTypes[column + i] = ColumnType::DATE;
-                        }
-                        else
-                        {
-                            if (columnTypes.at(column + i) != ColumnType::DATE)
-                            {
-                                columnTypes[column + i] = ColumnType::STRING;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (0 == currentColType.compare(FLOAT_TAG) ||
-                            0 == currentColType.compare(PERCENTAGE_TAG) ||
-                            0 == currentColType.compare(CURRENCY_TAG) ||
-                            0 == currentColType.compare(TIME_TAG))
-                        {
-                            maxColumn = std::max(maxColumn, column + i);
-                            rowEmpty = false;
-                            while (column + i >= columnTypes.size())
-                                columnTypes.push_back(ColumnType::UNKNOWN);
-                            if (columnTypes.at(column + i) ==
-                                ColumnType::UNKNOWN)
-                            {
-                                columnTypes[column + i] = ColumnType::NUMBER;
-                            }
-                            else
-                            {
-                                if (columnTypes.at(column + i) !=
-                                    ColumnType::NUMBER)
-                                {
-                                    columnTypes[column + i] =
-                                        ColumnType::STRING;
-                                }
-                            }
-                        }
-                    }
-                }
+                maxColumnIndex = std::max(maxColumnIndex, column + repeats - 1);
+                rowEmpty = false;
+                while (column + repeats - 1 >= columnTypes.size())
+                    columnTypes.push_back(ColumnType::UNKNOWN);
+
+                for (int i = 0; i < repeats; ++i)
+                    columnTypes[column + i] = recognizeColumnType(
+                        columnTypes.at(column + i), currentColType);
             }
             column += repeats - 1;
         }
@@ -229,7 +169,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     }
 
     rowCounts_[sheetName] = rowCounter;
-    columnCounts_[sheetName] = maxColumn + 1;
+    columnCounts_[sheetName] = maxColumnIndex + 1;
     columnTypes_[sheetName] = columnTypes;
 
     return {true, columnTypes};
@@ -749,4 +689,37 @@ QMap<unsigned int, unsigned int> ImportOds::createActiveColumnMapping(
         }
     }
     return activeColumnsMapping;
+}
+
+ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
+                                          const QString& xmlColTypeValue) const
+{
+    if (0 == xmlColTypeValue.compare(STRING_TAG))
+    {
+        if (currentType == ColumnType::UNKNOWN)
+            return ColumnType::STRING;
+        else if (currentType != ColumnType::STRING)
+            return ColumnType::STRING;
+    }
+
+    if (0 == xmlColTypeValue.compare(DATE_TAG))
+    {
+        if (currentType == ColumnType::UNKNOWN)
+            return ColumnType::DATE;
+        else if (currentType != ColumnType::DATE)
+            return ColumnType::STRING;
+    }
+
+    if (0 == xmlColTypeValue.compare(FLOAT_TAG) ||
+        0 == xmlColTypeValue.compare(PERCENTAGE_TAG) ||
+        0 == xmlColTypeValue.compare(CURRENCY_TAG) ||
+        0 == xmlColTypeValue.compare(TIME_TAG))
+    {
+        if (currentType == ColumnType::UNKNOWN)
+            return ColumnType::NUMBER;
+        else if (currentType != ColumnType::NUMBER)
+            return ColumnType::STRING;
+    }
+
+    return currentType;
 }
