@@ -83,6 +83,8 @@ private:
     QVariant retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
                                     ColumnType columnType) const;
 
+    bool isOfficeValueTagEmpty(const QXmlStreamReader& xmlStreamReader) const;
+
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
