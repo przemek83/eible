@@ -106,70 +106,11 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return {false, {}};
 
-    QVector<ColumnType> columnTypes;
-
-    // Actual column number.
-    int column = NOT_SET_COLUMN;
-    int maxColumnIndex = NOT_SET_COLUMN;
-
-    // Actual row number.
-    int rowCounter = 0;
-
-    // Actual data type in current cell (s, str, null).
-    QString currentColType;
-
-    bool rowEmpty = true;
-
-    while (!xmlStreamReader.atEnd() &&
-           xmlStreamReader.name().compare(TABLE_TAG) != 0)
-    {
-        // If start of row encountered than reset column counter add increment
-        // row counter.
-        if (isRowStart(xmlStreamReader))
-            column = NOT_SET_COLUMN;
-
-        // When we encounter start of cell description.
-        if (isCellStart(xmlStreamReader))
-        {
-            column++;
-
-            // Remember column type.
-            currentColType = xmlStreamReader.attributes()
-                                 .value(OFFICE_VALUE_TYPE_TAG)
-                                 .toString();
-            const int repeats{
-                getColumnRepeatCount(xmlStreamReader.attributes())};
-            if (isRecognizedColumnType(xmlStreamReader.attributes()))
-            {
-                maxColumnIndex = std::max(maxColumnIndex, column + repeats - 1);
-                rowEmpty = false;
-                while (column + repeats - 1 >= columnTypes.size())
-                    columnTypes.push_back(ColumnType::UNKNOWN);
-
-                for (int i = 0; i < repeats; ++i)
-                    columnTypes[column + i] = recognizeColumnType(
-                        columnTypes.at(column + i), currentColType);
-            }
-            column += repeats - 1;
-        }
-        xmlStreamReader.readNext();
-        if (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
-            xmlStreamReader.isEndElement())
-        {
-            if (!rowEmpty)
-                rowCounter++;
-            rowEmpty = true;
-        }
-    }
-
-    for (int i = 0; i < columnTypes.size(); ++i)
-    {
-        if (ColumnType::UNKNOWN == columnTypes.at(i))
-            columnTypes[i] = ColumnType::STRING;
-    }
+    auto [columnTypes, rowCounter] =
+        retrieveColumnTypesAndRowCount(xmlStreamReader);
 
     rowCounts_[sheetName] = rowCounter;
-    columnCounts_[sheetName] = maxColumnIndex + 1;
+    columnCounts_[sheetName] = columnTypes.size();
     columnTypes_[sheetName] = columnTypes;
 
     return {true, columnTypes};
@@ -722,4 +663,54 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
     }
 
     return currentType;
+}
+
+std::pair<QVector<ColumnType>, unsigned int>
+ImportOds::retrieveColumnTypesAndRowCount(
+    QXmlStreamReader& xmlStreamReader) const
+{
+    QVector<ColumnType> columnTypes;
+    int column = NOT_SET_COLUMN;
+    int rowCounter = 0;
+    bool rowEmpty = true;
+
+    while (!xmlStreamReader.atEnd() &&
+           xmlStreamReader.name().compare(TABLE_TAG) != 0)
+    {
+        if (isRowStart(xmlStreamReader))
+            column = NOT_SET_COLUMN;
+
+        if (isCellStart(xmlStreamReader))
+        {
+            column++;
+            const QXmlStreamAttributes attributes{xmlStreamReader.attributes()};
+            const QString xmlColTypeValue =
+                attributes.value(OFFICE_VALUE_TYPE_TAG).toString();
+            const int repeats{getColumnRepeatCount(attributes)};
+            if (isRecognizedColumnType(attributes))
+            {
+                rowEmpty = false;
+                while (column + repeats - 1 >= columnTypes.size())
+                    columnTypes.push_back(ColumnType::UNKNOWN);
+
+                for (int i = 0; i < repeats; ++i)
+                    columnTypes[column + i] = recognizeColumnType(
+                        columnTypes.at(column + i), xmlColTypeValue);
+            }
+            column += repeats - 1;
+        }
+        xmlStreamReader.readNext();
+        if (isRowEnd(xmlStreamReader))
+        {
+            if (!rowEmpty)
+                rowCounter++;
+            rowEmpty = true;
+        }
+    }
+
+    for (auto& columnType : columnTypes)
+        if (columnType == ColumnType::UNKNOWN)
+            columnType = ColumnType::STRING;
+
+    return {columnTypes, rowCounter};
 }

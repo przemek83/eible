@@ -77,6 +77,9 @@ private:
     ColumnType recognizeColumnType(ColumnType currentType,
                                    const QString& xmlColTypeValue) const;
 
+    std::pair<QVector<ColumnType>, unsigned int> retrieveColumnTypesAndRowCount(
+        QXmlStreamReader& xmlStreamReader) const;
+
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
