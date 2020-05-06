@@ -229,21 +229,13 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     QVector<QVector<QVariant>> dataContainer(
         std::min(getRowCount(sheetName).second, rowLimit));
 
-    // Current row data.
     QVector<QVariant> currentDataRow(templateDataRow);
 
-    // Actual column number.
     int column = NOT_SET_COLUMN;
 
-    // Actual data type in cell (s, str, null).
-    QString currentColType;
-    QString currentDateValue{};
-
-    // Current row number.
     unsigned int rowCounter = 0;
     int cellsFilledInRow = 0;
 
-    const QString emptyString(QLatin1String(""));
     bool rowEmpty = true;
     unsigned int lastEmittedPercent{0};
     const unsigned int rowCount{rowCounts_[sheetName]};
@@ -285,86 +277,19 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             }
 
             // Remember cell type.
-            currentColType = xmlStreamReader.attributes()
-                                 .value(OFFICE_VALUE_TYPE_TAG)
-                                 .toString();
+            QString xmlColTypeValue{xmlStreamReader.attributes()
+                                        .value(OFFICE_VALUE_TYPE_TAG)
+                                        .toString()};
 
             int repeats{getColumnRepeatCount(xmlStreamReader.attributes())};
             if (column + repeats - 1 >= static_cast<int>(columnCount))
                 repeats = columnCount - column;
 
-            if (!currentColType.isEmpty())
+            if (!xmlColTypeValue.isEmpty())
             {
-                QVariant value;
-                ColumnType format = columnTypes.at(column);
-
-                switch (format)
-                {
-                    case ColumnType::STRING:
-                    {
-                        currentDateValue = xmlStreamReader.attributes()
-                                               .value(OFFICE_DATE_VALUE_TAG)
-                                               .toString();
-
-                        while (!xmlStreamReader.atEnd() &&
-                               0 != xmlStreamReader.name().compare(P_TAG))
-
-                        {
-                            xmlStreamReader.readNext();
-                        }
-
-                        while (
-                            xmlStreamReader.tokenType() !=
-                                QXmlStreamReader::Characters &&
-                            0 != xmlStreamReader.name().compare(TABLE_CELL_TAG))
-                        {
-                            xmlStreamReader.readNext();
-                        }
-                        rowEmpty = false;
-                        if (currentColType.compare(DATE_TAG) == 0)
-                        {
-                            value = QVariant(currentDateValue);
-                        }
-                        else
-                        {
-                            const QString* stringPointer =
-                                xmlStreamReader.text().string();
-                            value = QVariant(stringPointer == nullptr
-                                                 ? emptyString
-                                                 : *stringPointer);
-                        }
-                        break;
-                    }
-
-                    case ColumnType::DATE:
-                    {
-                        static const int odsStringDateLength{10};
-                        rowEmpty = false;
-                        value = QVariant(
-                            QDate::fromString(xmlStreamReader.attributes()
-                                                  .value(OFFICE_DATE_VALUE_TAG)
-                                                  .toString()
-                                                  .left(odsStringDateLength),
-                                              DATE_FORMAT));
-
-                        break;
-                    }
-
-                    case ColumnType::NUMBER:
-                    {
-                        rowEmpty = false;
-                        value = QVariant(xmlStreamReader.attributes()
-                                             .value(OFFICE_VALUE_TAG)
-                                             .toDouble());
-                        break;
-                    }
-
-                    case ColumnType::UNKNOWN:
-                    {
-                        Q_ASSERT(false);
-                        break;
-                    }
-                }
+                rowEmpty = false;
+                QVariant value = retrieveValueFromField(xmlStreamReader,
+                                                        columnTypes.at(column));
 
                 for (int i = 0; i < repeats; ++i)
                 {
@@ -713,4 +638,70 @@ ImportOds::retrieveColumnTypesAndRowCount(
             columnType = ColumnType::STRING;
 
     return {columnTypes, rowCounter};
+}
+
+QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
+                                           ColumnType columnType) const
+{
+    const QString xmlColTypeValue{
+        xmlStreamReader.attributes().value(OFFICE_VALUE_TYPE_TAG).toString()};
+    QVariant value{};
+    const QString emptyString(QLatin1String(""));
+    QString currentDateValue{};
+
+    switch (columnType)
+    {
+        case ColumnType::STRING:
+        {
+            currentDateValue = xmlStreamReader.attributes()
+                                   .value(OFFICE_DATE_VALUE_TAG)
+                                   .toString();
+
+            while (!xmlStreamReader.atEnd() &&
+                   0 != xmlStreamReader.name().compare(P_TAG))
+                xmlStreamReader.readNext();
+
+            while (xmlStreamReader.tokenType() !=
+                       QXmlStreamReader::Characters &&
+                   0 != xmlStreamReader.name().compare(TABLE_CELL_TAG))
+                xmlStreamReader.readNext();
+            if (xmlColTypeValue.compare(DATE_TAG) == 0)
+                value = QVariant(currentDateValue);
+            else
+            {
+                const QString* stringPointer = xmlStreamReader.text().string();
+                value = QVariant(stringPointer == nullptr ? emptyString
+                                                          : *stringPointer);
+            }
+            break;
+        }
+
+        case ColumnType::DATE:
+        {
+            static const int odsStringDateLength{10};
+            value = QVariant(QDate::fromString(xmlStreamReader.attributes()
+                                                   .value(OFFICE_DATE_VALUE_TAG)
+                                                   .toString()
+                                                   .left(odsStringDateLength),
+                                               DATE_FORMAT));
+
+            break;
+        }
+
+        case ColumnType::NUMBER:
+        {
+            value = QVariant(xmlStreamReader.attributes()
+                                 .value(OFFICE_VALUE_TAG)
+                                 .toDouble());
+            break;
+        }
+
+        case ColumnType::UNKNOWN:
+        {
+            Q_ASSERT(false);
+            break;
+        }
+    }
+
+    return value;
 }

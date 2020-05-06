@@ -80,6 +80,9 @@ private:
     std::pair<QVector<ColumnType>, unsigned int> retrieveColumnTypesAndRowCount(
         QXmlStreamReader& xmlStreamReader) const;
 
+    QVariant retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
+                                    ColumnType columnType) const;
+
     std::optional<QStringList> sheetNames_{std::nullopt};
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
