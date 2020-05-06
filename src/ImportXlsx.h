@@ -69,6 +69,14 @@ private:
     QHash<QString, QVector<ColumnType>> columnTypes_{};
 
     static constexpr int DECIMAL_BASE{10};
+    static const QString ROW_TAG;
+    static const QString CELL_TAG;
+    static const QString SHEET_DATA_TAG;
+    static const QString S_TAG;
+    static const QString V_TAG;
+    static const QString R_TAG;
+    static const QString T_TAG;
+    static const QString STR_TAG;
 };
 
 #endif  // IMPORTXLSX_H
