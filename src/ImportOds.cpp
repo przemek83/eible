@@ -234,18 +234,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     int column = NOT_SET_COLUMN;
 
     unsigned int rowCounter = 0;
-    int cellsFilledInRow = 0;
-
     bool rowEmpty = true;
     unsigned int lastEmittedPercent{0};
-    const unsigned int rowCount{rowCounts_[sheetName]};
-    const bool fillSamplesOnly{rowCount != rowLimit};
     while (!xmlStreamReader.atEnd() &&
            0 != xmlStreamReader.name().compare(TABLE_TAG) &&
            rowCounter < rowLimit)
     {
-        // If start of row encountered than reset column counter add
-        // increment row counter.
         if (isRowStart(xmlStreamReader))
         {
             column = NOT_SET_COLUMN;
@@ -257,51 +251,27 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                 updateProgress(rowCounter, rowLimit, lastEmittedPercent);
             }
             rowEmpty = true;
-
-            if (fillSamplesOnly &&
-                rowCounter > static_cast<unsigned int>(dataContainer.size()))
-                break;
         }
 
-        // When we encounter start of cell description.
         if (isCellStart(xmlStreamReader))
         {
             column++;
-
-            // If we encounter column outside expected grid we move to row end.
-            if (column >= static_cast<int>(columnCount))
-            {
-                while (!xmlStreamReader.atEnd() && !isRowEnd(xmlStreamReader))
-                    xmlStreamReader.readNext();
-                continue;
-            }
-
-            // Remember cell type.
             QString xmlColTypeValue{xmlStreamReader.attributes()
                                         .value(OFFICE_VALUE_TYPE_TAG)
                                         .toString()};
-
             int repeats{getColumnRepeatCount(xmlStreamReader.attributes())};
-            if (column + repeats - 1 >= static_cast<int>(columnCount))
-                repeats = columnCount - column;
-
             if (!xmlColTypeValue.isEmpty())
             {
                 rowEmpty = false;
                 QVariant value = retrieveValueFromField(xmlStreamReader,
                                                         columnTypes.at(column));
-
                 for (int i = 0; i < repeats; ++i)
                 {
-                    if (!fillSamplesOnly &&
-                        excludedColumns.contains(column + i))
+                    if (excludedColumns.contains(column + i))
                         continue;
-
-                    cellsFilledInRow++;
                     currentDataRow[activeColumnsMapping[column + i]] = value;
                 }
             }
-
             column += repeats - 1;
         }
         xmlStreamReader.readNextStartElement();
