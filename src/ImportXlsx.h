@@ -64,6 +64,11 @@ private:
         QuaZipFile& zipFile,
         std::function<QDomNodeList(QDomElement)> nodesRetriever);
 
+    bool isRowStart(const QXmlStreamReader& xmlStreamReader) const;
+    bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
+    bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
+    bool isVTagStart(const QXmlStreamReader& xmlStreamReader) const;
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
