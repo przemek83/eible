@@ -35,83 +35,14 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
         return {true, sheets};
     }
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("xl/workbook.xml")))
+    auto [success, sheetIdToUserFriendlyNameMap] =
+        getSheetIdToUserFriendlyNameMap();
+    if (!success)
         return {false, {}};
 
-    // Create, set content and read DOM.
-    QDomDocument xmlDocument(__FUNCTION__);
-    if (!xmlDocument.setContent(zipFile.readAll()))
-    {
-        setError(__FUNCTION__, "File is corrupted.");
+    std::tie(success, sheets_) = retrieveSheets(sheetIdToUserFriendlyNameMap);
+    if (!success)
         return {false, {}};
-    }
-    zipFile.close();
-
-    QDomElement root = xmlDocument.documentElement();
-    QDomNodeList sheetNodes =
-        root.firstChildElement(QStringLiteral("sheets")).childNodes();
-
-    if (sheetNodes.size() <= 0)
-    {
-        setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
-        return {false, {}};
-    }
-
-    QMap<QString, QString> sheetIdToUserFriendlyNameMap;
-    for (int i = 0; i < sheetNodes.size(); ++i)
-    {
-        QDomElement sheet = sheetNodes.at(i).toElement();
-
-        if (!sheet.isNull())
-        {
-            sheetIdToUserFriendlyNameMap[sheet.attribute(QStringLiteral(
-                "r:id"))] = sheet.attribute(QStringLiteral("name"));
-        }
-    }
-
-    if (!initZipFile(zipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
-        return {false, {}};
-
-    // Create, set content and read DOM.
-    xmlDocument = QDomDocument(__FUNCTION__);
-    if (!xmlDocument.setContent(zipFile.readAll()))
-    {
-        setError(__FUNCTION__, "File is corrupted.");
-        return {false, {}};
-    }
-    zipFile.close();
-
-    root = xmlDocument.documentElement();
-    sheetNodes = root.childNodes();
-
-    if (sheetNodes.size() <= 0)
-    {
-        setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
-        return {false, {}};
-    }
-
-    QList<std::pair<QString, QString>> sheets;
-    for (int i = 0; i < sheetNodes.size(); ++i)
-    {
-        QDomElement sheet = sheetNodes.at(i).toElement();
-
-        if (!sheet.isNull())
-        {
-            QMap<QString, QString>::const_iterator iterator =
-                sheetIdToUserFriendlyNameMap.constFind(
-                    sheet.attribute(QStringLiteral("Id")));
-
-            if (sheetIdToUserFriendlyNameMap.constEnd() != iterator)
-            {
-                sheets.append(
-                    {*iterator,
-                     "xl/" + sheet.attribute(QStringLiteral("Target"))});
-            }
-        }
-    }
-
-    sheets_ = std::move(sheets);
 
     QStringList sheetsToReturn;
     for (const auto& [sheetName, sheetPath] : *sheets_)
@@ -636,6 +567,82 @@ bool ImportXlsx::analyzeSheet(const QString& sheetName)
     columnCounts_[sheetName] = maxColumn + 1;
 
     return true;
+}
+
+std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
+    QuaZipFile& zipFile,
+    std::function<QDomNodeList(QDomElement)> nodesRetriever)
+{
+    QDomDocument xmlDocument = QDomDocument(__FUNCTION__);
+    if (!xmlDocument.setContent(zipFile.readAll()))
+    {
+        setError(__FUNCTION__, "File is corrupted.");
+        return {false, {}};
+    }
+
+    QDomElement root = xmlDocument.documentElement();
+    QDomNodeList sheetNodes = nodesRetriever(root);
+
+    if (sheetNodes.size() <= 0)
+    {
+        setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
+        return {false, {}};
+    }
+    return {true, sheetNodes};
+}
+
+std::pair<bool, QMap<QString, QString>>
+ImportXlsx::getSheetIdToUserFriendlyNameMap()
+{
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, QStringLiteral("xl/workbook.xml")))
+        return {false, {}};
+
+    auto nodesRetriever{[](QDomElement root) {
+        return root.firstChildElement(QStringLiteral("sheets")).childNodes();
+    }};
+    auto [sucess, sheetNodes] = getSheetNodes(zipFile, nodesRetriever);
+    if (!sucess)
+        return {false, {}};
+
+    QMap<QString, QString> sheetIdToUserFriendlyNameMap;
+    for (int i = 0; i < sheetNodes.size(); ++i)
+    {
+        QDomElement sheet = sheetNodes.at(i).toElement();
+        if (!sheet.isNull())
+            sheetIdToUserFriendlyNameMap[sheet.attribute(QStringLiteral(
+                "r:id"))] = sheet.attribute(QStringLiteral("name"));
+    }
+    return {true, sheetIdToUserFriendlyNameMap};
+}
+
+std::pair<bool, QList<std::pair<QString, QString>>> ImportXlsx::retrieveSheets(
+    const QMap<QString, QString>& sheetIdToUserFriendlyNameMap)
+{
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
+        return {false, {}};
+
+    auto [sucess, sheetNodes] = getSheetNodes(
+        zipFile, [](QDomElement root) { return root.childNodes(); });
+    if (!sucess)
+        return {false, {}};
+
+    QList<std::pair<QString, QString>> sheets;
+    for (int i = 0; i < sheetNodes.size(); ++i)
+    {
+        const QDomElement sheet = sheetNodes.at(i).toElement();
+
+        if (!sheet.isNull())
+        {
+            const auto it = sheetIdToUserFriendlyNameMap.constFind(
+                sheet.attribute(QStringLiteral("Id")));
+            if (sheetIdToUserFriendlyNameMap.constEnd() != it)
+                sheets.append(
+                    {*it, "xl/" + sheet.attribute(QStringLiteral("Target"))});
+        }
+    }
+    return {true, sheets};
 }
 
 std::pair<bool, QList<int>> ImportXlsx::getAllStyles()

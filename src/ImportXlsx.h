@@ -2,6 +2,7 @@
 #define IMPORTXLSX_H
 
 #include <QHash>
+#include <QtXml/QDomDocument>
 
 #include "ImportSpreadsheet.h"
 
@@ -53,6 +54,15 @@ private:
         const QString& sheetName, const QHash<QString, unsigned int>& countMap);
 
     bool analyzeSheet(const QString& sheetName);
+
+    std::pair<bool, QMap<QString, QString>> getSheetIdToUserFriendlyNameMap();
+
+    std::pair<bool, QList<std::pair<QString, QString>>> retrieveSheets(
+        const QMap<QString, QString>& sheetIdToUserFriendlyNameMap);
+
+    std::pair<bool, QDomNodeList> getSheetNodes(
+        QuaZipFile& zipFile,
+        std::function<QDomNodeList(QDomElement)> nodesRetriever);
 
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
