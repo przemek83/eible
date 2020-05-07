@@ -69,6 +69,9 @@ private:
     bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
     bool isVTagStart(const QXmlStreamReader& xmlStreamReader) const;
 
+    QStringList retrieveColumnNames(QuaZipFile& zipFile,
+                                    const QString& sheetName);
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};

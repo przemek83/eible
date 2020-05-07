@@ -71,79 +71,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!initZipFile(zipFile, sheetPath))
         return {false, {}};
 
-    const unsigned int columnCount{columnCounts_.find(sheetName).value()};
-    QStringList columnNames;
-    // Loading column names is using Excel names names. Set 600 temporary.
-    // const int columnsCount = EibleUtilities::getMaxExcelColumns();
-    const QList<QByteArray> excelColNames =
-        EibleUtilities::generateExcelColumnNames(columnCount);
-
-    QXmlStreamReader xmlStreamReader;
-    xmlStreamReader.setDevice(&zipFile);
-
-    // Variable with actual type of data in cell (s, str, null).
-    QString currentColType = S_TAG;
-
-    // Go to first row.
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
-        xmlStreamReader.readNext();
-
-    xmlStreamReader.readNext();
-    xmlStreamReader.readNext();
-
-    // Actual column number.
-    int columnIndex = -1;
-    QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
-
-    const QRegExp regExp(QLatin1String("[0-9]"));
-
-    // Parse first row.
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != ROW_TAG)
-    {
-        if (isCellStart(xmlStreamReader))
-        {
-            columnIndex++;
-            QString rowNumber(
-                xmlStreamReader.attributes().value(R_TAG).toString());
-
-            // If cells are missing add default name.
-            while (excelColNames.indexOf(rowNumber.remove(regExp).toUtf8()) >
-                   columnIndex)
-            {
-                columnNames << emptyColName_;
-                columnIndex++;
-            }
-            // Remember column type.
-            currentColType =
-                xmlStreamReader.attributes().value(T_TAG).toString();
-        }
-
-        // If we encounter start of cell content than add it to list.
-        if (!xmlStreamReader.atEnd() && isVTagStart(xmlStreamReader))
-        {
-            if (currentColType == S_TAG)
-            {
-                int value = xmlStreamReader.readElementText().toInt();
-                columnNames.push_back((*sharedStrings_)[value]);
-            }
-            else
-            {
-                columnNames.push_back(xmlStreamReader.readElementText());
-            }
-        }
-
-        // If we encounter empty cell than add it to list.
-        if (isCellEnd(xmlStreamReader) &&
-            lastToken == QXmlStreamReader::StartElement)
-            columnNames << emptyColName_;
-        lastToken = xmlStreamReader.tokenType();
-        xmlStreamReader.readNext();
-    }
-
-    while (columnNames.count() < static_cast<int>(columnCount))
-        columnNames << emptyColName_;
-
-    return {true, columnNames};
+    return {true, retrieveColumnNames(zipFile, sheetName)};
 }
 
 std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
@@ -592,6 +520,83 @@ bool ImportXlsx::isVTagStart(const QXmlStreamReader& xmlStreamReader) const
 {
     return 0 == xmlStreamReader.name().compare(V_TAG) &&
            xmlStreamReader.isStartElement();
+}
+
+QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
+                                            const QString& sheetName)
+{
+    const unsigned int columnCount{columnCounts_.find(sheetName).value()};
+    QStringList columnNames;
+    // Loading column names is using Excel names names. Set 600 temporary.
+    // const int columnsCount = EibleUtilities::getMaxExcelColumns();
+    const QList<QByteArray> excelColNames =
+        EibleUtilities::generateExcelColumnNames(columnCount);
+
+    QXmlStreamReader xmlStreamReader;
+    xmlStreamReader.setDevice(&zipFile);
+
+    // Variable with actual type of data in cell (s, str, null).
+    QString currentColType = S_TAG;
+
+    // Go to first row.
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
+        xmlStreamReader.readNext();
+
+    xmlStreamReader.readNext();
+    xmlStreamReader.readNext();
+
+    // Actual column number.
+    int columnIndex = NOT_SET_COLUMN;
+    QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
+
+    const QRegExp regExp(QLatin1String("[0-9]"));
+
+    // Parse first row.
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != ROW_TAG)
+    {
+        if (isCellStart(xmlStreamReader))
+        {
+            columnIndex++;
+            QString rowNumber(
+                xmlStreamReader.attributes().value(R_TAG).toString());
+
+            // If cells are missing add default name.
+            while (excelColNames.indexOf(rowNumber.remove(regExp).toUtf8()) >
+                   columnIndex)
+            {
+                columnNames << emptyColName_;
+                columnIndex++;
+            }
+            currentColType =
+                xmlStreamReader.attributes().value(T_TAG).toString();
+        }
+
+        // If we encounter start of cell content than add it to list.
+        if (!xmlStreamReader.atEnd() && isVTagStart(xmlStreamReader))
+        {
+            if (currentColType == S_TAG)
+            {
+                int value = xmlStreamReader.readElementText().toInt();
+                columnNames.push_back((*sharedStrings_)[value]);
+            }
+            else
+            {
+                columnNames.push_back(xmlStreamReader.readElementText());
+            }
+        }
+
+        // If we encounter empty cell than add it to list.
+        if (isCellEnd(xmlStreamReader) &&
+            lastToken == QXmlStreamReader::StartElement)
+            columnNames << emptyColName_;
+        lastToken = xmlStreamReader.tokenType();
+        xmlStreamReader.readNext();
+    }
+
+    while (columnNames.count() < static_cast<int>(columnCount))
+        columnNames << emptyColName_;
+
+    return columnNames;
 }
 
 std::pair<bool, QMap<QString, QString>>
