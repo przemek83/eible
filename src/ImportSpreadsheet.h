@@ -48,7 +48,13 @@ protected:
     virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
                                 unsigned int& lastEmittedPercent);
 
-    bool openZipFile(QuaZipFile& zipFile, const QString& zipFileName);
+    bool openZip();
+
+    bool setCurrentZipFile(const QString& zipFileName);
+
+    bool openZipFile(QuaZipFile& zipFile);
+
+    bool initZipFile(QuaZipFile& zipFile, const QString& zipFileName);
 
     QIODevice& ioDevice_;
 

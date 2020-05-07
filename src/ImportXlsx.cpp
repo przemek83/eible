@@ -36,7 +36,7 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
     }
 
     QuaZipFile zipFile;
-    if (!openZipFile(zipFile, QStringLiteral("xl/workbook.xml")))
+    if (!initZipFile(zipFile, QStringLiteral("xl/workbook.xml")))
         return {false, {}};
 
     // Create, set content and read DOM.
@@ -70,7 +70,7 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
         }
     }
 
-    if (!openZipFile(zipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
+    if (!initZipFile(zipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
         return {false, {}};
 
     // Create, set content and read DOM.
@@ -119,18 +119,6 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
     return {true, sheetsToReturn};
 }
 
-std::pair<bool, QList<std::pair<QString, QString>>> ImportXlsx::getSheets()
-{
-    if (!sheets_ && !getSheetNames().first)
-        return {false, {}};
-    return {true, *sheets_};
-}
-
-void ImportXlsx::setSheets(QList<std::pair<QString, QString>> sheets)
-{
-    sheets_ = std::move(sheets);
-}
-
 std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     const QString& sheetName)
 {
@@ -144,14 +132,13 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (it == columnCounts_.end() && !analyzeSheet(sheetName))
         return {false, {}};
 
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
+    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    if (!sheetFound)
         return {false, {}};
-    }
+
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, sheetPath))
+        return {false, {}};
 
     const unsigned int columnCount{columnCounts_.find(sheetName).value()};
     QStringList columnNames;
@@ -159,24 +146,6 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     // const int columnsCount = EibleUtilities::getMaxExcelColumns();
     const QList<QByteArray> excelColNames =
         EibleUtilities::generateExcelColumnNames(columnCount);
-
-    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
-    if (!sheetFound)
-        return {false, {}};
-
-    if (!zip.setCurrentFile(sheetPath))
-    {
-        setError(__FUNCTION__,
-                 "File named " + sheetName + " not found in archive.");
-        return {false, {}};
-    }
-    QuaZipFile zipFile(&zip);
-    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        setError(__FUNCTION__,
-                 "Can not open file " + zipFile.getFileName() + ".");
-        return {false, {}};
-    }
 
     QXmlStreamReader xmlStreamReader;
     xmlStreamReader.setDevice(&zipFile);
@@ -264,82 +233,58 @@ ImportXlsx::getStyles()
     // List of predefined excel styles for dates.
     dateStyles.append(predefinedExcelStylesForDates);
 
-    QuaZip zip(&ioDevice_);
-    if (!zip.open(QuaZip::mdUnzip))
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, QStringLiteral("xl/styles.xml")))
+        return {false, {}, {}};
+
+    // Create, set content and read DOM.
+    QDomDocument xmlDocument(__FUNCTION__);
+    if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
+        setError(__FUNCTION__, "Xml file is corrupted.");
         return {false, std::nullopt, std::nullopt};
     }
+    zipFile.close();
 
-    // Load styles.
-    if (zip.setCurrentFile(QStringLiteral("xl/styles.xml")))
+    QDomElement root = xmlDocument.documentElement();
+    QDomNodeList sheetNodes =
+        root.firstChildElement(QStringLiteral("numFmts")).childNodes();
+
+    for (int i = 0; i < sheetNodes.size(); ++i)
     {
-        // Open file in archive.
-        QuaZipFile zipFile(&zip);
-        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        QDomElement sheet = sheetNodes.at(i).toElement();
+
+        if (sheet.hasAttribute(QStringLiteral("numFmtId")) &&
+            sheet.hasAttribute(QStringLiteral("formatCode")))  //&&
+        // sheet.attribute("formatCode").contains("@"))
         {
-            setError(__FUNCTION__, "Can not open file.");
-            return {false, std::nullopt, std::nullopt};
-        }
+            QString formatCode = sheet.attribute(QStringLiteral("formatCode"));
+            bool gotD =
+                formatCode.contains(QStringLiteral("d"), Qt::CaseInsensitive);
+            bool gotM =
+                formatCode.contains(QStringLiteral("m"), Qt::CaseInsensitive);
+            bool gotY =
+                formatCode.contains(QStringLiteral("y"), Qt::CaseInsensitive);
 
-        // Create, set content and read DOM.
-        QDomDocument xmlDocument(__FUNCTION__);
-        if (!xmlDocument.setContent(zipFile.readAll()))
-        {
-            setError(__FUNCTION__, "Xml file is corrupted.");
-            return {false, std::nullopt, std::nullopt};
-        }
-        zipFile.close();
-
-        QDomElement root = xmlDocument.documentElement();
-        QDomNodeList sheetNodes =
-            root.firstChildElement(QStringLiteral("numFmts")).childNodes();
-
-        for (int i = 0; i < sheetNodes.size(); ++i)
-        {
-            QDomElement sheet = sheetNodes.at(i).toElement();
-
-            if (sheet.hasAttribute(QStringLiteral("numFmtId")) &&
-                sheet.hasAttribute(QStringLiteral("formatCode")))  //&&
-            // sheet.attribute("formatCode").contains("@"))
+            if ((gotD && gotY) || (gotD && gotM) || (gotM && gotY))
             {
-                QString formatCode =
-                    sheet.attribute(QStringLiteral("formatCode"));
-                bool gotD = formatCode.contains(QStringLiteral("d"),
-                                                Qt::CaseInsensitive);
-                bool gotM = formatCode.contains(QStringLiteral("m"),
-                                                Qt::CaseInsensitive);
-                bool gotY = formatCode.contains(QStringLiteral("y"),
-                                                Qt::CaseInsensitive);
-
-                if ((gotD && gotY) || (gotD && gotM) || (gotM && gotY))
-                {
-                    dateStyles.push_back(
-                        sheet.attribute(QStringLiteral("numFmtId")).toInt());
-                }
-            }
-        }
-
-        sheetNodes =
-            root.firstChildElement(QStringLiteral("cellXfs")).childNodes();
-
-        for (int i = 0; i < sheetNodes.size(); ++i)
-        {
-            QDomElement sheet = sheetNodes.at(i).toElement();
-
-            if (!sheet.isNull() &&
-                sheet.hasAttribute(QStringLiteral("numFmtId")))
-            {
-                allStyles.push_back(
+                dateStyles.push_back(
                     sheet.attribute(QStringLiteral("numFmtId")).toInt());
             }
         }
     }
-    else
+
+    sheetNodes = root.firstChildElement(QStringLiteral("cellXfs")).childNodes();
+
+    for (int i = 0; i < sheetNodes.size(); ++i)
     {
-        setError(__FUNCTION__, "No file named xl/workbook.xml in archive.");
-        return {false, std::nullopt, std::nullopt};
+        QDomElement sheet = sheetNodes.at(i).toElement();
+
+        if (!sheet.isNull() && sheet.hasAttribute(QStringLiteral("numFmtId")))
+        {
+            allStyles.push_back(
+                sheet.attribute(QStringLiteral("numFmtId")).toInt());
+        }
     }
 
     return {true, dateStyles, allStyles};
@@ -365,51 +310,29 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
     if (sharedStrings_)
         return {true, *sharedStrings_};
 
-    // Loading shared strings, it is separate file in archive with unique
-    // table of all strings, in spreadsheet there are calls to this table.
-
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
+    if (!openZip())
         return {false, {}};
-    }
+
+    if (!setCurrentZipFile(QStringLiteral("xl/sharedStrings.xml")))
+        return {true, {}};
+
+    QuaZipFile zipFile;
+    if (!openZipFile(zipFile))
+        return {false, {}};
+
+    QXmlStreamReader xmlStreamReader;
+    xmlStreamReader.setDevice(&zipFile);
 
     QStringList sharedStrings;
-
-    if (zip.setCurrentFile(QStringLiteral("xl/sharedStrings.xml")))
+    while (!xmlStreamReader.atEnd())
     {
-        // Set variable.
-        QuaZipFile zipFile(&zip);
+        xmlStreamReader.readNext();
 
-        // Opening file.
-        if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            setError(__FUNCTION__,
-                     "Can not open file " + zipFile.getFileName() + ".");
-            return {false, {}};
-        }
-
-        QXmlStreamReader xmlStreamReader;
-        xmlStreamReader.setDevice(&zipFile);
-
-        while (!xmlStreamReader.atEnd())
-        {
-            xmlStreamReader.readNext();
-
-            // If 't' tag found add value to shared strings.
-            if (xmlStreamReader.name() == T_TAG)
-                sharedStrings.append(xmlStreamReader.readElementText());
-        }
-        zipFile.close();
+        // If 't' tag found add value to shared strings.
+        if (xmlStreamReader.name() == T_TAG)
+            sharedStrings.append(xmlStreamReader.readElementText());
     }
-    else
-    {
-        setError(__FUNCTION__, "No file xl/sharedStrings.xml in archive.");
-        return {true, {}};
-    }
+    zipFile.close();
 
     sharedStrings_ = std::move(sharedStrings);
     return {true, *sharedStrings_};
@@ -430,23 +353,16 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     if (!getDateStyles().first && !getAllStyles().first)
         return {false, {}};
 
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
-        return {false, {}};
-    }
-
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
     if (!sheetFound)
         return {false, {}};
 
     QuaZipFile zipFile;
-    QXmlStreamReader xmlStreamReader;
+    if (!initZipFile(zipFile, sheetPath))
+        return {false, {}};
 
-    if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
+    QXmlStreamReader xmlStreamReader;
+    if (!moveToSecondRow(zipFile, xmlStreamReader))
         return {false, {}};
 
     QVector<ColumnType> columnTypes;
@@ -623,25 +539,9 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     return {true, columnTypes};
 }
 
-bool ImportXlsx::openZipAndMoveToSecondRow(QuaZip& zip,
-                                           const QString& sheetName,
-                                           QuaZipFile& zipFile,
-                                           QXmlStreamReader& xmlStreamReader)
+bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
+                                 QXmlStreamReader& xmlStreamReader)
 {
-    if (!zip.setCurrentFile(sheetName))
-    {
-        setError(__FUNCTION__,
-                 "File named " + sheetName + " not found in archive.");
-        return false;
-    }
-    zipFile.setZip(&zip);
-    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        setError(__FUNCTION__,
-                 "Can not open file " + zipFile.getFileName() + ".");
-        return false;
-    }
-
     xmlStreamReader.setDevice(&zipFile);
 
     bool secondRow = false;
@@ -678,23 +578,16 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
 
 bool ImportXlsx::analyzeSheet(const QString& sheetName)
 {
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
-        return false;
-    }
-
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
     if (!sheetFound)
         return false;
 
     QuaZipFile zipFile;
-    QXmlStreamReader xmlStreamReader;
+    if (!initZipFile(zipFile, sheetPath))
+        return false;
 
-    if (!openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader))
+    QXmlStreamReader xmlStreamReader;
+    if (!moveToSecondRow(zipFile, xmlStreamReader))
         return false;
 
     const QList<QByteArray> excelColNames =
@@ -754,11 +647,6 @@ std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
     return {success, *allStyles_};
 }
 
-void ImportXlsx::setAllStyles(QList<int> allStyles)
-{
-    allStyles_ = std::move(allStyles);
-}
-
 std::pair<bool, unsigned int> ImportXlsx::getColumnCount(
     const QString& sheetName)
 {
@@ -794,15 +682,6 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         return {false, {}};
     }
 
-    QuaZip zip(&ioDevice_);
-
-    if (!zip.open(QuaZip::mdUnzip))
-    {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip.getZipName() + ".");
-        return {false, {}};
-    }
-
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
     if (!sheetFound)
         return {false, {}};
@@ -811,9 +690,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         EibleUtilities::generateExcelColumnNames(columnCount);
 
     QuaZipFile zipFile;
+    if (!initZipFile(zipFile, sheetPath))
+        return {false, {}};
+
     QXmlStreamReader xmlStreamReader;
 
-    openZipAndMoveToSecondRow(zip, sheetPath, zipFile, xmlStreamReader);
+    moveToSecondRow(zipFile, xmlStreamReader);
 
     // Actual column number.
     int column = NOT_SET_COLUMN;
@@ -1004,14 +886,4 @@ std::pair<bool, QList<int>> ImportXlsx::getDateStyles()
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
     return {success, *dateStyles_};
-}
-
-void ImportXlsx::setDateStyles(QList<int> dateStyles)
-{
-    dateStyles_ = std::move(dateStyles);
-}
-
-void ImportXlsx::setSharedStrings(QStringList sharedStrings)
-{
-    sharedStrings_ = std::move(sharedStrings);
 }

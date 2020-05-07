@@ -17,8 +17,6 @@ public:
     explicit ImportXlsx(QIODevice& ioDevice);
 
     std::pair<bool, QStringList> getSheetNames() override;
-    std::pair<bool, QList<std::pair<QString, QString>>> getSheets();
-    void setSheets(QList<std::pair<QString, QString>> sheets);
 
     std::pair<bool, QVector<ColumnType>> getColumnTypes(
         const QString& sheetName) override;
@@ -27,13 +25,10 @@ public:
         const QString& sheetName) override;
 
     std::pair<bool, QStringList> getSharedStrings();
-    void setSharedStrings(QStringList sharedStrings);
 
     std::pair<bool, QList<int>> getDateStyles();
-    void setDateStyles(QList<int> dateStyles);
 
     std::pair<bool, QList<int>> getAllStyles();
-    void setAllStyles(QList<int> allStyles);
 
     std::pair<bool, unsigned int> getColumnCount(
         const QString& sheetName) override;
@@ -51,9 +46,8 @@ private:
 
     std::pair<bool, QString> getSheetPath(QString sheetName);
 
-    bool openZipAndMoveToSecondRow(QuaZip& zip, const QString& sheetName,
-                                   QuaZipFile& zipFile,
-                                   QXmlStreamReader& xmlStreamReader);
+    bool moveToSecondRow(QuaZipFile& zipFile,
+                         QXmlStreamReader& xmlStreamReader);
 
     std::pair<bool, unsigned int> getCount(
         const QString& sheetName, const QHash<QString, unsigned int>& countMap);

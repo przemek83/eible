@@ -50,8 +50,7 @@ void ImportSpreadsheet::updateProgress(unsigned int currentRow,
     }
 }
 
-bool ImportSpreadsheet::openZipFile(QuaZipFile& zipFile,
-                                    const QString& zipFileName)
+bool ImportSpreadsheet::openZip()
 {
     if (!zip_.isOpen() && !zip_.open(QuaZip::mdUnzip))
     {
@@ -59,14 +58,22 @@ bool ImportSpreadsheet::openZipFile(QuaZipFile& zipFile,
                  "Can not open zip file " + zip_.getZipName() + ".");
         return false;
     }
+    return true;
+}
 
+bool ImportSpreadsheet::setCurrentZipFile(const QString& zipFileName)
+{
     if (!zip_.setCurrentFile(zipFileName))
     {
         setError(__FUNCTION__,
                  "Can not find file " + zipFileName + " in archive.");
         return false;
     }
+    return true;
+}
 
+bool ImportSpreadsheet::openZipFile(QuaZipFile& zipFile)
+{
     zipFile.setZip(&zip_);
     if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -74,6 +81,11 @@ bool ImportSpreadsheet::openZipFile(QuaZipFile& zipFile,
                  "Can not open file " + zipFile.getFileName() + ".");
         return false;
     }
-
     return true;
+}
+
+bool ImportSpreadsheet::initZipFile(QuaZipFile& zipFile,
+                                    const QString& zipFileName)
+{
+    return openZip() && setCurrentZipFile(zipFileName) && openZipFile(zipFile);
 }

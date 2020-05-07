@@ -40,7 +40,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
         return {true, *sheetNames_};
 
     QuaZipFile zipFile;
-    if (!openZipFile(zipFile, QStringLiteral("settings.xml")))
+    if (!initZipFile(zipFile, QStringLiteral("settings.xml")))
         return {false, {}};
 
     QDomDocument xmlDocument(__FUNCTION__);
@@ -94,7 +94,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
         return {false, {}};
 
     QuaZipFile zipFile;
-    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
+    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
         return {false, {}};
 
     QXmlStreamReader xmlStreamReader;
@@ -124,7 +124,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
         return {false, {}};
 
     QuaZipFile zipFile;
-    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
+    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
         return {false, {}};
 
     QXmlStreamReader xmlStreamReader;
@@ -195,7 +195,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         return {false, {}};
 
     QuaZipFile zipFile;
-    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
+    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
         return {false, {}};
 
     QXmlStreamReader xmlStreamReader;
@@ -284,7 +284,7 @@ std::pair<bool, unsigned int> ImportOds::getCount(
 bool ImportOds::analyzeSheet(const QString& sheetName)
 {
     QuaZipFile zipFile;
-    if (!openZipFile(zipFile, QStringLiteral("content.xml")))
+    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
         return false;
 
     QXmlStreamReader xmlStreamReader;
