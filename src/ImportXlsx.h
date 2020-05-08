@@ -88,6 +88,17 @@ private:
 
     int getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader) const;
 
+    std::pair<QVector<ColumnType>, unsigned int> retrieveColumnTypesAndRowCount(
+        QXmlStreamReader& xmlStreamReader) const;
+
+    QVector<QVariant> createTemplateDataRow(
+        const QVector<unsigned int>& excludedColumns,
+        const QVector<ColumnType>& columnTypes) const;
+
+    QMap<unsigned int, unsigned int> createActiveColumnMapping(
+        const QVector<unsigned int>& excludedColumns,
+        unsigned int columnCount) const;
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};

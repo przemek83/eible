@@ -49,8 +49,6 @@ private:
     void skipToSheet(QXmlStreamReader& xmlStreamReader,
                      const QString& sheetName) const;
 
-    //    bool openZipFile(QuaZipFile& zipFile, const QString& zipFileName);
-
     bool isRecognizedColumnType(const QXmlStreamAttributes& attributes) const;
 
     int getColumnRepeatCount(const QXmlStreamAttributes& attributes) const;
