@@ -94,6 +94,11 @@ private:
     ColumnType recognizeColumnType(ColumnType currentType,
                                    QXmlStreamReader& xmlStreamReader) const;
 
+    QVariant getCurrentValue(QXmlStreamReader& xmlStreamReader,
+                             ColumnType currentColumnFormat,
+                             const QString& currentColType,
+                             const QString& actualSTagValue) const;
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};

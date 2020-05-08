@@ -607,6 +607,59 @@ std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
     return getCount(sheetName, rowCounts_);
 }
 
+QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
+                                     ColumnType currentColumnFormat,
+                                     const QString& currentColType,
+                                     const QString& actualSTagValue) const
+{
+    using namespace EibleUtilities;
+    const QString valueAsString{xmlStreamReader.readElementText()};
+    QVariant currentValue{};
+    switch (currentColumnFormat)
+    {
+        case ColumnType::STRING:
+        {
+            if (0 == currentColType.compare(S_TAG))
+                currentValue = valueAsString.toInt();
+            else
+            {
+                if (!actualSTagValue.isEmpty() &&
+                    dateStyles_->contains(
+                        allStyles_->at(actualSTagValue.toInt())))
+                {
+                    const int daysToAdd = valueAsString.toInt();
+                    currentValue =
+                        getStartOfExcelWorld().addDays(daysToAdd).toString(
+                            Qt::ISODate);
+                }
+                else
+                    currentValue = valueAsString;
+            }
+            break;
+        }
+
+        case ColumnType::DATE:
+        {
+            const int daysToAdd = valueAsString.toInt();
+            currentValue = getStartOfExcelWorld().addDays(daysToAdd);
+            break;
+        }
+
+        case ColumnType::NUMBER:
+        {
+            currentValue = valueAsString.toDouble();
+            break;
+        }
+
+        case ColumnType::UNKNOWN:
+        {
+            Q_ASSERT(false);
+            break;
+        }
+    }
+    return currentValue;
+}
+
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
@@ -642,11 +695,11 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QVector<QVariant> currentDataRow(templateDataRow);
 
     // Number of chars to chop from end.
-    int charsToChop = 1;
-    int column = NOT_SET_COLUMN;
-    QString currentColType = S_TAG;
+    int charsToChop{1};
+    int column{NOT_SET_COLUMN};
+    QString currentColType{S_TAG};
     QString actualSTagValue{};
-    unsigned int rowCounter = 0;
+    unsigned int rowCounter{0};
     unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
            0 != xmlStreamReader.name().compare(SHEET_DATA_TAG) &&
@@ -676,66 +729,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                 xmlStreamReader.attributes().value(S_TAG).toString();
         }
 
-        // Insert data into table.
         if (!xmlStreamReader.atEnd() && isVTagStart(xmlStreamReader) &&
             (!excludedColumns.contains(column)))
         {
             ColumnType format = columnTypes.at(column);
-
-            switch (format)
-            {
-                case ColumnType::STRING:
-                {
-                    if (0 == currentColType.compare(S_TAG))
-                        currentDataRow[activeColumnsMapping[column]] =
-                            QVariant(xmlStreamReader.readElementText().toInt());
-                    else
-                    {
-                        if (!actualSTagValue.isEmpty() &&
-                            dateStyles_->contains(
-                                allStyles_->at(actualSTagValue.toInt())))
-                        {
-                            int daysToAdd = static_cast<int>(
-                                xmlStreamReader.readElementText().toInt());
-                            currentDataRow[activeColumnsMapping[column]] =
-                                QVariant(EibleUtilities::getStartOfExcelWorld()
-                                             .addDays(daysToAdd)
-                                             .toString(Qt::ISODate));
-                        }
-                        else
-                        {
-                            currentDataRow[activeColumnsMapping[column]] =
-                                QVariant(xmlStreamReader.readElementText());
-                        }
-                    }
-                    break;
-                }
-
-                case ColumnType::DATE:
-                {
-                    // If YYYY-MM-DD HH:MI:SS cut and left YYYY-MM-DD.
-                    int daysToAdd = static_cast<int>(
-                        xmlStreamReader.readElementText().toDouble());
-                    currentDataRow[activeColumnsMapping[column]] =
-                        QVariant(EibleUtilities::getStartOfExcelWorld().addDays(
-                            daysToAdd));
-                    break;
-                }
-
-                case ColumnType::NUMBER:
-                {
-                    if (0 != currentColType.compare(S_TAG))
-                        currentDataRow[activeColumnsMapping[column]] = QVariant(
-                            xmlStreamReader.readElementText().toDouble());
-                    break;
-                }
-
-                case ColumnType::UNKNOWN:
-                {
-                    Q_ASSERT(false);
-                    break;
-                }
-            }
+            currentDataRow[activeColumnsMapping[column]] = getCurrentValue(
+                xmlStreamReader, format, currentColType, actualSTagValue);
         }
         xmlStreamReader.readNextStartElement();
     }
