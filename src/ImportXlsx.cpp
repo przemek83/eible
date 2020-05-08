@@ -74,39 +74,17 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     return {true, retrieveColumnNames(zipFile, sheetName)};
 }
 
-std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
-ImportXlsx::getStyles()
+QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
 {
     QList<int> dateStyles;
-    QList<int> allStyles;
-
     const QList predefinedExcelStylesForDates{14, 15, 16, 17, 22};
-    // List of predefined excel styles for dates.
     dateStyles.append(predefinedExcelStylesForDates);
-
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("xl/styles.xml")))
-        return {false, {}, {}};
-
-    // Create, set content and read DOM.
-    QDomDocument xmlDocument(__FUNCTION__);
-    if (!xmlDocument.setContent(zipFile.readAll()))
-    {
-        setError(__FUNCTION__, "Xml file is corrupted.");
-        return {false, std::nullopt, std::nullopt};
-    }
-
-    QDomElement root = xmlDocument.documentElement();
-    QDomNodeList sheetNodes =
-        root.firstChildElement(QStringLiteral("numFmts")).childNodes();
-
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
         QDomElement sheet = sheetNodes.at(i).toElement();
 
         if (sheet.hasAttribute(QStringLiteral("numFmtId")) &&
-            sheet.hasAttribute(QStringLiteral("formatCode")))  //&&
-        // sheet.attribute("formatCode").contains("@"))
+            sheet.hasAttribute(QStringLiteral("formatCode")))
         {
             QString formatCode = sheet.attribute(QStringLiteral("formatCode"));
             bool gotD =
@@ -117,15 +95,16 @@ ImportXlsx::getStyles()
                 formatCode.contains(QStringLiteral("y"), Qt::CaseInsensitive);
 
             if ((gotD && gotY) || (gotD && gotM) || (gotM && gotY))
-            {
                 dateStyles.push_back(
                     sheet.attribute(QStringLiteral("numFmtId")).toInt());
-            }
         }
     }
+    return dateStyles;
+}
 
-    sheetNodes = root.firstChildElement(QStringLiteral("cellXfs")).childNodes();
-
+QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes) const
+{
+    QList<int> allStyles;
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
         QDomElement sheet = sheetNodes.at(i).toElement();
@@ -134,6 +113,30 @@ ImportXlsx::getStyles()
             allStyles.push_back(
                 sheet.attribute(QStringLiteral("numFmtId")).toInt());
     }
+    return allStyles;
+}
+
+std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
+ImportXlsx::getStyles()
+{
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, QStringLiteral("xl/styles.xml")))
+        return {false, {}, {}};
+
+    QDomDocument xmlDocument(__FUNCTION__);
+    if (!xmlDocument.setContent(zipFile.readAll()))
+    {
+        setError(__FUNCTION__, "Xml file is corrupted.");
+        return {false, std::nullopt, std::nullopt};
+    }
+
+    QDomElement root = xmlDocument.documentElement();
+    QDomNodeList sheetNodes =
+        root.firstChildElement(QStringLiteral("numFmts")).childNodes();
+    QList<int> dateStyles{retrieveDateStyles(sheetNodes)};
+
+    sheetNodes = root.firstChildElement(QStringLiteral("cellXfs")).childNodes();
+    QList<int> allStyles{retrieveAllStyles(sheetNodes)};
 
     return {true, dateStyles, allStyles};
 }

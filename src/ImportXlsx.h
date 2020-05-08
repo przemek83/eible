@@ -72,6 +72,9 @@ private:
     QStringList retrieveColumnNames(QuaZipFile& zipFile,
                                     const QString& sheetName);
 
+    QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes) const;
+    QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes) const;
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
