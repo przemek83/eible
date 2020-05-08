@@ -427,116 +427,65 @@ ImportXlsx::retrieveColumnTypesAndRowCount(
 
         if (isCellStart(xmlStreamReader))
         {
-            column++;
             column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
             maxColumnIndex = std::max(maxColumnIndex, column);
 
             if (column >= columnTypes.size())
                 for (int i = columnTypes.size(); i <= column; ++i)
                     columnTypes.push_back(ColumnType::UNKNOWN);
-
-            // If data format in column is unknown than read it.
-            if (columnTypes.at(column) == ColumnType::UNKNOWN)
-            {
-                xmlStreamAtrributes = xmlStreamReader.attributes();
-                QString value = xmlStreamAtrributes.value(T_TAG).toString();
-                bool valueIsSTag = (0 == value.compare(S_TAG));
-                if (valueIsSTag || 0 == value.compare(STR_TAG))
-                {
-                    if (valueIsSTag)
-                    {
-                        xmlStreamReader.readNextStartElement();
-
-                        if (isVTagStart(xmlStreamReader) &&
-                            (*sharedStrings_)[xmlStreamReader.readElementText()
-                                                  .toInt()]
-                                .isEmpty())
-                        {
-                        }
-                        else
-                        {
-                            columnTypes[column] = ColumnType::STRING;
-                        }
-                    }
-                    else
-                    {
-                        columnTypes[column] = ColumnType::STRING;
-                    }
-                }
-                else
-                {
-                    QString otherValue =
-                        xmlStreamAtrributes.value(S_TAG).toString();
-                    if (!otherValue.isEmpty() &&
-                        dateStyles_->contains(
-                            allStyles_->at(otherValue.toInt())))
-                        columnTypes[column] = ColumnType::DATE;
-                    else
-                        columnTypes[column] = ColumnType::NUMBER;
-                }
-            }
-            else
-            {
-                if (ColumnType::STRING != columnTypes.at(column))
-                {
-                    // If type of column is known than check if it is correct.
-                    xmlStreamAtrributes = xmlStreamReader.attributes();
-                    QString value = xmlStreamAtrributes.value(T_TAG).toString();
-                    bool valueIsSTag = (0 == value.compare(S_TAG));
-                    if (valueIsSTag || 0 == value.compare(STR_TAG))
-                    {
-                        if (valueIsSTag)
-                        {
-                            xmlStreamReader.readNextStartElement();
-
-                            if (isVTagStart(xmlStreamReader) &&
-                                (*sharedStrings_)
-                                    [xmlStreamReader.readElementText().toInt()]
-                                        .isEmpty())
-                            {
-                            }
-                            else
-                            {
-                                columnTypes[column] = ColumnType::STRING;
-                            }
-                        }
-                        else
-                        {
-                            columnTypes[column] = ColumnType::STRING;
-                        }
-                    }
-                    else
-                    {
-                        QString othervalue =
-                            xmlStreamAtrributes.value(S_TAG).toString();
-
-                        if (!othervalue.isEmpty() &&
-                            dateStyles_->contains(
-                                allStyles_->at(othervalue.toInt())))
-                        {
-                            if (columnTypes.at(column) != ColumnType::DATE)
-                                columnTypes[column] = ColumnType::STRING;
-                        }
-                        else
-                        {
-                            if (columnTypes.at(column) == ColumnType::UNKNOWN)
-                                columnTypes[column] = ColumnType::STRING;
-                        }
-                    }
-                }
-            }
+            columnTypes[column] =
+                recognizeColumnType(columnTypes.at(column), xmlStreamReader);
         }
-
         xmlStreamReader.readNextStartElement();
     }
 
     for (int i = 0; i < columnTypes.size(); ++i)
-    {
         if (ColumnType::UNKNOWN == columnTypes.at(i))
             columnTypes[i] = ColumnType::STRING;
-    }
 
     return {columnTypes, rowCounter};
+}
+
+ColumnType ImportXlsx::recognizeColumnType(
+    ColumnType currentType, QXmlStreamReader& xmlStreamReader) const
+{
+    if (ColumnType::STRING == currentType)
+        return currentType;
+
+    ColumnType detectedType{currentType};
+    QXmlStreamAttributes xmlStreamAtrributes = xmlStreamReader.attributes();
+    const QString value{xmlStreamAtrributes.value(T_TAG).toString()};
+    const QString sTagValue{xmlStreamAtrributes.value(S_TAG).toString()};
+    if (value.compare(S_TAG) == 0 || value.compare(STR_TAG) == 0)
+    {
+        if (value.compare(S_TAG) == 0)
+        {
+            xmlStreamReader.readNextStartElement();
+            const int sharedStringIndex{
+                xmlStreamReader.readElementText().toInt()};
+            if (!(*sharedStrings_)[sharedStringIndex].isEmpty())
+                detectedType = ColumnType::STRING;
+        }
+        else
+            detectedType = ColumnType::STRING;
+    }
+    else
+    {
+        if (!sTagValue.isEmpty() &&
+            dateStyles_->contains(allStyles_->at(sTagValue.toInt())))
+        {
+            if (currentType == ColumnType::UNKNOWN)
+                detectedType = ColumnType::DATE;
+            else if (currentType != ColumnType::DATE)
+                detectedType = ColumnType::STRING;
+        }
+        else
+        {
+            if (currentType == ColumnType::UNKNOWN)
+                detectedType = ColumnType::NUMBER;
+        }
+    }
+    return detectedType;
 }
 
 QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
@@ -703,17 +652,13 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
            0 != xmlStreamReader.name().compare(SHEET_DATA_TAG) &&
            rowCounter <= rowLimit)
     {
-        // If start of row encountered than reset column counter add
-        // increment row counter.
         if (isRowStart(xmlStreamReader))
         {
             column = NOT_SET_COLUMN;
-
             if (0 != rowCounter)
             {
                 dataContainer[rowCounter - 1] = currentDataRow;
                 currentDataRow = QVector<QVariant>(templateDataRow);
-
                 double power = pow(DECIMAL_BASE, charsToChop);
                 if (static_cast<unsigned int>(qRound(power)) <= rowCounter + 2)
                     charsToChop++;
@@ -724,10 +669,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
         if (isCellStart(xmlStreamReader))
         {
-            column++;
             column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
-
-            // Remember cell type.
             currentColType =
                 xmlStreamReader.attributes().value(T_TAG).toString();
             actualSTagValue =
@@ -744,7 +686,6 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
             {
                 case ColumnType::STRING:
                 {
-                    // Strings.
                     if (0 == currentColType.compare(S_TAG))
                         currentDataRow[activeColumnsMapping[column]] =
                             QVariant(xmlStreamReader.readElementText().toInt());

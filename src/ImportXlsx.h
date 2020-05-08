@@ -91,6 +91,9 @@ private:
     std::pair<QVector<ColumnType>, unsigned int> retrieveColumnTypesAndRowCount(
         QXmlStreamReader& xmlStreamReader) const;
 
+    ColumnType recognizeColumnType(ColumnType currentType,
+                                   QXmlStreamReader& xmlStreamReader) const;
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
