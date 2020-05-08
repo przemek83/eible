@@ -75,6 +75,12 @@ private:
     QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes) const;
     QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes) const;
 
+    std::pair<unsigned int, unsigned int> getRowAndColumnCount(
+        QXmlStreamReader& xmlStreamReader) const;
+
+    int getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
+                               unsigned int charsToChop) const;
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
@@ -82,6 +88,7 @@ private:
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
     QHash<QString, QVector<ColumnType>> columnTypes_{};
+    const QList<QByteArray> excelColNames_;
 
     static constexpr int DECIMAL_BASE{10};
     static const QString ROW_TAG;

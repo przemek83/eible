@@ -23,7 +23,12 @@ const QString ImportXlsx::R_TAG{QStringLiteral("r")};
 const QString ImportXlsx::T_TAG{QStringLiteral("t")};
 const QString ImportXlsx::STR_TAG{QStringLiteral("str")};
 
-ImportXlsx::ImportXlsx(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
+ImportXlsx::ImportXlsx(QIODevice& ioDevice)
+    : ImportSpreadsheet(ioDevice),
+      excelColNames_(EibleUtilities::generateExcelColumnNames(
+          EibleUtilities::getMaxExcelColumns()))
+{
+}
 
 std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 {
@@ -164,6 +169,7 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
     if (!openZip())
         return {false, {}};
 
+    // There can be no shared strings file. Return empty list in that case.
     if (!setCurrentZipFile(QStringLiteral("xl/sharedStrings.xml")))
         return {true, {}};
 
@@ -178,8 +184,6 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
     while (!xmlStreamReader.atEnd())
     {
         xmlStreamReader.readNext();
-
-        // If 't' tag found add value to shared strings.
         if (xmlStreamReader.name() == T_TAG)
             sharedStrings.append(xmlStreamReader.readElementText());
     }
@@ -217,10 +221,6 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
 
     QVector<ColumnType> columnTypes;
 
-    const QList<QByteArray> excelColNames =
-        EibleUtilities::generateExcelColumnNames(
-            EibleUtilities::getMaxExcelColumns());
-
     // Current column.
     int column = NOT_SET_COLUMN;
     int maxColumn = NOT_SET_COLUMN;
@@ -255,7 +255,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
                 xmlStreamReader.attributes().value(R_TAG).toString();
             int numberOfCharsToRemove =
                 stringToChop.size() - charsToChopFromEndInCellName;
-            int expectedIndexCurrentColumn = excelColNames.indexOf(
+            int expectedIndexCurrentColumn = excelColNames_.indexOf(
                 stringToChop.left(numberOfCharsToRemove).toUtf8());
 
             // If cells are missing increment column number.
@@ -419,6 +419,46 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
     return {true, countMap.find(sheetName).value()};
 }
 
+int ImportXlsx::getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
+                                       unsigned int charsToChop) const
+{
+    QString stringToChop = xmlStreamReader.attributes().value(R_TAG).toString();
+    int numberOfCharsToRemove = stringToChop.size() - charsToChop;
+    int expectedColumnIndex = excelColNames_.indexOf(
+        stringToChop.left(numberOfCharsToRemove).toUtf8());
+    return expectedColumnIndex;
+}
+
+std::pair<unsigned int, unsigned int> ImportXlsx::getRowAndColumnCount(
+    QXmlStreamReader& xmlStreamReader) const
+{
+    unsigned int rowCounter = 0;
+    int maxColumnIndex = NOT_SET_COLUMN;
+    int column = NOT_SET_COLUMN;
+    unsigned int charsToChop = 1;
+
+    while (!xmlStreamReader.atEnd() &&
+           0 != xmlStreamReader.name().compare(SHEET_DATA_TAG))
+    {
+        if (isRowStart(xmlStreamReader))
+        {
+            rowCounter++;
+            column = NOT_SET_COLUMN;
+            double power = pow(DECIMAL_BASE, charsToChop);
+            if (power <= rowCounter + 1)
+                charsToChop++;
+        }
+
+        if (isCellStart(xmlStreamReader))
+        {
+            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
+            maxColumnIndex = std::max(maxColumnIndex, column);
+        }
+        xmlStreamReader.readNextStartElement();
+    }
+    return {rowCounter, maxColumnIndex + 1};
+}
+
 bool ImportXlsx::analyzeSheet(const QString& sheetName)
 {
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
@@ -433,48 +473,8 @@ bool ImportXlsx::analyzeSheet(const QString& sheetName)
     if (!moveToSecondRow(zipFile, xmlStreamReader))
         return false;
 
-    const QList<QByteArray> excelColNames =
-        EibleUtilities::generateExcelColumnNames(
-            EibleUtilities::getMaxExcelColumns());
-
-    unsigned int rowCounter = 0;
-    int maxColumn = NOT_SET_COLUMN;
-    int column = NOT_SET_COLUMN;
-    int charsToChopFromEndInCellName = 1;
-
-    while (!xmlStreamReader.atEnd() &&
-           0 != xmlStreamReader.name().compare(SHEET_DATA_TAG))
-    {
-        if (isRowStart(xmlStreamReader))
-        {
-            rowCounter++;
-            column = NOT_SET_COLUMN;
-            double power = pow(DECIMAL_BASE, charsToChopFromEndInCellName);
-            if (power <= rowCounter + 1)
-                charsToChopFromEndInCellName++;
-        }
-
-        if (isCellStart(xmlStreamReader))
-        {
-            column++;
-            QString stringToChop =
-                xmlStreamReader.attributes().value(R_TAG).toString();
-            int numberOfCharsToRemove =
-                stringToChop.size() - charsToChopFromEndInCellName;
-            int expectedIndexCurrentColumn = excelColNames.indexOf(
-                stringToChop.left(numberOfCharsToRemove).toUtf8());
-
-            // If cells are missing increment column number.
-            while (expectedIndexCurrentColumn > column)
-                column++;
-
-            maxColumn = std::max(maxColumn, column);
-        }
-        xmlStreamReader.readNextStartElement();
-    }
-
-    rowCounts_[sheetName] = rowCounter;
-    columnCounts_[sheetName] = maxColumn + 1;
+    std::tie(rowCounts_[sheetName], columnCounts_[sheetName]) =
+        getRowAndColumnCount(xmlStreamReader);
 
     return true;
 }
@@ -530,10 +530,6 @@ QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
 {
     const unsigned int columnCount{columnCounts_.find(sheetName).value()};
     QStringList columnNames;
-    // Loading column names is using Excel names names. Set 600 temporary.
-    // const int columnsCount = EibleUtilities::getMaxExcelColumns();
-    const QList<QByteArray> excelColNames =
-        EibleUtilities::generateExcelColumnNames(columnCount);
 
     QXmlStreamReader xmlStreamReader;
     xmlStreamReader.setDevice(&zipFile);
@@ -564,7 +560,7 @@ QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
                 xmlStreamReader.attributes().value(R_TAG).toString());
 
             // If cells are missing add default name.
-            while (excelColNames.indexOf(rowNumber.remove(regExp).toUtf8()) >
+            while (excelColNames_.indexOf(rowNumber.remove(regExp).toUtf8()) >
                    columnIndex)
             {
                 columnNames << emptyColName_;
@@ -704,9 +700,6 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     if (!sheetFound)
         return {false, {}};
 
-    QList<QByteArray> excelColNames =
-        EibleUtilities::generateExcelColumnNames(columnCount);
-
     QuaZipFile zipFile;
     if (!initZipFile(zipFile, sheetPath))
         return {false, {}};
@@ -794,7 +787,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
             QString stringToChop =
                 xmlStreamReader.attributes().value(R_TAG).toString();
-            int expectedIndexCurrentColumn = excelColNames.indexOf(
+            int expectedIndexCurrentColumn = excelColNames_.indexOf(
                 stringToChop
                     .left(stringToChop.size() - charsToChopFromEndInCellName)
                     .toUtf8());
