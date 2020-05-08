@@ -539,25 +539,6 @@ ImportXlsx::retrieveColumnTypesAndRowCount(
     return {columnTypes, rowCounter};
 }
 
-QVector<QVariant> ImportXlsx::createTemplateDataRow(
-    const QVector<unsigned int>& excludedColumns,
-    const QVector<ColumnType>& columnTypes) const
-{
-    QVector<QVariant> templateDataRow;
-    int columnToFill = 0;
-    templateDataRow.resize(columnTypes.size() - excludedColumns.size());
-    for (int i = 0; i < columnTypes.size(); ++i)
-    {
-        if (!excludedColumns.contains(i))
-        {
-            templateDataRow[columnToFill] =
-                EibleUtilities::getDefaultVariantForFormat(columnTypes[i]);
-            columnToFill++;
-        }
-    }
-    return templateDataRow;
-}
-
 QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
                                             const QString& sheetName)
 {
@@ -677,23 +658,6 @@ std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
     return getCount(sheetName, rowCounts_);
 }
 
-QMap<unsigned int, unsigned int> ImportXlsx::createActiveColumnMapping(
-    const QVector<unsigned int>& excludedColumns,
-    unsigned int columnCount) const
-{
-    QMap<unsigned int, unsigned int> activeColumnsMapping;
-    int columnToFill = 0;
-    for (unsigned int i = 0; i < columnCount; ++i)
-    {
-        if (!excludedColumns.contains(i))
-        {
-            activeColumnsMapping[i] = columnToFill;
-            columnToFill++;
-        }
-    }
-    return activeColumnsMapping;
-}
-
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
@@ -703,17 +667,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         return {false, {}};
 
     const unsigned int columnCount{columnCounts_[sheetName]};
-    auto it = std::find_if(
-        excludedColumns.begin(), excludedColumns.end(),
-        [=](unsigned int column) { return column >= columnCount; });
-    if (it != excludedColumns.end())
-    {
-        setError(__FUNCTION__, "Column to exclude " + QString::number(*it) +
-                                   " is invalid. Xlsx got only " +
-                                   QString::number(columnCount) +
-                                   " columns indexed from 0.");
+    if (!columnsToExcludeAreValid(excludedColumns, columnCount))
         return {false, {}};
-    }
 
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
     if (!sheetFound)
@@ -726,11 +681,6 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QXmlStreamReader xmlStreamReader;
     moveToSecondRow(zipFile, xmlStreamReader);
 
-    int column = NOT_SET_COLUMN;
-    QString currentColType = S_TAG;
-    QString actualSTagValue{};
-    unsigned int rowCounter = 0;
-
     QVector<QVariant> templateDataRow{
         createTemplateDataRow(excludedColumns, columnTypes)};
 
@@ -740,17 +690,14 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QVector<QVector<QVariant>> dataContainer(
         std::min(getRowCount(sheetName).second, rowLimit));
 
-    // Protection from potential core related to empty rows.
-    unsigned int containerSize = dataContainer.size();
-    for (unsigned int i = 0; i < containerSize; ++i)
-        dataContainer[i] = templateDataRow;
-
-    // Current row data.
     QVector<QVariant> currentDataRow(templateDataRow);
 
     // Number of chars to chop from end.
     int charsToChop = 1;
-
+    int column = NOT_SET_COLUMN;
+    QString currentColType = S_TAG;
+    QString actualSTagValue{};
+    unsigned int rowCounter = 0;
     unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
            0 != xmlStreamReader.name().compare(SHEET_DATA_TAG) &&

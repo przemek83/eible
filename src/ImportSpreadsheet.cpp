@@ -1,11 +1,12 @@
 #include "ImportSpreadsheet.h"
 
+#include <quazip5/quazipfile.h>
 #include <QCoreApplication>
 #include <QIODevice>
 #include <QVariant>
 #include <QVector>
 
-#include <quazip5/quazipfile.h>
+#include "EibleUtilities.h"
 
 ImportSpreadsheet::ImportSpreadsheet(QIODevice& ioDevice)
     : ioDevice_(ioDevice), emptyColName_("---"), zip_(&ioDevice_)
@@ -88,4 +89,57 @@ bool ImportSpreadsheet::initZipFile(QuaZipFile& zipFile,
                                     const QString& zipFileName)
 {
     return openZip() && setCurrentZipFile(zipFileName) && openZipFile(zipFile);
+}
+
+QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
+    const QVector<unsigned int>& excludedColumns,
+    unsigned int columnCount) const
+{
+    QMap<unsigned int, unsigned int> activeColumnsMapping;
+    int columnToFill = 0;
+    for (unsigned int i = 0; i < columnCount; ++i)
+    {
+        if (!excludedColumns.contains(i))
+        {
+            activeColumnsMapping[i] = columnToFill;
+            columnToFill++;
+        }
+    }
+    return activeColumnsMapping;
+}
+
+QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
+    const QVector<unsigned int>& excludedColumns,
+    const QVector<ColumnType>& columnTypes) const
+{
+    QVector<QVariant> templateDataRow;
+    int columnToFill = 0;
+    templateDataRow.resize(columnTypes.size() - excludedColumns.size());
+    for (int i = 0; i < columnTypes.size(); ++i)
+    {
+        if (!excludedColumns.contains(i))
+        {
+            templateDataRow[columnToFill] =
+                EibleUtilities::getDefaultVariantForFormat(columnTypes[i]);
+            columnToFill++;
+        }
+    }
+    return templateDataRow;
+}
+
+bool ImportSpreadsheet::columnsToExcludeAreValid(
+    const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
+{
+    auto it = std::find_if(
+        excludedColumns.begin(), excludedColumns.end(),
+        [=](unsigned int column) { return column >= columnCount; });
+    if (it != excludedColumns.end())
+    {
+        setError(__FUNCTION__, "Column to exclude " + QString::number(*it) +
+                                   " is invalid. Xlsx got only " +
+                                   QString::number(columnCount) +
+                                   " columns indexed from 0.");
+        return false;
+    }
+    return true;
 }

@@ -426,59 +426,6 @@ bool ImportOds::sheetNameValid(const QString& sheetName)
     return true;
 }
 
-bool ImportOds::columnsToExcludeAreValid(
-    const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
-{
-    auto it = std::find_if(
-        excludedColumns.begin(), excludedColumns.end(),
-        [=](unsigned int column) { return column >= columnCount; });
-    if (it != excludedColumns.end())
-    {
-        setError(__FUNCTION__, "Column to exclude " + QString::number(*it) +
-                                   " is invalid. Xlsx got only " +
-                                   QString::number(columnCount) +
-                                   " columns indexed from 0.");
-        return false;
-    }
-    return true;
-}
-
-QVector<QVariant> ImportOds::createTemplateDataRow(
-    const QVector<unsigned int>& excludedColumns,
-    const QVector<ColumnType>& columnTypes) const
-{
-    QVector<QVariant> templateDataRow;
-    int columnToFill = 0;
-    templateDataRow.resize(columnTypes.size() - excludedColumns.size());
-    for (int i = 0; i < columnTypes.size(); ++i)
-    {
-        if (!excludedColumns.contains(i))
-        {
-            templateDataRow[columnToFill] =
-                EibleUtilities::getDefaultVariantForFormat(columnTypes[i]);
-            columnToFill++;
-        }
-    }
-    return templateDataRow;
-}
-
-QMap<unsigned int, unsigned int> ImportOds::createActiveColumnMapping(
-    const QVector<unsigned int>& excludedColumns,
-    unsigned int columnCount) const
-{
-    QMap<unsigned int, unsigned int> activeColumnsMapping;
-    int columnToFill = 0;
-    for (unsigned int i = 0; i < columnCount; ++i)
-    {
-        if (!excludedColumns.contains(i))
-        {
-            activeColumnsMapping[i] = columnToFill;
-            columnToFill++;
-        }
-    }
-    return activeColumnsMapping;
-}
-
 ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
                                           const QString& xmlColTypeValue) const
 {

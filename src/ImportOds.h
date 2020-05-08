@@ -60,17 +60,6 @@ private:
 
     bool sheetNameValid(const QString& sheetName);
 
-    bool columnsToExcludeAreValid(const QVector<unsigned int>& excludedColumns,
-                                  unsigned int columnCount);
-
-    QVector<QVariant> createTemplateDataRow(
-        const QVector<unsigned int>& excludedColumns,
-        const QVector<ColumnType>& columnTypes) const;
-
-    QMap<unsigned int, unsigned int> createActiveColumnMapping(
-        const QVector<unsigned int>& excludedColumns,
-        unsigned int columnCount) const;
-
     ColumnType recognizeColumnType(ColumnType currentType,
                                    const QString& xmlColTypeValue) const;
 

@@ -56,6 +56,17 @@ protected:
 
     bool initZipFile(QuaZipFile& zipFile, const QString& zipFileName);
 
+    QVector<QVariant> createTemplateDataRow(
+        const QVector<unsigned int>& excludedColumns,
+        const QVector<ColumnType>& columnTypes) const;
+
+    QMap<unsigned int, unsigned int> createActiveColumnMapping(
+        const QVector<unsigned int>& excludedColumns,
+        unsigned int columnCount) const;
+
+    bool columnsToExcludeAreValid(const QVector<unsigned int>& excludedColumns,
+                                  unsigned int columnCount);
+
     QIODevice& ioDevice_;
 
     /// If empty column is encountered insert defined string.
