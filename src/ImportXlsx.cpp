@@ -228,7 +228,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     // Current row.
     int rowCounter = 0;
 
-    int charsToChopFromEndInCellName = 1;
+    int charsToChop = 1;
 
     QXmlStreamAttributes xmlStreamAtrributes;
 
@@ -241,35 +241,17 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
         {
             column = NOT_SET_COLUMN;
             rowCounter++;
-            double power = pow(DECIMAL_BASE, charsToChopFromEndInCellName);
+            double power = pow(DECIMAL_BASE, charsToChop);
             if (power <= rowCounter + 1)
-                charsToChopFromEndInCellName++;
+                charsToChop++;
         }
 
         // When we encounter start of cell description.
         if (isCellStart(xmlStreamReader))
         {
             column++;
-
-            QString stringToChop =
-                xmlStreamReader.attributes().value(R_TAG).toString();
-            int numberOfCharsToRemove =
-                stringToChop.size() - charsToChopFromEndInCellName;
-            int expectedIndexCurrentColumn = excelColNames_.indexOf(
-                stringToChop.left(numberOfCharsToRemove).toUtf8());
-
-            // If cells are missing increment column number.
-            while (expectedIndexCurrentColumn > column)
-                column++;
-
+            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
             maxColumn = std::max(maxColumn, column);
-
-            // If we encounter column outside expected grid we move to row end.
-            if (expectedIndexCurrentColumn == NOT_SET_COLUMN)
-            {
-                xmlStreamReader.skipCurrentElement();
-                continue;
-            }
 
             if (column >= columnTypes.size())
                 for (int i = columnTypes.size(); i <= column; ++i)
@@ -525,43 +507,57 @@ bool ImportXlsx::isVTagStart(const QXmlStreamReader& xmlStreamReader) const
            xmlStreamReader.isStartElement();
 }
 
+QString ImportXlsx::getColumnName(QXmlStreamReader& xmlStreamReader,
+                                  const QString& currentColType) const
+{
+    QString columnName;
+    if (currentColType == S_TAG)
+    {
+        int value = xmlStreamReader.readElementText().toInt();
+        columnName = (*sharedStrings_)[value];
+    }
+    else
+    {
+        columnName = xmlStreamReader.readElementText();
+    }
+    return columnName;
+}
+
+void ImportXlsx::skipToFirstRow(QXmlStreamReader& xmlStreamReader) const
+{
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
+        xmlStreamReader.readNext();
+    xmlStreamReader.readNext();
+    xmlStreamReader.readNext();
+}
+
+int ImportXlsx::getCurrentColumnNumber(
+    const QXmlStreamReader& xmlStreamReader) const
+{
+    const QRegExp regExp(QLatin1String("[0-9]"));
+    QString rowNumber(xmlStreamReader.attributes().value(R_TAG).toString());
+    return excelColNames_.indexOf(rowNumber.remove(regExp).toUtf8());
+}
+
 QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
                                             const QString& sheetName)
 {
-    const unsigned int columnCount{columnCounts_.find(sheetName).value()};
-    QStringList columnNames;
-
     QXmlStreamReader xmlStreamReader;
     xmlStreamReader.setDevice(&zipFile);
+    skipToFirstRow(xmlStreamReader);
 
-    // Variable with actual type of data in cell (s, str, null).
-    QString currentColType = S_TAG;
-
-    // Go to first row.
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
-        xmlStreamReader.readNext();
-
-    xmlStreamReader.readNext();
-    xmlStreamReader.readNext();
-
-    // Actual column number.
     int columnIndex = NOT_SET_COLUMN;
     QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
-
-    const QRegExp regExp(QLatin1String("[0-9]"));
-
-    // Parse first row.
+    QStringList columnNames;
+    QString currentColType;
     while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != ROW_TAG)
     {
         if (isCellStart(xmlStreamReader))
         {
             columnIndex++;
-            QString rowNumber(
-                xmlStreamReader.attributes().value(R_TAG).toString());
-
-            // If cells are missing add default name.
-            while (excelColNames_.indexOf(rowNumber.remove(regExp).toUtf8()) >
-                   columnIndex)
+            const int currentColumnNumber{
+                getCurrentColumnNumber(xmlStreamReader)};
+            while (currentColumnNumber > columnIndex)
             {
                 columnNames << emptyColName_;
                 columnIndex++;
@@ -570,19 +566,8 @@ QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
                 xmlStreamReader.attributes().value(T_TAG).toString();
         }
 
-        // If we encounter start of cell content than add it to list.
         if (!xmlStreamReader.atEnd() && isVTagStart(xmlStreamReader))
-        {
-            if (currentColType == S_TAG)
-            {
-                int value = xmlStreamReader.readElementText().toInt();
-                columnNames.push_back((*sharedStrings_)[value]);
-            }
-            else
-            {
-                columnNames.push_back(xmlStreamReader.readElementText());
-            }
-        }
+            columnNames.append(getColumnName(xmlStreamReader, currentColType));
 
         // If we encounter empty cell than add it to list.
         if (isCellEnd(xmlStreamReader) &&
@@ -592,6 +577,7 @@ QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
         xmlStreamReader.readNext();
     }
 
+    const unsigned int columnCount{columnCounts_.find(sheetName).value()};
     while (columnNames.count() < static_cast<int>(columnCount))
         columnNames << emptyColName_;
 
@@ -749,7 +735,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QVector<QVariant> currentDataRow(templateDataRow);
 
     // Number of chars to chop from end.
-    int charsToChopFromEndInCellName = 1;
+    int charsToChop = 1;
 
     unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
@@ -767,9 +753,9 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                 dataContainer[rowCounter - 1] = currentDataRow;
                 currentDataRow = QVector<QVariant>(templateDataRow);
 
-                double power = pow(DECIMAL_BASE, charsToChopFromEndInCellName);
+                double power = pow(DECIMAL_BASE, charsToChop);
                 if (static_cast<unsigned int>(qRound(power)) <= rowCounter + 2)
-                    charsToChopFromEndInCellName++;
+                    charsToChop++;
             }
 
             rowCounter++;
@@ -784,24 +770,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         if (isCellStart(xmlStreamReader))
         {
             column++;
-
-            QString stringToChop =
-                xmlStreamReader.attributes().value(R_TAG).toString();
-            int expectedIndexCurrentColumn = excelColNames_.indexOf(
-                stringToChop
-                    .left(stringToChop.size() - charsToChopFromEndInCellName)
-                    .toUtf8());
-
-            // If cells missing than increment column number.
-            while (expectedIndexCurrentColumn > column)
-                column++;
-
-            // If we encounter column outside expected grid we move to row end.
-            if (expectedIndexCurrentColumn == NOT_SET_COLUMN)
-            {
-                xmlStreamReader.skipCurrentElement();
-                continue;
-            }
+            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
 
             // Remember cell type.
             currentColType =
