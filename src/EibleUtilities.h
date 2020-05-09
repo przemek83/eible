@@ -5,17 +5,16 @@
 #include <QVariant>
 
 #include "ColumnType.h"
-#include "eible_global.h"
 
 namespace EibleUtilities
 {
-QDate EIBLE_EXPORT getStartOfExcelWorld();
+QDate getStartOfExcelWorld();
 
-QList<QByteArray> EIBLE_EXPORT generateExcelColumnNames(int columnsNumber);
+QList<QByteArray> generateExcelColumnNames(int columnsNumber);
 
-int EIBLE_EXPORT getMaxExcelColumns();
+int getMaxExcelColumns();
 
-QString EIBLE_EXPORT getXlsxTemplateName();
+QString getXlsxTemplateName();
 
 QVariant getDefaultVariantForFormat(ColumnType format);
 }  // namespace EibleUtilities
