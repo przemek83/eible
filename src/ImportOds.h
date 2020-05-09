@@ -38,10 +38,11 @@ private:
     std::pair<bool, unsigned int> getCount(
         const QString& sheetName, const QHash<QString, unsigned int>& countMap);
 
-    bool analyzeSheet(const QString& sheetName);
+    std::pair<bool, QStringList> retrieveColumnNames(
+        const QString& sheetName) override;
 
-    std::pair<unsigned int, unsigned int> getRowAndColumnCount(
-        QXmlStreamReader& xmlStreamReader) const;
+    std::tuple<bool, unsigned int, QVector<ColumnType>>
+    retrieveRowCountAndColumnTypes(const QString& sheetName) override;
 
     bool moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
                          QXmlStreamReader& xmlStreamReader);
@@ -63,18 +64,12 @@ private:
     ColumnType recognizeColumnType(ColumnType currentType,
                                    const QString& xmlColTypeValue) const;
 
-    std::pair<QVector<ColumnType>, unsigned int> retrieveColumnTypesAndRowCount(
-        QXmlStreamReader& xmlStreamReader) const;
-
     QVariant retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
                                     ColumnType columnType) const;
 
     bool isOfficeValueTagEmpty(const QXmlStreamReader& xmlStreamReader) const;
 
     std::optional<QStringList> sheetNames_{std::nullopt};
-    QHash<QString, unsigned int> rowCounts_{};
-    QHash<QString, unsigned int> columnCounts_{};
-    QHash<QString, QVector<ColumnType>> columnTypes_{};
 
     static const QString TABLE_TAG;
     static const QString TABLE_ROW_TAG;

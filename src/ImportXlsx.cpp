@@ -64,19 +64,14 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!sharedStrings_ && !getSharedStrings().first)
         return {false, {}};
 
-    const auto it = columnCounts_.find(sheetName);
-    if (it == columnCounts_.end() && !analyzeSheet(sheetName))
+    if (!getDateStyles().first && !getAllStyles().first)
         return {false, {}};
 
-    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
-    if (!sheetFound)
+    const auto it = columnNames_.find(sheetName);
+    if (it == columnNames_.end() && !analyzeSheet(sheetName))
         return {false, {}};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, sheetPath))
-        return {false, {}};
-
-    return {true, retrieveColumnNames(zipFile, sheetName)};
+    return {true, columnNames_[sheetName]};
 }
 
 QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
@@ -205,26 +200,10 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     if (!getDateStyles().first && !getAllStyles().first)
         return {false, {}};
 
-    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
-    if (!sheetFound)
+    if (!analyzeSheet(sheetName))
         return {false, {}};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, sheetPath))
-        return {false, {}};
-
-    QXmlStreamReader xmlStreamReader;
-    if (!moveToSecondRow(zipFile, xmlStreamReader))
-        return {false, {}};
-
-    auto [columnTypes, rowCounter] =
-        retrieveColumnTypesAndRowCount(xmlStreamReader);
-
-    rowCounts_[sheetName] = rowCounter;
-    columnCounts_[sheetName] = columnTypes.size();
-    columnTypes_[sheetName] = columnTypes;
-
-    return {true, columnTypes};
+    return {true, columnTypes_[sheetName]};
 }
 
 bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
@@ -255,6 +234,12 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
     if (it != countMap.end())
         return {true, it.value()};
 
+    if (!sharedStrings_ && !getSharedStrings().first)
+        return {false, {}};
+
+    if (!getDateStyles().first && !getAllStyles().first)
+        return {false, {}};
+
     if (!analyzeSheet(sheetName))
         return {false, 0};
 
@@ -269,54 +254,6 @@ int ImportXlsx::getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
     int expectedColumnIndex{excelColNames_.indexOf(
         stringToChop.left(numberOfCharsToRemove).toUtf8())};
     return expectedColumnIndex;
-}
-
-std::pair<unsigned int, unsigned int> ImportXlsx::getRowAndColumnCount(
-    QXmlStreamReader& xmlStreamReader) const
-{
-    unsigned int rowCounter{0};
-    int maxColumnIndex{NOT_SET_COLUMN};
-    int column{NOT_SET_COLUMN};
-    unsigned int charsToChop{1};
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
-    {
-        if (isRowStart(xmlStreamReader))
-        {
-            rowCounter++;
-            column = NOT_SET_COLUMN;
-            double power = pow(DECIMAL_BASE, charsToChop);
-            if (power <= rowCounter + 1)
-                charsToChop++;
-        }
-
-        if (isCellStart(xmlStreamReader))
-        {
-            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
-            maxColumnIndex = std::max(maxColumnIndex, column);
-        }
-        xmlStreamReader.readNextStartElement();
-    }
-    return {rowCounter, maxColumnIndex + 1};
-}
-
-bool ImportXlsx::analyzeSheet(const QString& sheetName)
-{
-    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
-    if (!sheetFound)
-        return false;
-
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, sheetPath))
-        return false;
-
-    QXmlStreamReader xmlStreamReader;
-    if (!moveToSecondRow(zipFile, xmlStreamReader))
-        return false;
-
-    std::tie(rowCounts_[sheetName], columnCounts_[sheetName]) =
-        getRowAndColumnCount(xmlStreamReader);
-
-    return true;
 }
 
 std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
@@ -362,109 +299,17 @@ bool ImportXlsx::isVTagStart(const QXmlStreamReader& xmlStreamReader) const
     return xmlStreamReader.name() == V_TAG && xmlStreamReader.isStartElement();
 }
 
-QString ImportXlsx::getColumnName(QXmlStreamReader& xmlStreamReader,
-                                  const QString& currentColType) const
+std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
+    const QString& sheetName)
 {
-    QString columnName;
-    if (currentColType == S_TAG)
-    {
-        int value{xmlStreamReader.readElementText().toInt()};
-        columnName = (*sharedStrings_)[value];
-    }
-    else
-    {
-        columnName = xmlStreamReader.readElementText();
-    }
-    return columnName;
-}
+    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    if (!sheetFound)
+        return {false, {}};
 
-void ImportXlsx::skipToFirstRow(QXmlStreamReader& xmlStreamReader) const
-{
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
-        xmlStreamReader.readNext();
-    xmlStreamReader.readNext();
-    xmlStreamReader.readNext();
-}
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, sheetPath))
+        return {false, {}};
 
-int ImportXlsx::getCurrentColumnNumber(
-    const QXmlStreamReader& xmlStreamReader) const
-{
-    const QRegExp regExp(QLatin1String("[0-9]"));
-    QString rowNumber{xmlStreamReader.attributes().value(R_TAG).toString()};
-    return excelColNames_.indexOf(rowNumber.remove(regExp).toUtf8());
-}
-
-std::pair<QVector<ColumnType>, unsigned int>
-ImportXlsx::retrieveColumnTypesAndRowCount(
-    QXmlStreamReader& xmlStreamReader) const
-{
-    QVector<ColumnType> columnTypes;
-    int column{NOT_SET_COLUMN};
-    int maxColumnIndex{NOT_SET_COLUMN};
-    int rowCounter{0};
-    int charsToChop{1};
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
-    {
-        if (isRowStart(xmlStreamReader))
-        {
-            column = NOT_SET_COLUMN;
-            rowCounter++;
-            double power{pow(DECIMAL_BASE, charsToChop)};
-            if (power <= rowCounter + 1)
-                charsToChop++;
-        }
-
-        if (isCellStart(xmlStreamReader))
-        {
-            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
-            maxColumnIndex = std::max(maxColumnIndex, column);
-            if (column >= columnTypes.size())
-                for (int i = columnTypes.size(); i <= column; ++i)
-                    columnTypes.push_back(ColumnType::UNKNOWN);
-            columnTypes[column] =
-                recognizeColumnType(columnTypes.at(column), xmlStreamReader);
-        }
-        xmlStreamReader.readNextStartElement();
-    }
-
-    for (int i = 0; i < columnTypes.size(); ++i)
-        if (ColumnType::UNKNOWN == columnTypes.at(i))
-            columnTypes[i] = ColumnType::STRING;
-
-    return {columnTypes, rowCounter};
-}
-
-ColumnType ImportXlsx::recognizeColumnType(
-    ColumnType currentType, QXmlStreamReader& xmlStreamReader) const
-{
-    if (ColumnType::STRING == currentType)
-        return currentType;
-
-    QXmlStreamAttributes xmlStreamAtrributes{xmlStreamReader.attributes()};
-    const QString value{xmlStreamAtrributes.value(T_TAG).toString()};
-    if (value == S_TAG || value == STR_TAG)
-        return ColumnType::STRING;
-
-    ColumnType detectedType{currentType};
-    const QString sTagValue{xmlStreamAtrributes.value(S_TAG).toString()};
-    if (isDateStyle(sTagValue))
-    {
-        if (currentType == ColumnType::UNKNOWN)
-            detectedType = ColumnType::DATE;
-        else if (currentType != ColumnType::DATE)
-            detectedType = ColumnType::STRING;
-    }
-    else
-    {
-        if (currentType == ColumnType::UNKNOWN)
-            detectedType = ColumnType::NUMBER;
-    }
-    return detectedType;
-}
-
-QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
-                                            const QString& sheetName) const
-{
     QXmlStreamReader xmlStreamReader;
     xmlStreamReader.setDevice(&zipFile);
     skipToFirstRow(xmlStreamReader);
@@ -499,12 +344,118 @@ QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
         lastToken = xmlStreamReader.tokenType();
         xmlStreamReader.readNext();
     }
+    return {true, columnNames};
+}
 
-    const unsigned int columnCount{columnCounts_.find(sheetName).value()};
-    while (columnNames.count() < static_cast<int>(columnCount))
-        columnNames << emptyColName_;
+std::tuple<bool, unsigned int, QVector<ColumnType>>
+ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
+{
+    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    if (!sheetFound)
+        return {false, {}, {}};
 
-    return columnNames;
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, sheetPath))
+        return {false, {}, {}};
+
+    QXmlStreamReader xmlStreamReader;
+    if (!moveToSecondRow(zipFile, xmlStreamReader))
+        return {false, {}, {}};
+
+    QVector<ColumnType> columnTypes;
+    int column{NOT_SET_COLUMN};
+    int maxColumnIndex{NOT_SET_COLUMN};
+    int rowCounter{0};
+    int charsToChop{1};
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
+    {
+        if (isRowStart(xmlStreamReader))
+        {
+            column = NOT_SET_COLUMN;
+            rowCounter++;
+            double power{pow(DECIMAL_BASE, charsToChop)};
+            if (power <= rowCounter + 1)
+                charsToChop++;
+        }
+
+        if (isCellStart(xmlStreamReader))
+        {
+            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
+            maxColumnIndex = std::max(maxColumnIndex, column);
+            if (column >= columnTypes.size())
+                for (int i = columnTypes.size(); i <= column; ++i)
+                    columnTypes.push_back(ColumnType::UNKNOWN);
+            columnTypes[column] =
+                recognizeColumnType(columnTypes.at(column), xmlStreamReader);
+        }
+        xmlStreamReader.readNextStartElement();
+    }
+
+    for (int i = 0; i < columnTypes.size(); ++i)
+        if (ColumnType::UNKNOWN == columnTypes.at(i))
+            columnTypes[i] = ColumnType::STRING;
+
+    return {true, rowCounter, columnTypes};
+}
+
+QString ImportXlsx::getColumnName(QXmlStreamReader& xmlStreamReader,
+                                  const QString& currentColType) const
+{
+    QString columnName;
+    if (currentColType == S_TAG)
+    {
+        int value{xmlStreamReader.readElementText().toInt()};
+        columnName = (*sharedStrings_)[value];
+    }
+    else
+    {
+        columnName = xmlStreamReader.readElementText();
+    }
+    return columnName;
+}
+
+void ImportXlsx::skipToFirstRow(QXmlStreamReader& xmlStreamReader) const
+{
+    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
+        xmlStreamReader.readNext();
+    xmlStreamReader.readNext();
+    xmlStreamReader.readNext();
+}
+
+int ImportXlsx::getCurrentColumnNumber(
+    const QXmlStreamReader& xmlStreamReader) const
+{
+    const QRegExp regExp(QLatin1String("[0-9]"));
+    QString rowNumber{xmlStreamReader.attributes().value(R_TAG).toString()};
+    return excelColNames_.indexOf(rowNumber.remove(regExp).toUtf8());
+}
+
+ColumnType ImportXlsx::recognizeColumnType(
+    ColumnType currentType, QXmlStreamReader& xmlStreamReader) const
+{
+    if (ColumnType::STRING == currentType)
+        return currentType;
+
+    QXmlStreamAttributes xmlStreamAtrributes{xmlStreamReader.attributes()};
+    const QString value{xmlStreamAtrributes.value(T_TAG).toString()};
+    if (value == S_TAG || value == STR_TAG)
+        return ColumnType::STRING;
+
+    ColumnType detectedType{currentType};
+    const QString sTagValue{xmlStreamAtrributes.value(S_TAG).toString()};
+    if (isDateStyle(sTagValue))
+    {
+        if (currentType == ColumnType::UNKNOWN)
+            detectedType = ColumnType::DATE;
+        else if (currentType != ColumnType::DATE)
+            detectedType = ColumnType::STRING;
+    }
+    else
+    {
+        if (currentType == ColumnType::UNKNOWN)
+            detectedType = ColumnType::NUMBER;
+    }
+    return detectedType;
 }
 
 std::pair<bool, QMap<QString, QString>>

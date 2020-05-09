@@ -67,6 +67,19 @@ protected:
     bool columnsToExcludeAreValid(const QVector<unsigned int>& excludedColumns,
                                   unsigned int columnCount);
 
+    virtual std::pair<bool, QStringList> retrieveColumnNames(
+        const QString& sheetName) = 0;
+
+    virtual std::tuple<bool, unsigned int, QVector<ColumnType>>
+    retrieveRowCountAndColumnTypes(const QString& sheetName) = 0;
+
+    bool analyzeSheet(const QString& sheetName);
+
+    QHash<QString, unsigned int> rowCounts_{};
+    QHash<QString, unsigned int> columnCounts_{};
+    QHash<QString, QVector<ColumnType>> columnTypes_{};
+    QHash<QString, QStringList> columnNames_{};
+
     QIODevice& ioDevice_;
 
     /// If empty column is encountered insert defined string.

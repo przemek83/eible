@@ -143,3 +143,31 @@ bool ImportSpreadsheet::columnsToExcludeAreValid(
     }
     return true;
 }
+
+bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
+{
+    auto [namesRetrieved, columnNames] = retrieveColumnNames(sheetName);
+    if (!namesRetrieved)
+        return false;
+
+    auto [success, rowCount, columnTypes] =
+        retrieveRowCountAndColumnTypes(sheetName);
+    if (!success)
+        return false;
+
+    const int actualColumnCount{
+        std::max(columnNames.size(), columnTypes.size())};
+
+    for (int i = columnNames.size(); i < actualColumnCount; ++i)
+        columnNames << emptyColName_;
+
+    for (int i = columnTypes.size(); i < actualColumnCount; ++i)
+        columnTypes.append(ColumnType::STRING);
+
+    rowCounts_[sheetName] = rowCount;
+    columnCounts_[sheetName] = actualColumnCount;
+    columnTypes_[sheetName] = columnTypes;
+    columnNames_[sheetName] = columnNames;
+
+    return true;
+}

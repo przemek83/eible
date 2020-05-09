@@ -8,9 +8,9 @@
 #include <QSignalSpy>
 #include <QTest>
 
-const QStringList ImportCommon::sheetNames_{
-    "Sheet1", "Sheet2", "Sheet3(empty)", "Sheet4",
-    "Sheet5", "Sheet6", "Sheet7",        "testAccounts"};
+const QStringList ImportCommon::sheetNames_{"Sheet1", "Sheet2", "Sheet3(empty)",
+                                            "Sheet4", "Sheet5", "Sheet6",
+                                            "Sheet7", "Sheet9", "testAccounts"};
 
 const QList<QStringList> ImportCommon::testColumnNames_ = {
     {"Text", "Numeric", "Date"},
@@ -22,10 +22,11 @@ const QList<QStringList> ImportCommon::testColumnNames_ = {
      "---", "---", "---"},
     {"modificator", "x", "y"},
     {"Pow", "Cena", "cena_m", "---", "---", "---"},
+    {"---", "second", "third"},
     {"user", "pass", "lic_exp", "uwagi"}};
 
-const std::vector<unsigned int> ImportCommon::expectedRowCounts_{2,  19, 0,  4,
-                                                                 30, 25, 20, 3};
+const std::vector<unsigned int> ImportCommon::expectedRowCounts_{
+    2, 19, 0, 4, 30, 25, 20, 3, 3};
 
 const QVector<QVector<ColumnType>> ImportCommon::columnTypes_ = {
     {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE},
@@ -42,6 +43,7 @@ const QVector<QVector<ColumnType>> ImportCommon::columnTypes_ = {
     {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
     {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
      ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER},
+    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::STRING},
     {ColumnType::STRING, ColumnType::STRING, ColumnType::STRING,
      ColumnType::STRING}};
 
@@ -212,6 +214,9 @@ const QVector<QVector<QVector<QVariant>>> ImportCommon::sheetData_ = {
       QVariant(QVariant::String), 0.},
      {34., 366544., 10780.7058823529, QVariant(QVariant::String),
       QVariant(QVariant::String), 0.}},
+    {{"a", 45., QVariant(QVariant::String)},
+     {"s", 5., QVariant(QVariant::String)},
+     {"d", 67., QVariant(QVariant::String)}},
     {{"test1", "test123", "zawsze aktualna", QVariant(QVariant::String)},
      {"test2", "test123", QVariant(QVariant::String), "konto zablokowane"},
      {"test3", "test123", "2011-09-30", QVariant(QVariant::String)}}};

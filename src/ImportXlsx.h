@@ -53,8 +53,6 @@ private:
     std::pair<bool, unsigned int> getCount(
         const QString& sheetName, const QHash<QString, unsigned int>& countMap);
 
-    bool analyzeSheet(const QString& sheetName);
-
     std::pair<bool, QMap<QString, QString>> getSheetIdToUserFriendlyNameMap();
 
     std::pair<bool, QList<std::pair<QString, QString>>> retrieveSheets(
@@ -69,14 +67,14 @@ private:
     bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
     bool isVTagStart(const QXmlStreamReader& xmlStreamReader) const;
 
-    QStringList retrieveColumnNames(QuaZipFile& zipFile,
-                                    const QString& sheetName) const;
+    std::pair<bool, QStringList> retrieveColumnNames(
+        const QString& sheetName) override;
+
+    std::tuple<bool, unsigned int, QVector<ColumnType>>
+    retrieveRowCountAndColumnTypes(const QString& sheetName) override;
 
     QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes) const;
     QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes) const;
-
-    std::pair<unsigned int, unsigned int> getRowAndColumnCount(
-        QXmlStreamReader& xmlStreamReader) const;
 
     int getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
                                unsigned int charsToChop) const;
@@ -87,9 +85,6 @@ private:
     void skipToFirstRow(QXmlStreamReader& xmlStreamReader) const;
 
     int getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader) const;
-
-    std::pair<QVector<ColumnType>, unsigned int> retrieveColumnTypesAndRowCount(
-        QXmlStreamReader& xmlStreamReader) const;
 
     ColumnType recognizeColumnType(ColumnType currentType,
                                    QXmlStreamReader& xmlStreamReader) const;
@@ -107,9 +102,6 @@ private:
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
     std::optional<QList<int>> allStyles_{std::nullopt};
-    QHash<QString, unsigned int> rowCounts_{};
-    QHash<QString, unsigned int> columnCounts_{};
-    QHash<QString, QVector<ColumnType>> columnTypes_{};
     const QList<QByteArray> excelColNames_;
 
     static constexpr int DECIMAL_BASE{10};
