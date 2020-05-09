@@ -228,7 +228,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
 }
 
 bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
-                                 QXmlStreamReader& xmlStreamReader)
+                                 QXmlStreamReader& xmlStreamReader) const
 {
     xmlStreamReader.setDevice(&zipFile);
     bool secondRow{false};
@@ -330,8 +330,8 @@ std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
         return {false, {}};
     }
 
-    QDomElement root = xmlDocument.documentElement();
-    QDomNodeList sheetNodes = nodesRetriever(root);
+    QDomElement root{xmlDocument.documentElement()};
+    QDomNodeList sheetNodes{nodesRetriever(root)};
     if (sheetNodes.size() <= 0)
     {
         setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
@@ -447,8 +447,7 @@ ColumnType ImportXlsx::recognizeColumnType(
 
     ColumnType detectedType{currentType};
     const QString sTagValue{xmlStreamAtrributes.value(S_TAG).toString()};
-    if (!sTagValue.isEmpty() &&
-        dateStyles_->contains(allStyles_->at(sTagValue.toInt())))
+    if (isDateStyle(sTagValue))
     {
         if (currentType == ColumnType::UNKNOWN)
             detectedType = ColumnType::DATE;
@@ -464,7 +463,7 @@ ColumnType ImportXlsx::recognizeColumnType(
 }
 
 QStringList ImportXlsx::retrieveColumnNames(QuaZipFile& zipFile,
-                                            const QString& sheetName)
+                                            const QString& sheetName) const
 {
     QXmlStreamReader xmlStreamReader;
     xmlStreamReader.setDevice(&zipFile);
@@ -586,7 +585,6 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
                                      const QString& currentColType,
                                      const QString& actualSTagValue) const
 {
-    using namespace EibleUtilities;
     const QString valueAsString{xmlStreamReader.readElementText()};
     QVariant currentValue;
     switch (currentColumnFormat)
@@ -597,15 +595,9 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
                 currentValue = valueAsString.toInt();
             else
             {
-                if (!actualSTagValue.isEmpty() &&
-                    dateStyles_->contains(
-                        allStyles_->at(actualSTagValue.toInt())))
-                {
-                    const int daysToAdd{valueAsString.toInt()};
+                if (isDateStyle(actualSTagValue))
                     currentValue =
-                        getStartOfExcelWorld().addDays(daysToAdd).toString(
-                            Qt::ISODate);
-                }
+                        getDateFromString(valueAsString).toString(Qt::ISODate);
                 else
                     currentValue = valueAsString;
             }
@@ -614,8 +606,7 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
 
         case ColumnType::DATE:
         {
-            const int daysToAdd{valueAsString.toInt()};
-            currentValue = getStartOfExcelWorld().addDays(daysToAdd);
+            currentValue = getDateFromString(valueAsString);
             break;
         }
 
@@ -632,6 +623,18 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
         }
     }
     return currentValue;
+}
+
+QDate ImportXlsx::getDateFromString(const QString& dateAsString) const
+{
+    const int daysToAdd{dateAsString.toInt()};
+    return EibleUtilities::getStartOfExcelWorld().addDays(daysToAdd);
+}
+
+bool ImportXlsx::isDateStyle(const QString& sTagValue) const
+{
+    return !sTagValue.isEmpty() &&
+           dateStyles_->contains(allStyles_->at(sTagValue.toInt()));
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
@@ -667,8 +670,6 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         std::min(getRowCount(sheetName).second, rowLimit));
 
     QVector<QVariant> currentDataRow(templateDataRow);
-
-    // Number of chars to chop from end.
     int charsToChop{1};
     int column{NOT_SET_COLUMN};
     QString currentColType{S_TAG};
@@ -676,8 +677,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     unsigned int rowCounter{0};
     unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
-           0 != xmlStreamReader.name().compare(SHEET_DATA_TAG) &&
-           rowCounter <= rowLimit)
+           xmlStreamReader.name() != SHEET_DATA_TAG && rowCounter <= rowLimit)
     {
         if (isRowStart(xmlStreamReader))
         {

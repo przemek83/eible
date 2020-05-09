@@ -48,7 +48,7 @@ private:
     std::pair<bool, QString> getSheetPath(QString sheetName);
 
     bool moveToSecondRow(QuaZipFile& zipFile,
-                         QXmlStreamReader& xmlStreamReader);
+                         QXmlStreamReader& xmlStreamReader) const;
 
     std::pair<bool, unsigned int> getCount(
         const QString& sheetName, const QHash<QString, unsigned int>& countMap);
@@ -70,7 +70,7 @@ private:
     bool isVTagStart(const QXmlStreamReader& xmlStreamReader) const;
 
     QStringList retrieveColumnNames(QuaZipFile& zipFile,
-                                    const QString& sheetName);
+                                    const QString& sheetName) const;
 
     QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes) const;
     QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes) const;
@@ -98,6 +98,10 @@ private:
                              ColumnType currentColumnFormat,
                              const QString& currentColType,
                              const QString& actualSTagValue) const;
+
+    QDate getDateFromString(const QString& dateAsString) const;
+
+    bool isDateStyle(const QString& sTagValue) const;
 
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
