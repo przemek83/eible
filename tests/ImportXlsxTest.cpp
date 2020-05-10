@@ -256,6 +256,7 @@ void ImportXlsxTest::testGetData_data()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
+    QCOMPARE(sheets_.size(), ImportCommon::getSheetNames().size());
     for (int i = 0; i < sheets_.size(); ++i)
     {
         const QString& sheetName{sheets_[i].first};

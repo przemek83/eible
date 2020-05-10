@@ -584,6 +584,8 @@ QVector<QVector<QVariant>> ImportCommon::getDataWithoutColumns(
     return expectedValues;
 }
 
+QStringList ImportCommon::getSheetNames() { return sheetNames_; }
+
 template <class T>
 void ImportCommon::checkEmittingProgressPercentChangedEmptyFile(
     const QString& fileName)

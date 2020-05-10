@@ -69,6 +69,8 @@ public:
     static void checkEmittingProgressPercentChangedBigFile(
         const QString& fileName);
 
+    static QStringList getSheetNames();
+
 private:
     static const QStringList sheetNames_;
     static const QList<QStringList> testColumnNames_;
