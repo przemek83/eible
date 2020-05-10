@@ -22,7 +22,8 @@ const QList<std::pair<QString, QString>> ImportXlsxTest::sheets_{
     {"Sheet5", "xl/worksheets/sheet5.xml"},
     {"Sheet6", "xl/worksheets/sheet6.xml"},
     {"Sheet7", "xl/worksheets/sheet7.xml"},
-    {"testAccounts", "xl/worksheets/sheet8.xml"}};
+    {"Sheet9", "xl/worksheets/sheet8.xml"},
+    {"testAccounts", "xl/worksheets/sheet9.xml"}};
 
 const QStringList ImportXlsxTest::sharedStrings_{"Text",
                                                  "Numeric",
@@ -94,6 +95,7 @@ const QStringList ImportXlsxTest::sharedStrings_{"Text",
                                                  "Q90",
                                                  "second",
                                                  "third",
+                                                 "fourth",
                                                  "s",
                                                  "d",
                                                  "user",
@@ -107,10 +109,10 @@ const QStringList ImportXlsxTest::sharedStrings_{"Text",
                                                  "konto zablokowane",
                                                  "test3"};
 
-const QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22,
-                                             165, 167, 170, 171, 172};
-const QList<int> ImportXlsxTest::allStyles_{164, 164, 165, 164, 166, 167, 168,
-                                            169, 169, 170, 164, 164, 171, 172};
+const QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22, 165,
+                                             167, 170, 171, 172, 173};
+const QList<int> ImportXlsxTest::allStyles_{
+    164, 164, 165, 164, 166, 167, 168, 169, 169, 170, 164, 164, 171, 172, 173};
 
 void ImportXlsxTest::testRetrievingSheetNames()
 {

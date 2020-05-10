@@ -578,7 +578,7 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
 
 QDate ImportXlsx::getDateFromString(const QString& dateAsString) const
 {
-    const int daysToAdd{dateAsString.toInt()};
+    const int daysToAdd{static_cast<int>(dateAsString.toDouble())};
     return EibleUtilities::getStartOfExcelWorld().addDays(daysToAdd);
 }
 

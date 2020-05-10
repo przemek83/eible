@@ -22,7 +22,7 @@ const QList<QStringList> ImportCommon::testColumnNames_ = {
      "---", "---", "---"},
     {"modificator", "x", "y"},
     {"Pow", "Cena", "cena_m", "---", "---", "---"},
-    {"---", "second", "third"},
+    {"---", "second", "third", "fourth"},
     {"user", "pass", "lic_exp", "uwagi"}};
 
 const std::vector<unsigned int> ImportCommon::expectedRowCounts_{
@@ -43,7 +43,8 @@ const QVector<QVector<ColumnType>> ImportCommon::columnTypes_ = {
     {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
     {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
      ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER},
-    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::STRING},
+    {ColumnType::DATE, ColumnType::STRING, ColumnType::NUMBER,
+     ColumnType::STRING},
     {ColumnType::STRING, ColumnType::STRING, ColumnType::STRING,
      ColumnType::STRING}};
 
@@ -214,9 +215,9 @@ const QVector<QVector<QVector<QVariant>>> ImportCommon::sheetData_ = {
       QVariant(QVariant::String), 0.},
      {34., 366544., 10780.7058823529, QVariant(QVariant::String),
       QVariant(QVariant::String), 0.}},
-    {{"a", 45., QVariant(QVariant::String)},
-     {"s", 5., QVariant(QVariant::String)},
-     {"d", 67., QVariant(QVariant::String)}},
+    {{QDate(2012, 1, 1), "a", 45., QVariant(QVariant::String)},
+     {QVariant(QVariant::Date), "s", 5., QVariant(QVariant::String)},
+     {QVariant(QVariant::Date), "d", 67., QVariant(QVariant::String)}},
     {{"test1", "test123", "zawsze aktualna", QVariant(QVariant::String)},
      {"test2", "test123", QVariant(QVariant::String), "konto zablokowane"},
      {"test3", "test123", "2011-09-30", QVariant(QVariant::String)}}};
