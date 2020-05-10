@@ -171,3 +171,16 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
 
     return true;
 }
+
+bool ImportSpreadsheet::isSheetNameValid(const QStringList& sheetNames,
+                                         const QString& sheetName)
+{
+    if (!sheetNames.contains(sheetName))
+    {
+        setError(__FUNCTION__,
+                 "Sheet " + sheetName +
+                     " not found. Available sheets: " + sheetNames.join(','));
+        return false;
+    }
+    return true;
+}

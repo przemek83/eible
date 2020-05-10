@@ -376,3 +376,8 @@ void ImportXlsxTest::testEmittingProgressPercentChangedBigFile()
     ImportCommon::checkEmittingProgressPercentChangedBigFile<ImportXlsx>(
         ":/mediumFile.xlsx");
 }
+
+void ImportXlsxTest::testInvalidSheetName()
+{
+    ImportCommon::checkInvalidSheetName<ImportXlsx>(testFileName_);
+}

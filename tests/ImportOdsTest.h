@@ -43,6 +43,8 @@ private Q_SLOTS:
     void testEmittingProgressPercentChangedSmallFile();
     void testEmittingProgressPercentChangedBigFile();
 
+    void testInvalidSheetName();
+
 private:
     static const QString testFileName_;
     static const QString templateFileName_;

@@ -149,3 +149,8 @@ void ImportOdsTest::testEmittingProgressPercentChangedBigFile()
     ImportCommon::checkEmittingProgressPercentChangedBigFile<ImportOds>(
         ":/mediumFile.ods");
 }
+
+void ImportOdsTest::testInvalidSheetName()
+{
+    ImportCommon::checkInvalidSheetName<ImportOds>(testFileName_);
+}

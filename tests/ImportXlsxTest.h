@@ -58,6 +58,8 @@ private Q_SLOTS:
     void testEmittingProgressPercentChangedSmallFile();
     void testEmittingProgressPercentChangedBigFile();
 
+    void testInvalidSheetName();
+
 private:
     QVector<QVector<QVariant>> convertDataToUseSharedStrings(
         QVector<QVector<QVariant>> inputData);

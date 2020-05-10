@@ -75,6 +75,9 @@ protected:
 
     bool analyzeSheet(const QString& sheetName);
 
+    bool isSheetNameValid(const QStringList& sheetNames,
+                          const QString& sheetName);
+
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};
     QHash<QString, QVector<ColumnType>> columnTypes_{};

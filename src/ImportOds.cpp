@@ -94,7 +94,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     if (!sheetNames_ && !getSheetNames().first)
         return {false, {}};
 
-    if (!sheetNameValid(sheetName))
+    if (!isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
     QuaZipFile zipFile;
@@ -116,7 +116,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
     if (!sheetNames_ && !getSheetNames().first)
         return {false, {}};
 
-    if (!sheetNameValid(sheetName))
+    if (!isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
     const auto it = columnNames_.find(sheetName);
@@ -224,7 +224,7 @@ std::pair<bool, unsigned int> ImportOds::getCount(
     if (!sheetNames_ && !getSheetNames().first)
         return {false, {}};
 
-    if (!sheetNameValid(sheetName))
+    if (!isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
     if (const auto it = countMap.find(sheetName); it != countMap.end())
@@ -420,18 +420,6 @@ bool ImportOds::isCellEnd(const QXmlStreamReader& xmlStreamReader) const
 {
     return xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
            xmlStreamReader.isEndElement();
-}
-
-bool ImportOds::sheetNameValid(const QString& sheetName)
-{
-    if (!sheetNames_->contains(sheetName))
-    {
-        setError(__FUNCTION__,
-                 "Sheet " + sheetName +
-                     " not found. Available sheets: " + sheetNames_->join(','));
-        return false;
-    }
-    return true;
 }
 
 ColumnType ImportOds::recognizeColumnType(ColumnType currentType,

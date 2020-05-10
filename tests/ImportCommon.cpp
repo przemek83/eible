@@ -587,6 +587,20 @@ QVector<QVector<QVariant>> ImportCommon::getDataWithoutColumns(
 QStringList ImportCommon::getSheetNames() { return sheetNames_; }
 
 template <class T>
+void ImportCommon::checkInvalidSheetName(const QString& fileName)
+{
+    QFile testFile(fileName);
+    T importer(testFile);
+    auto [success, actualSharedStrings] =
+        importer.getColumnCount("invalidSheetName");
+    QCOMPARE(success, false);
+}
+template void ImportCommon::checkInvalidSheetName<ImportXlsx>(
+    const QString& fileName);
+template void ImportCommon::checkInvalidSheetName<ImportOds>(
+    const QString& fileName);
+
+template <class T>
 void ImportCommon::checkEmittingProgressPercentChangedEmptyFile(
     const QString& fileName)
 {

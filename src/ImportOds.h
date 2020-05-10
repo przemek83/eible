@@ -59,8 +59,6 @@ private:
     bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
     bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
 
-    bool sheetNameValid(const QString& sheetName);
-
     ColumnType recognizeColumnType(ColumnType currentType,
                                    const QString& xmlColTypeValue) const;
 

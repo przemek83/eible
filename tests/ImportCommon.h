@@ -71,6 +71,9 @@ public:
 
     static QStringList getSheetNames();
 
+    template <class T>
+    static void checkInvalidSheetName(const QString& fileName);
+
 private:
     static const QStringList sheetNames_;
     static const QList<QStringList> testColumnNames_;

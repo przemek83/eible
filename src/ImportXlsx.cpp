@@ -61,6 +61,9 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!sheets_ && !getSheetNames().first)
         return {false, {}};
 
+    if (!isSheetNameValid(getSheetNames().second, sheetName))
+        return {false, {}};
+
     if (!sharedStrings_ && !getSharedStrings().first)
         return {false, {}};
 
@@ -194,6 +197,9 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     if (!sheets_ && !getSheetNames().first)
         return {false, {}};
 
+    if (!isSheetNameValid(getSheetNames().second, sheetName))
+        return {false, {}};
+
     if (!sharedStrings_ && !getSharedStrings().first)
         return {false, {}};
 
@@ -228,6 +234,9 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
     const QString& sheetName, const QHash<QString, unsigned int>& countMap)
 {
     if (!sheets_ && !getSheetNames().first)
+        return {false, {}};
+
+    if (!isSheetNameValid(getSheetNames().second, sheetName))
         return {false, {}};
 
     const auto it = countMap.find(sheetName);
