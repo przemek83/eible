@@ -77,8 +77,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 include(GNUInstallDirs)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Widgets Qt5::Xml)
-target_link_libraries(${PROJECT_NAME} PRIVATE optimized quazip5)
-target_link_libraries(${PROJECT_NAME} PRIVATE debug quazip5d)
+target_link_libraries(${PROJECT_NAME} PRIVATE optimized Qt5Quazip)
+target_link_libraries(${PROJECT_NAME} PRIVATE debug Qt5Quazipd)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE EIBLE_LIBRARY)
 

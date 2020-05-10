@@ -1,6 +1,6 @@
 #include "ExportXlsx.h"
 
-#include <quazip5/quazipfile.h>
+#include <Qt5Quazip/quazipfile.h>
 
 #include <QAbstractItemView>
 #include <QCoreApplication>

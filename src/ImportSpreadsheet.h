@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include <quazip5/quazip.h>
+#include <Qt5Quazip/quazip.h>
 
 #include "ColumnType.h"
 #include "eible_global.h"

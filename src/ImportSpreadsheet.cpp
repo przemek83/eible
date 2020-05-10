@@ -1,6 +1,6 @@
 #include "ImportSpreadsheet.h"
 
-#include <quazip5/quazipfile.h>
+#include <Qt5Quazip/quazipfile.h>
 #include <QCoreApplication>
 #include <QIODevice>
 #include <QVariant>
