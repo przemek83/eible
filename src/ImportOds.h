@@ -20,7 +20,7 @@ class EIBLE_EXPORT ImportOds : public ImportSpreadsheet
 public:
     /**
      * @brief Constructor.
-     * @param Object from which data will be loaded (QFile, QBuffer, ...).
+     * @param ioDevice Source of data (QFile, QBuffer, ...).
      */
     explicit ImportOds(QIODevice& ioDevice);
 

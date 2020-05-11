@@ -21,7 +21,7 @@ class EIBLE_EXPORT ImportSpreadsheet : public QObject
 public:
     /**
      * @brief Constructor.
-     * @param Object from which data will be loaded (QFile, QBuffer, ...).
+     * @param ioDevice Source of data (QFile, QBuffer, ...).
      */
     explicit ImportSpreadsheet(QIODevice& ioDevice);
 
@@ -33,7 +33,7 @@ public:
 
     /**
      * @brief Get list of column names.
-     * @param Sheet name.
+     * @param sheetName Sheet name.
      * @return First value indicating success, second is column names list.
      */
     virtual std::pair<bool, QStringList> getColumnNames(
@@ -41,7 +41,7 @@ public:
 
     /**
      * @brief Get list of column types.
-     * @param Sheet name.
+     * @param sheetName Sheet name.
      * @return First value indicating success, second is column types vector.
      */
     virtual std::pair<bool, QVector<ColumnType>> getColumnTypes(
@@ -55,13 +55,13 @@ public:
 
     /**
      * @brief Set name used for empty columns.
-     * @param Name for empty column.
+     * @param name Name for empty column.
      */
     void setNameForEmptyColumn(const QString& name);
 
     /**
      * @brief Get number of columns in given sheet.
-     * @param Sheet name.
+     * @param sheetName Sheet name.
      * @return First value indicating success, second is column count.
      */
     virtual std::pair<bool, unsigned int> getColumnCount(
@@ -69,7 +69,7 @@ public:
 
     /**
      * @brief Get number of rows in given sheet.
-     * @param Sheet name.
+     * @param sheetName Sheet name.
      * @return First value indicating success, second is row count.
      */
     virtual std::pair<bool, unsigned int> getRowCount(
@@ -77,8 +77,8 @@ public:
 
     /**
      * @brief Get data from sheet.
-     * @param Sheet name.
-     * @param Vector of excluded columns (indexes).
+     * @param sheetName Sheet name.
+     * @param excludedColumns Vector of excluded columns (indexes).
      * @return First value indicating success, second is vector of data rows.
      */
     std::pair<bool, QVector<QVector<QVariant>>> getData(
@@ -86,9 +86,9 @@ public:
 
     /**
      * @brief Get limited data from sheet.
-     * @param Sheet name.
-     * @param Vector of excluded columns (indexes).
-     * @param Number of rows to load.
+     * @param sheetName Sheet name.
+     * @param excludedColumns Vector of excluded columns (indexes).
+     * @param rowLimit Number of rows to load.
      * @return First value indicating success, second is vector of data rows.
      */
     virtual std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
@@ -149,6 +149,10 @@ private:
     QuaZip zip_;
 
 Q_SIGNALS:
+    /**
+     * Triggered on change of progress percentage.
+     * @param progressPercent New progress percent.
+     */
     void progressPercentChanged(unsigned int progressPercent);
 };
 
