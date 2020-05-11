@@ -11,33 +11,86 @@
 class QIODevice;
 class QuaZipFile;
 
+/**
+ * @class ImportSpreadsheet
+ * @brief Base class for spreadsheet importing classes.
+ */
 class EIBLE_EXPORT ImportSpreadsheet : public QObject
 {
     Q_OBJECT
 public:
+    /**
+     * @brief Constructor.
+     * @param Object from which data will be loaded (QFile, QBuffer, ...).
+     */
     explicit ImportSpreadsheet(QIODevice& ioDevice);
 
+    /**
+     * @brief Get list of sheet names.
+     * @return First value indicating success, second is sheet names list.
+     */
     virtual std::pair<bool, QStringList> getSheetNames() = 0;
 
+    /**
+     * @brief Get list of column names.
+     * @param Sheet name.
+     * @return First value indicating success, second is column names list.
+     */
     virtual std::pair<bool, QStringList> getColumnNames(
         const QString& sheetName) = 0;
 
+    /**
+     * @brief Get list of column types.
+     * @param Sheet name.
+     * @return First value indicating success, second is column types vector.
+     */
     virtual std::pair<bool, QVector<ColumnType>> getColumnTypes(
         const QString& sheetName) = 0;
 
+    /**
+     * @brief Get last error.
+     * @return First value contains function name, second error.
+     */
     std::pair<QString, QString> getError() const;
 
+    /**
+     * @brief Set name used for empty columns.
+     * @param Name for empty column.
+     */
     void setNameForEmptyColumn(const QString& name);
 
+    /**
+     * @brief Get number of columns in given sheet.
+     * @param Sheet name.
+     * @return First value indicating success, second is column count.
+     */
     virtual std::pair<bool, unsigned int> getColumnCount(
         const QString& sheetName) = 0;
 
+    /**
+     * @brief Get number of rows in given sheet.
+     * @param Sheet name.
+     * @return First value indicating success, second is row count.
+     */
     virtual std::pair<bool, unsigned int> getRowCount(
         const QString& sheetName) = 0;
 
+    /**
+     * @brief Get data from sheet.
+     * @param Sheet name.
+     * @param Vector of excluded columns (indexes).
+     * @return First value indicating success, second is vector of data rows.
+     */
     std::pair<bool, QVector<QVector<QVariant>>> getData(
         const QString& sheetName, const QVector<unsigned int>& excludedColumns);
 
+    /**
+     * @brief Get limited data from sheet.
+     * @param Sheet name.
+     * @param Vector of excluded columns (indexes).
+     * @param Number of rows to load.
+     * @return First value indicating success, second is vector of data rows.
+     */
     virtual std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
         const QString& sheetName, const QVector<unsigned int>& excludedColumns,
         unsigned int rowLimit) = 0;

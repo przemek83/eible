@@ -11,9 +11,17 @@ class QuaZipFile;
 class QXmlStreamReader;
 class QXmlStreamAttributes;
 
+/**
+ * @class ImportOds
+ * @brief Class analysing content and loading it from ods files.
+ */
 class EIBLE_EXPORT ImportOds : public ImportSpreadsheet
 {
 public:
+    /**
+     * @brief Constructor.
+     * @param Object from which data will be loaded (QFile, QBuffer, ...).
+     */
     explicit ImportOds(QIODevice& ioDevice);
 
     std::pair<bool, QStringList> getSheetNames() override;
