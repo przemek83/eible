@@ -98,6 +98,8 @@ private:
 
     bool isDateStyle(const QString& sTagValue) const;
 
+    bool isCommonDataOk(const QString& sheetName);
+
     std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};

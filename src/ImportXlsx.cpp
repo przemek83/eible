@@ -58,16 +58,7 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     const QString& sheetName)
 {
-    if (!sheets_ && !getSheetNames().first)
-        return {false, {}};
-
-    if (!isSheetNameValid(getSheetNames().second, sheetName))
-        return {false, {}};
-
-    if (!sharedStrings_ && !getSharedStrings().first)
-        return {false, {}};
-
-    if (!getDateStyles().first && !getAllStyles().first)
+    if (!isCommonDataOk(sheetName))
         return {false, {}};
 
     const auto it = columnNames_.find(sheetName);
@@ -194,16 +185,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     if (const auto it = columnTypes_.find(sheetName); it != columnTypes_.end())
         return {true, *it};
 
-    if (!sheets_ && !getSheetNames().first)
-        return {false, {}};
-
-    if (!isSheetNameValid(getSheetNames().second, sheetName))
-        return {false, {}};
-
-    if (!sharedStrings_ && !getSharedStrings().first)
-        return {false, {}};
-
-    if (!getDateStyles().first && !getAllStyles().first)
+    if (!isCommonDataOk(sheetName))
         return {false, {}};
 
     if (!analyzeSheet(sheetName))
@@ -233,20 +215,11 @@ bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
 std::pair<bool, unsigned int> ImportXlsx::getCount(
     const QString& sheetName, const QHash<QString, unsigned int>& countMap)
 {
-    if (!sheets_ && !getSheetNames().first)
-        return {false, {}};
-
-    if (!isSheetNameValid(getSheetNames().second, sheetName))
-        return {false, {}};
-
     const auto it = countMap.find(sheetName);
     if (it != countMap.end())
         return {true, it.value()};
 
-    if (!sharedStrings_ && !getSharedStrings().first)
-        return {false, {}};
-
-    if (!getDateStyles().first && !getAllStyles().first)
+    if (!isCommonDataOk(sheetName))
         return {false, {}};
 
     if (!analyzeSheet(sheetName))
@@ -595,6 +568,23 @@ bool ImportXlsx::isDateStyle(const QString& sTagValue) const
 {
     return !sTagValue.isEmpty() &&
            dateStyles_->contains(allStyles_->at(sTagValue.toInt()));
+}
+
+bool ImportXlsx::isCommonDataOk(const QString& sheetName)
+{
+    if (!sheets_ && !getSheetNames().first)
+        return false;
+
+    if (!isSheetNameValid(getSheetNames().second, sheetName))
+        return false;
+
+    if (!sharedStrings_ && !getSharedStrings().first)
+        return false;
+
+    if (!getDateStyles().first && !getAllStyles().first)
+        return false;
+
+    return true;
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
