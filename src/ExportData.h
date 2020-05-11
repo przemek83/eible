@@ -9,6 +9,10 @@ class QAbstractItemView;
 class QAbstractItemModel;
 class QIODevice;
 
+/**
+ * @class ExportData
+ * @brief Base class for exporting classes.
+ */
 class EIBLE_EXPORT ExportData : public QObject
 {
     Q_OBJECT
@@ -22,6 +26,12 @@ public:
     ExportData& operator=(ExportData&& other) = delete;
     ExportData(ExportData&& other) = delete;
 
+    /**
+     * @brief Export data from view to ioDevice.
+     * @param view Source of data.
+     * @param ioDevice Destination of exported content.
+     * @return True if success, false if failure.
+     */
     bool exportView(const QAbstractItemView& view, QIODevice& ioDevice);
 
 protected:
@@ -44,6 +54,10 @@ protected:
                                 unsigned int& lastEmittedPercent);
 
 Q_SIGNALS:
+    /**
+     * Triggered on change of progress percentage.
+     * @param progressPercent New progress percent.
+     */
     void progressPercentChanged(unsigned int currentPercent);
 };
 

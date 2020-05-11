@@ -9,6 +9,10 @@ class QAbstractItemModel;
 class QAbstractItemView;
 class QIODevice;
 
+/**
+ * @class ExportXlsx
+ * @brief Class for exporting data to xlsx files.
+ */
 class EIBLE_EXPORT ExportXlsx : public ExportData
 {
     Q_OBJECT
