@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>example.xlsx</file>
+        <file>example.ods</file>
+    </qresource>
+</RCC>

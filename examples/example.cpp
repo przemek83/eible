@@ -10,6 +10,8 @@
 
 #include "ExportDsv.h"
 #include "ExportXlsx.h"
+#include "ImportOds.h"
+#include "ImportXlsx.h"
 
 void initTable(QTableWidget& tableWidget)
 {
@@ -88,17 +90,66 @@ static bool exportFiles()
 {
     QTableWidget tableWidget;
     initTable(tableWidget);
-
     bool success = exportXlsx(tableWidget);
     success &= exportCsv(tableWidget);
     return success;
 }
 
+static void printSpreadsheetContent(QStringList columnNames,
+                                    QVector<QVector<QVariant>> data)
+{
+    std::cout << columnNames.join('\t').toStdString() << std::endl;
+    for (const auto& row : data)
+    {
+        for (const auto& column : row)
+            std::cout << column.toString().toStdString() << "\t";
+        std::cout << std::endl;
+    }
+}
+
+static bool importFile(ImportSpreadsheet& importer, const QString& fileName)
+{
+    const QString sheetName("Sheet1");
+    auto [sucess, columnNames] = importer.getColumnNames(sheetName);
+    if (!sucess)
+        return false;
+    QVector<QVector<QVariant>> xlsxData;
+    std::tie(sucess, xlsxData) = importer.getData(sheetName, {});
+    if (!sucess)
+        return false;
+    std::cout << "File " + fileName.toStdString() + " opened, content of " +
+                     sheetName.toStdString() + ":"
+              << std::endl;
+    printSpreadsheetContent(columnNames, xlsxData);
+    return true;
+}
+
+static bool importFiles()
+{
+    QFile odsFile(":/example.ods");
+    ImportOds importOds(odsFile);
+    if (!importFile(importOds, odsFile.fileName()))
+        return false;
+
+    QFile xlsxFile(":/example.xlsx");
+    ImportXlsx importXlsx(xlsxFile);
+    if (!importFile(importXlsx, xlsxFile.fileName()))
+        return false;
+    const QStringList sharedStrings{importXlsx.getSharedStrings().second};
+    std::cout << "Where shared strings: ";
+    for (int i = 0; i < sharedStrings.size(); ++i)
+        std::cout << "(" << i << ", " << sharedStrings[i].toStdString() << ") ";
+    std::cout << std::endl;
+    return true;
+}
+
+static bool performOperations() { return importFiles() && exportFiles(); }
+
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
     QTimer::singleShot(0, []() {
-        QApplication::exit(exportFiles() ? EXIT_SUCCESS : EXIT_FAILURE);
+        QApplication::exit(performOperations() ? EXIT_SUCCESS : EXIT_FAILURE);
     });
     return a.exec();
 }
