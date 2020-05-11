@@ -58,7 +58,10 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     const QString& sheetName)
 {
-    if (!isCommonDataOk(sheetName))
+    if (!isCommonDataOk())
+        return {false, {}};
+
+    if (!isSheetNameValid(getSheetNames().second, sheetName))
         return {false, {}};
 
     const auto it = columnNames_.find(sheetName);
@@ -185,7 +188,10 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     if (const auto it = columnTypes_.find(sheetName); it != columnTypes_.end())
         return {true, *it};
 
-    if (!isCommonDataOk(sheetName))
+    if (!isCommonDataOk())
+        return {false, {}};
+
+    if (!isSheetNameValid(getSheetNames().second, sheetName))
         return {false, {}};
 
     if (!analyzeSheet(sheetName))
@@ -219,7 +225,10 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
     if (it != countMap.end())
         return {true, it.value()};
 
-    if (!isCommonDataOk(sheetName))
+    if (!isCommonDataOk())
+        return {false, {}};
+
+    if (!isSheetNameValid(getSheetNames().second, sheetName))
         return {false, {}};
 
     if (!analyzeSheet(sheetName))
@@ -570,12 +579,9 @@ bool ImportXlsx::isDateStyle(const QString& sTagValue) const
            dateStyles_->contains(allStyles_->at(sTagValue.toInt()));
 }
 
-bool ImportXlsx::isCommonDataOk(const QString& sheetName)
+bool ImportXlsx::isCommonDataOk()
 {
     if (!sheets_ && !getSheetNames().first)
-        return false;
-
-    if (!isSheetNameValid(getSheetNames().second, sheetName))
         return false;
 
     if (!sharedStrings_ && !getSharedStrings().first)
