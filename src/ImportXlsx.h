@@ -1,6 +1,8 @@
 #ifndef IMPORTXLSX_H
 #define IMPORTXLSX_H
 
+#include <functional>
+
 #include <QHash>
 #include <QtXml/QDomDocument>
 

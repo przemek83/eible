@@ -1,9 +1,9 @@
 #ifndef IMPORTSPREADSHEET_H
 #define IMPORTSPREADSHEET_H
 
-#include <QObject>
-
 #include <Qt5Quazip/quazip.h>
+#include <QObject>
+#include <QVector>
 
 #include "ColumnType.h"
 #include "eible_global.h"

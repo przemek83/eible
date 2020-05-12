@@ -5,7 +5,7 @@
 
 #include "eible_global.h"
 
-enum class EIBLE_EXPORT ColumnType : char
+enum class ColumnType : char
 {
     UNKNOWN = -1,
     STRING,
