@@ -66,7 +66,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1)
 set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER
     src/eible_global.h
     src/ExportXlsx.h
-    src/EibleUtilities.h
     src/ExportDsv.h
     src/ExportData.h
     src/ImportSpreadsheet.h
