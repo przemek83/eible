@@ -37,6 +37,8 @@ Base class for spreadsheet related import classes. Following pure virtual method
 + `retrieveRowCountAndColumnTypes()`
 
 Emits signal `progressPercentChanged` during loading data.
+
+Importing can be done from object with interface QIODevice: file on disk, file from resources, QBuffer and more.
 ### ImportXlsx
 Class used to import data from .xlsx files. Basic usage:
 ```cpp
@@ -63,6 +65,16 @@ Base class for export related classes. Following pure virtual methods need to be
 + `generateRowContent()`
 
 Emits signal `progressPercentChanged` during loading data.
+
+Data can be exported to object with interface QIODevice. It can be not only QFile but also QBuffer. Example of exporting data into memory:
+```cpp
+QByteArray exportedZipBuffer;
+QBuffer exportedZip(&exportedZipBuffer);
+exportedZip.open(QIODevice::WriteOnly);
+QTableWidget tableWidget;
+ExportXlsx exportXlsx;
+exportXlsx.exportView(tableWidget, exportedZip);
+```
 ### ExportDsv
 Class for exporting data to DSV (Delimiter Separated Values) files. Delimiter is set in constructor and can be any char (comma, tab, semicolon, ...). CSV or TSV files can be created using this class.   
 Three additional method can be used to customize output:
@@ -72,20 +84,20 @@ Three additional method can be used to customize output:
 
 Basic usage:
 ```cpp
-ExportDsv exportDsv(',');
 QFile outFile("example.csv");
 outFile.open(QIODevice::WriteOnly);
 QTableWidget tableWidget;
+ExportDsv exportDsv(',');
 exportDsv.exportView(tableWidget, outFile);
 ```
 ### ExportXlsx
 Class for exporting data to .xlsx files.  
 Basic usage:
 ```cpp
-ExportXlsx exportXlsx;
 QFile outFile("example.xlsx");
 outFile.open(QIODevice::WriteOnly);
 QTableWidget tableWidget;
+ExportXlsx exportXlsx;
 exportXlsx.exportView(tableWidget, outFile);
 ```
 Xlsx files are created using template file `template.xlsx` included into project via resource collection file `resources.qrc`.
