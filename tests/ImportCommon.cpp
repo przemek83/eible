@@ -25,8 +25,8 @@ const QList<QStringList> ImportCommon::testColumnNames_ = {
     {"---", "second", "third", "fourth"},
     {"user", "pass", "lic_exp", "uwagi"}};
 
-const std::vector<unsigned int> ImportCommon::expectedRowCounts_{
-    2, 19, 0, 4, 30, 25, 20, 3, 3};
+const QVector<unsigned int> ImportCommon::expectedRowCounts_{2,  19, 0, 4, 30,
+                                                             25, 20, 3, 3};
 
 const QVector<QVector<ColumnType>> ImportCommon::columnTypes_ = {
     {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE},
@@ -317,7 +317,8 @@ void ImportCommon::checkSettingEmptyColumnName(const QString& fileName)
     importer.setNameForEmptyColumn(newEmptyColumnName);
     auto [success, actualColumnList] = importer.getColumnNames(sheetNames_[4]);
 
-    std::list<QString> expectedColumnList(testColumnNames_[4].size());
+    std::list<QString> expectedColumnList(
+        static_cast<size_t>(testColumnNames_[4].size()));
     std::replace_copy(testColumnNames_[4].begin(), testColumnNames_[4].end(),
                       expectedColumnList.begin(), QString("---"),
                       newEmptyColumnName);
@@ -489,7 +490,7 @@ void ImportCommon::prepareDataForGetDataLimitRows()
     QVector<QVector<QVariant>> expectedValues;
     const unsigned int rowLimit{12u};
     for (unsigned int i = 0; i < rowLimit; ++i)
-        expectedValues.append(sheetData_[5][i]);
+        expectedValues.append(sheetData_[5][static_cast<int>(i)]);
     QTest::newRow(
         ("Limited data to " + QString::number(rowLimit) + " in " + sheetName)
             .toStdString()
