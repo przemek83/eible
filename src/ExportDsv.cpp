@@ -4,7 +4,10 @@
 #include <QDate>
 #include <QVariant>
 
-ExportDsv::ExportDsv(char separator) : ExportData(), separator_(separator) {}
+ExportDsv::ExportDsv(char separator, QObject* parent)
+    : ExportData(parent), separator_(separator)
+{
+}
 
 QByteArray ExportDsv::getEmptyContent() { return QByteArray(); }
 
@@ -40,27 +43,13 @@ QByteArray ExportDsv::generateRowContent(const QAbstractItemModel& model,
 
 void ExportDsv::setDateFormat(Qt::DateFormat format) { qtDateFormat_ = format; }
 
-void ExportDsv::setDateFormat(QString format) { dateFormat_ = format; }
+void ExportDsv::setDateFormat(const QString& format) { dateFormat_ = format; }
 
-void ExportDsv::setNumbersLocale(QLocale locale) { locale_ = locale; }
+void ExportDsv::setNumbersLocale(const QLocale& locale) { locale_ = locale; }
 
 bool ExportDsv::writeContent(const QByteArray& content, QIODevice& ioDevice)
 {
     return ioDevice.write(content) != -1;
-}
-
-QString doubleToStringUsingLocale(double value, int precision)
-{
-    static bool initialized{false};
-    static QLocale locale;
-    if (!initialized)
-    {
-        locale.setNumberOptions(locale.numberOptions() &
-                                ~QLocale::OmitGroupSeparator);
-        initialized = true;
-    }
-
-    return locale.toString(value, 'f', precision);
 }
 
 void ExportDsv::variantToString(const QVariant& variant,

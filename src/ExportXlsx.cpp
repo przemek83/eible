@@ -14,6 +14,8 @@ const QByteArray ExportXlsx::ROW_NUMBER_CLOSE{QByteArrayLiteral("\" ")};
 const QByteArray ExportXlsx::VALUE_START{QByteArrayLiteral("><v>")};
 const QByteArray ExportXlsx::CELL_END{QByteArrayLiteral("</v></c>")};
 
+ExportXlsx::ExportXlsx(QObject* parent) : ExportData(parent) {}
+
 bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
 {
     QFile xlsxTemplate(QStringLiteral(":/") +

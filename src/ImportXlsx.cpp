@@ -64,11 +64,11 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!isSheetNameValid(getSheetNames().second, sheetName))
         return {false, {}};
 
-    const auto it = columnNames_.find(sheetName);
-    if (it == columnNames_.end() && !analyzeSheet(sheetName))
+    const auto it = columnNames_.constFind(sheetName);
+    if (it == columnNames_.constEnd() && !analyzeSheet(sheetName))
         return {false, {}};
 
-    return {true, columnNames_[sheetName]};
+    return {true, columnNames_.value(sheetName)};
 }
 
 QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
@@ -136,7 +136,7 @@ ImportXlsx::getStyles()
     return {true, dateStyles, allStyles};
 }
 
-std::pair<bool, QString> ImportXlsx::getSheetPath(QString sheetName)
+std::pair<bool, QString> ImportXlsx::getSheetPath(const QString& sheetName)
 {
     for (const auto& [currentSheetName, sheetPath] : *sheets_)
         if (currentSheetName == sheetName)
@@ -185,7 +185,8 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     const QString& sheetName)
 {
-    if (const auto it = columnTypes_.find(sheetName); it != columnTypes_.end())
+    if (const auto it = columnTypes_.constFind(sheetName);
+        it != columnTypes_.constEnd())
         return {true, *it};
 
     if (!isCommonDataOk())
@@ -197,7 +198,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     if (!analyzeSheet(sheetName))
         return {false, {}};
 
-    return {true, columnTypes_[sheetName]};
+    return {true, columnTypes_.value(sheetName)};
 }
 
 bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
@@ -601,7 +602,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     if (!success)
         return {false, {}};
 
-    const unsigned int columnCount{columnCounts_[sheetName]};
+    const unsigned int columnCount{columnCounts_.value(sheetName)};
     if (!columnsToExcludeAreValid(excludedColumns, columnCount))
         return {false, {}};
 

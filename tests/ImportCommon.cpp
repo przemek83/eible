@@ -8,9 +8,12 @@
 #include <QSignalSpy>
 #include <QTest>
 
-const QStringList ImportCommon::sheetNames_{"Sheet1", "Sheet2", "Sheet3(empty)",
-                                            "Sheet4", "Sheet5", "Sheet6",
-                                            "Sheet7", "Sheet9", "testAccounts"};
+const QStringList ImportCommon::sheetNames_{
+    QStringLiteral("Sheet1"),        QStringLiteral("Sheet2"),
+    QStringLiteral("Sheet3(empty)"), QStringLiteral("Sheet4"),
+    QStringLiteral("Sheet5"),        QStringLiteral("Sheet6"),
+    QStringLiteral("Sheet7"),        QStringLiteral("Sheet9"),
+    QStringLiteral("testAccounts")};
 
 const QList<QStringList> ImportCommon::testColumnNames_ = {
     {"Text", "Numeric", "Date"},

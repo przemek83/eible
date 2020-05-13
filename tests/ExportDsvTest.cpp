@@ -40,13 +40,14 @@ QString ExportDsvTest::doubleQuotesInStringFieldDataCsv_ =
     "Text,Numeric,Date\n\"Other\"\"item\",1.00,2020-01-03\nItem 0 "
     "1,2.00,2020-01-04";
 QString ExportDsvTest::customDateFormatData_ =
-    "Text,Numeric,Date\nItem 0 0,1.00,03/01/20";
+    QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,03/01/20");
 QString ExportDsvTest::defaultLocaleShortDateData_ =
-    "Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020";
+    QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020");
 QString ExportDsvTest::localeForNumbersData_ =
-    "Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03";
-QString ExportDsvTest::emptyData_ = "";
-QStringList ExportDsvTest::headers_{"Text", "Numeric", "Date"};
+    QStringLiteral("Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03");
+QString ExportDsvTest::emptyData_ = QStringLiteral("");
+QStringList ExportDsvTest::headers_{
+    QStringLiteral("Text"), QStringLiteral("Numeric"), QStringLiteral("Date")};
 
 void ExportDsvTest::testEmptyTable_data()
 {
@@ -217,7 +218,7 @@ void ExportDsvTest::testCustomDateFormat()
     exportedBuffer.open(QIODevice::WriteOnly);
 
     ExportDsv exportDsv(',');
-    exportDsv.setDateFormat("dd/MM/yy");
+    exportDsv.setDateFormat(QStringLiteral("dd/MM/yy"));
     exportDsv.exportView(view, exportedBuffer);
 
     QCOMPARE(exportedByteArray, customDateFormatData_);

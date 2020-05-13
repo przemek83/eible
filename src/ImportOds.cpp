@@ -30,8 +30,8 @@ const QString ImportOds::OFFICE_DATE_VALUE_TAG{
     QStringLiteral("office:date-value")};
 const QString ImportOds::OFFICE_VALUE_TAG{QStringLiteral("office:value")};
 const QString ImportOds::DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
-const QString ImportOds::TABLE_QUALIFIED_NAME{"table:table"};
-const QString ImportOds::TABLE_NAME_TAG{QLatin1String("table:name")};
+const QString ImportOds::TABLE_QUALIFIED_NAME{QStringLiteral("table:table")};
+const QString ImportOds::TABLE_NAME_TAG{QStringLiteral("table:name")};
 
 ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
@@ -88,7 +88,8 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
 std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     const QString& sheetName)
 {
-    if (const auto it = columnTypes_.find(sheetName); it != columnTypes_.end())
+    if (const auto it = columnTypes_.constFind(sheetName);
+        it != columnTypes_.constEnd())
         return {true, *it};
 
     if (!sheetNames_ && !getSheetNames().first)
@@ -108,7 +109,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     if (!analyzeSheet(sheetName))
         return {false, {}};
 
-    return {true, columnTypes_[sheetName]};
+    return {true, columnTypes_.value(sheetName)};
 }
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
@@ -119,11 +120,11 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
     if (!isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
-    const auto it = columnNames_.find(sheetName);
-    if (it == columnNames_.end() && !analyzeSheet(sheetName))
+    const auto it = columnNames_.constFind(sheetName);
+    if (it == columnNames_.constEnd() && !analyzeSheet(sheetName))
         return {false, {}};
 
-    return {true, columnNames_[sheetName]};
+    return {true, columnNames_.value(sheetName)};
 }
 
 std::pair<bool, unsigned int> ImportOds::getColumnCount(
@@ -145,7 +146,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     if (!success)
         return {false, {}};
 
-    const unsigned int columnCount{columnCounts_[sheetName]};
+    const unsigned int columnCount{columnCounts_.value(sheetName)};
     if (!columnsToExcludeAreValid(excludedColumns, columnCount))
         return {false, {}};
 
@@ -211,7 +212,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                     currentDataRow[static_cast<int>(mappedColumnIndex)] = value;
                 }
             }
-            column += repeats - 1;
+            column += static_cast<int>(repeats - 1);
         }
         xmlStreamReader.readNextStartElement();
     }
@@ -329,7 +330,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
                         columnTypes.at(currentColumn), xmlColTypeValue);
                 }
             }
-            column += repeats - 1;
+            column += static_cast<int>(repeats - 1U);
         }
         xmlStreamReader.readNext();
         if (isRowEnd(xmlStreamReader))
@@ -403,7 +404,7 @@ bool ImportOds::isRecognizedColumnType(
 unsigned int ImportOds::getColumnRepeatCount(
     const QXmlStreamAttributes& attributes) const
 {
-    return std::max(1u,
+    return std::max(1U,
                     attributes.value(COLUMNS_REPEATED_TAG).toString().toUInt());
 }
 
@@ -438,7 +439,7 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
     {
         if (currentType == ColumnType::UNKNOWN)
             return ColumnType::STRING;
-        else if (currentType != ColumnType::STRING)
+        if (currentType != ColumnType::STRING)
             return ColumnType::STRING;
     }
 
@@ -446,7 +447,7 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
     {
         if (currentType == ColumnType::UNKNOWN)
             return ColumnType::DATE;
-        else if (currentType != ColumnType::DATE)
+        if (currentType != ColumnType::DATE)
             return ColumnType::STRING;
     }
 
@@ -457,7 +458,7 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
     {
         if (currentType == ColumnType::UNKNOWN)
             return ColumnType::NUMBER;
-        else if (currentType != ColumnType::NUMBER)
+        if (currentType != ColumnType::NUMBER)
             return ColumnType::STRING;
     }
 

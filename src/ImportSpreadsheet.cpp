@@ -9,7 +9,9 @@
 #include "EibleUtilities.h"
 
 ImportSpreadsheet::ImportSpreadsheet(QIODevice& ioDevice)
-    : ioDevice_(ioDevice), emptyColName_("---"), zip_(&ioDevice_)
+    : ioDevice_(ioDevice),
+      emptyColName_(QStringLiteral("---")),
+      zip_(&ioDevice_)
 {
 }
 

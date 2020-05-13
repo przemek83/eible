@@ -3,6 +3,8 @@
 #include <QAbstractItemView>
 #include <QCoreApplication>
 
+ExportData::ExportData(QObject* parent) : QObject(parent) {}
+
 bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {
     const auto model = view.model();
@@ -49,7 +51,7 @@ void ExportData::updateProgress(unsigned int currentRow, unsigned int rowCount,
         static_cast<unsigned int>(100. * (currentRow + 1) / rowCount)};
     if (currentPercent > lastEmittedPercent)
     {
-        emit progressPercentChanged(currentPercent);
+        Q_EMIT progressPercentChanged(currentPercent);
         lastEmittedPercent = currentPercent;
         QCoreApplication::processEvents();
     }

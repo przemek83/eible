@@ -17,6 +17,7 @@ class QXmlStreamAttributes;
  */
 class EIBLE_EXPORT ImportOds : public ImportSpreadsheet
 {
+    Q_OBJECT
 public:
     /**
      * @brief Constructor.

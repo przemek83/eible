@@ -20,6 +20,7 @@ class QXmlStreamReader;
  */
 class EIBLE_EXPORT ImportXlsx : public ImportSpreadsheet
 {
+    Q_OBJECT
 public:
     /**
      * @brief Constructor.
@@ -67,7 +68,7 @@ private:
     std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
     getStyles();
 
-    std::pair<bool, QString> getSheetPath(QString sheetName);
+    std::pair<bool, QString> getSheetPath(const QString& sheetName);
 
     bool moveToSecondRow(QuaZipFile& zipFile,
                          QXmlStreamReader& xmlStreamReader) const;

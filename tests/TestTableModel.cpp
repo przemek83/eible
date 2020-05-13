@@ -15,8 +15,9 @@ TestTableModel::TestTableModel(int columnCount, int rowCount)
             switch (columnIndex)
             {
                 case 0:
-                    data_[column].append(
-                        QString("Item %1 %2").arg(column).arg(row));
+                    data_[column].append(QString(QStringLiteral("Item %1 %2"))
+                                             .arg(column)
+                                             .arg(row));
                     break;
                 case 1:
                     data_[column].append(column + row);
@@ -45,7 +46,8 @@ QVariant TestTableModel::headerData(
     int section, [[maybe_unused]] Qt::Orientation orientation,
     [[maybe_unused]] int role) const
 {
-    const QStringList headers{"Text", "Numeric", "Date"};
+    const QStringList headers{QStringLiteral("Text"), QStringLiteral("Numeric"),
+                              QStringLiteral("Date")};
     return headers[section % 3];
 }
 

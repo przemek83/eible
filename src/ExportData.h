@@ -17,7 +17,7 @@ class EIBLE_EXPORT ExportData : public QObject
 {
     Q_OBJECT
 public:
-    ExportData() = default;
+    explicit ExportData(QObject* parent = nullptr);
     ~ExportData() override = default;
 
     ExportData& operator=(const ExportData& other) = delete;
@@ -56,7 +56,7 @@ protected:
 Q_SIGNALS:
     /**
      * Triggered on change of progress percentage.
-     * @param progressPercent New progress percent.
+     * @param currentPercent New progress percent.
      */
     void progressPercentChanged(unsigned int currentPercent);
 };

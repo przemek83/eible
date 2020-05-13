@@ -13,13 +13,15 @@
 #include "ImportOds.h"
 #include "ImportXlsx.h"
 
-void initTable(QTableWidget& tableWidget)
+static void initTable(QTableWidget& tableWidget)
 {
     const int columnCount{3};
     const int rowCount{3};
     tableWidget.setRowCount(rowCount);
     tableWidget.setColumnCount(columnCount);
-    tableWidget.setHorizontalHeaderLabels({"Text", "Numeric", "Date"});
+    tableWidget.setHorizontalHeaderLabels({QStringLiteral("Text"),
+                                           QStringLiteral("Numeric"),
+                                           QStringLiteral("Date")});
     for (int column = 0; column < columnCount; ++column)
         for (int row = 0; row < rowCount; ++row)
         {
@@ -36,6 +38,8 @@ void initTable(QTableWidget& tableWidget)
                 case 2:
                     item->setData(Qt::DisplayRole,
                                   QDate(2020, 1 + column, 1 + row));
+                    break;
+                default:
                     break;
             }
             tableWidget.setItem(row, column, item);
@@ -95,8 +99,8 @@ static bool exportFiles()
     return success;
 }
 
-static void printSpreadsheetContent(QStringList columnNames,
-                                    QVector<QVector<QVariant>> data)
+static void printSpreadsheetContent(const QStringList& columnNames,
+                                    const QVector<QVector<QVariant>>& data)
 {
     std::cout << columnNames.join('\t').toStdString() << std::endl;
     for (const auto& row : data)
@@ -109,7 +113,7 @@ static void printSpreadsheetContent(QStringList columnNames,
 
 static bool importFile(ImportSpreadsheet& importer, const QString& fileName)
 {
-    const QString sheetName("Sheet1");
+    const QString sheetName(QStringLiteral("Sheet1"));
     auto [sucess, columnNames] = importer.getColumnNames(sheetName);
     if (!sucess)
         return false;
@@ -126,12 +130,12 @@ static bool importFile(ImportSpreadsheet& importer, const QString& fileName)
 
 static bool importFiles()
 {
-    QFile odsFile(":/example.ods");
+    QFile odsFile(QStringLiteral(":/example.ods"));
     ImportOds importOds(odsFile);
     if (!importFile(importOds, odsFile.fileName()))
         return false;
 
-    QFile xlsxFile(":/example.xlsx");
+    QFile xlsxFile(QStringLiteral(":/example.xlsx"));
     ImportXlsx importXlsx(xlsxFile);
     if (!importFile(importXlsx, xlsxFile.fileName()))
         return false;
@@ -151,5 +155,5 @@ int main(int argc, char* argv[])
     QTimer::singleShot(0, []() {
         QApplication::exit(performOperations() ? EXIT_SUCCESS : EXIT_FAILURE);
     });
-    return a.exec();
+    return QApplication::exec();
 }

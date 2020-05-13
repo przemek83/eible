@@ -22,7 +22,7 @@ public:
      * @brief Constructor.
      * @param separator Separator to be used during export (comma, tab, ...).
      */
-    explicit ExportDsv(char separator);
+    explicit ExportDsv(char separator, QObject* parent = nullptr);
     ~ExportDsv() override = default;
 
     ExportDsv& operator=(const ExportDsv& other) = delete;
@@ -41,13 +41,13 @@ public:
      * @brief Change date format to given one via string. (overloaded)
      * @param format New format for dates as string.
      */
-    void setDateFormat(QString format);
+    void setDateFormat(const QString& format);
 
     /**
      * @brief Set locale for numbers conversion.
      * @param locale Locale to be used in exporting.
      */
-    void setNumbersLocale(QLocale locale);
+    void setNumbersLocale(const QLocale& locale);
 
 protected:
     bool writeContent(const QByteArray& content, QIODevice& ioDevice) override;
@@ -63,10 +63,11 @@ private:
     void variantToString(const QVariant& variant, QByteArray& destinationArray,
                          char separator) const;
 
-    Qt::DateFormat qtDateFormat_{Qt::ISODate};
     QString dateFormat_{};
 
     QLocale locale_;
+
+    Qt::DateFormat qtDateFormat_{Qt::ISODate};
 
     const char separator_;
 };

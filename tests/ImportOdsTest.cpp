@@ -147,7 +147,7 @@ void ImportOdsTest::testGetDataExcludeInvalidColumn()
 void ImportOdsTest::benchmarkGetData()
 {
     QSKIP("Skip benchmark.");
-    QFile testFile(":/bigFile.ods");
+    QFile testFile(QStringLiteral(":/bigFile.ods"));
     ImportOds importOds(testFile);
     auto [success, sheetNames] = importOds.getSheetNames();
     QCOMPARE(success, true);
@@ -175,7 +175,7 @@ void ImportOdsTest::testEmittingProgressPercentChangedSmallFile()
 
 void ImportOdsTest::testEmittingProgressPercentChangedBigFile()
 {
-    QFile testFile(":/mediumFile.ods");
+    QFile testFile(QStringLiteral(":/mediumFile.ods"));
     ImportOds importOds(testFile);
     ImportCommon::checkEmittingProgressPercentChangedBigFile(importOds);
 }

@@ -17,7 +17,7 @@ class EIBLE_EXPORT ExportXlsx : public ExportData
 {
     Q_OBJECT
 public:
-    ExportXlsx() = default;
+    explicit ExportXlsx(QObject* parent = nullptr);
     ~ExportXlsx() override = default;
 
     ExportXlsx& operator=(const ExportXlsx& other) = delete;

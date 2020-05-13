@@ -52,7 +52,7 @@ int getMaxExcelColumns()
 
 QString getXlsxTemplateName()
 {
-    const QString templateFileName{"template.xlsx"};
+    const QString templateFileName{QStringLiteral("template.xlsx")};
     return templateFileName;
 }
 

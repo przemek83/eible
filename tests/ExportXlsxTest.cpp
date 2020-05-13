@@ -12,7 +12,8 @@
 #include "TestTableModel.h"
 #include "Utilities.h"
 
-QString ExportXlsxTest::zipWorkSheetPath_{"xl/worksheets/sheet1.xml"};
+QString ExportXlsxTest::zipWorkSheetPath_{
+    QStringLiteral("xl/worksheets/sheet1.xml")};
 
 QString ExportXlsxTest::tableSheetData_ =
     R"(<sheetData>)"
@@ -68,7 +69,8 @@ QString ExportXlsxTest::headersOnlySheetData_ =
 
 QString ExportXlsxTest::emptySheetData_ = R"(</sheetData>)";
 
-QStringList ExportXlsxTest::headers_{"Text", "Numeric", "Date"};
+QStringList ExportXlsxTest::headers_{
+    QStringLiteral("Text"), QStringLiteral("Numeric"), QStringLiteral("Date")};
 
 QByteArray ExportXlsxTest::retrieveFileFromZip(QBuffer& exportedZip,
                                                const QString& fileName) const
