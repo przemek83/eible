@@ -69,13 +69,13 @@ QVariant getDefaultVariantForFormat(ColumnType format)
         {
             return QVariant(QVariant::Double);
         }
+
         case ColumnType::DATE:
         {
             return QVariant(QVariant::Date);
         }
 
         case ColumnType::UNKNOWN:
-        default:
         {
             Q_ASSERT(false);
             return QVariant(QVariant::String);

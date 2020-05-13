@@ -60,7 +60,8 @@ private:
 
     bool isRecognizedColumnType(const QXmlStreamAttributes& attributes) const;
 
-    int getColumnRepeatCount(const QXmlStreamAttributes& attributes) const;
+    unsigned int getColumnRepeatCount(
+        const QXmlStreamAttributes& attributes) const;
 
     bool isRowStart(const QXmlStreamReader& xmlStreamReader) const;
     bool isRowEnd(const QXmlStreamReader& xmlStreamReader) const;

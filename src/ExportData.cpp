@@ -22,7 +22,9 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
             continue;
         }
         content.append(generateRowContent(*model, row, skippedRows));
-        updateProgress(row, model->rowCount(), lastEmittedPercent);
+        updateProgress(static_cast<unsigned int>(row),
+                       static_cast<unsigned int>(model->rowCount()),
+                       lastEmittedPercent);
     }
     content.append(getContentEnding());
     return writeContent(content, ioDevice);

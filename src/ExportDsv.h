@@ -63,12 +63,12 @@ private:
     void variantToString(const QVariant& variant, QByteArray& destinationArray,
                          char separator) const;
 
-    const char separator_;
-
     Qt::DateFormat qtDateFormat_{Qt::ISODate};
     QString dateFormat_{};
 
     QLocale locale_;
+
+    const char separator_;
 };
 
 #endif  // EXPORTDSV_H

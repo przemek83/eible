@@ -164,7 +164,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         createActiveColumnMapping(excludedColumns, columnCount)};
 
     QVector<QVector<QVariant>> dataContainer(
-        std::min(getRowCount(sheetName).second, rowLimit));
+        static_cast<int>(std::min(getRowCount(sheetName).second, rowLimit)));
 
     QVector<QVariant> currentDataRow(templateDataRow);
 
@@ -182,7 +182,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             column = NOT_SET_COLUMN;
             if (!rowEmpty)
             {
-                dataContainer[rowCounter] = currentDataRow;
+                dataContainer[static_cast<int>(rowCounter)] = currentDataRow;
                 currentDataRow = templateDataRow;
                 rowCounter++;
                 updateProgress(rowCounter, rowLimit, lastEmittedPercent);
@@ -193,18 +193,22 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         if (isCellStart(xmlStreamReader))
         {
             column++;
-            const int repeats{
+            const unsigned int repeats{
                 getColumnRepeatCount(xmlStreamReader.attributes())};
             if (!isOfficeValueTagEmpty(xmlStreamReader))
             {
                 rowEmpty = false;
                 const QVariant value = retrieveValueFromField(
                     xmlStreamReader, columnTypes.at(column));
-                for (int i = 0; i < repeats; ++i)
+                for (unsigned int i = 0; i < repeats; ++i)
                 {
-                    if (excludedColumns.contains(column + i))
+                    const unsigned int currentColumn{
+                        static_cast<unsigned int>(column) + i};
+                    if (excludedColumns.contains(currentColumn))
                         continue;
-                    currentDataRow[activeColumnsMapping[column + i]] = value;
+                    const unsigned int mappedColumnIndex{
+                        activeColumnsMapping[currentColumn]};
+                    currentDataRow[static_cast<int>(mappedColumnIndex)] = value;
                 }
             }
             column += repeats - 1;
@@ -294,9 +298,9 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
         return {false, {}, {}};
 
     QVector<ColumnType> columnTypes;
-    int column = NOT_SET_COLUMN;
-    int rowCounter = 0;
-    bool rowEmpty = true;
+    int column{NOT_SET_COLUMN};
+    int rowCounter{0};
+    bool rowEmpty{true};
 
     while (!xmlStreamReader.atEnd() &&
            xmlStreamReader.name().compare(TABLE_TAG) != 0)
@@ -310,16 +314,20 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
             const QXmlStreamAttributes attributes{xmlStreamReader.attributes()};
             const QString xmlColTypeValue =
                 attributes.value(OFFICE_VALUE_TYPE_TAG).toString();
-            const int repeats{getColumnRepeatCount(attributes)};
+            const unsigned int repeats{getColumnRepeatCount(attributes)};
             if (isRecognizedColumnType(attributes))
             {
                 rowEmpty = false;
-                while (column + repeats - 1 >= columnTypes.size())
+                for (int i = columnTypes.size();
+                     i < column + static_cast<int>(repeats); ++i)
                     columnTypes.push_back(ColumnType::UNKNOWN);
 
-                for (int i = 0; i < repeats; ++i)
-                    columnTypes[column + i] = recognizeColumnType(
-                        columnTypes.at(column + i), xmlColTypeValue);
+                for (unsigned int i = 0; i < repeats; ++i)
+                {
+                    const int currentColumn{column + static_cast<int>(i)};
+                    columnTypes[currentColumn] = recognizeColumnType(
+                        columnTypes.at(currentColumn), xmlColTypeValue);
+                }
             }
             column += repeats - 1;
         }
@@ -332,9 +340,10 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
         }
     }
 
-    for (auto& columnType : columnTypes)
-        if (columnType == ColumnType::UNKNOWN)
-            columnType = ColumnType::STRING;
+    std::replace_if(
+        columnTypes.begin(), columnTypes.end(),
+        [](ColumnType columnType) { return columnType == ColumnType::UNKNOWN; },
+        ColumnType::STRING);
 
     return {true, rowCounter, columnTypes};
 }
@@ -391,11 +400,11 @@ bool ImportOds::isRecognizedColumnType(
            0 == columnType.compare(TIME_TAG);
 }
 
-int ImportOds::getColumnRepeatCount(
+unsigned int ImportOds::getColumnRepeatCount(
     const QXmlStreamAttributes& attributes) const
 {
-    return std::max(1,
-                    attributes.value(COLUMNS_REPEATED_TAG).toString().toInt());
+    return std::max(1u,
+                    attributes.value(COLUMNS_REPEATED_TAG).toString().toUInt());
 }
 
 bool ImportOds::isRowStart(const QXmlStreamReader& xmlStreamReader) const

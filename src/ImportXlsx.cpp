@@ -241,9 +241,10 @@ int ImportXlsx::getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
                                        unsigned int charsToChop) const
 {
     QString stringToChop{xmlStreamReader.attributes().value(R_TAG).toString()};
-    unsigned int numberOfCharsToRemove{stringToChop.size() - charsToChop};
+    unsigned int numberOfCharsToRemove{
+        static_cast<unsigned int>(stringToChop.size()) - charsToChop};
     int expectedColumnIndex{excelColNames_.indexOf(
-        stringToChop.left(numberOfCharsToRemove).toUtf8())};
+        stringToChop.left(static_cast<int>(numberOfCharsToRemove)).toUtf8())};
     return expectedColumnIndex;
 }
 
@@ -357,12 +358,11 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     int column{NOT_SET_COLUMN};
     int maxColumnIndex{NOT_SET_COLUMN};
     int rowCounter{0};
-    int charsToChop{1};
+    unsigned int charsToChop{1};
     while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
     {
         if (isRowStart(xmlStreamReader))
         {
-            column = NOT_SET_COLUMN;
             rowCounter++;
             double power{pow(DECIMAL_BASE, charsToChop)};
             if (power <= rowCounter + 1)
@@ -623,10 +623,10 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         createActiveColumnMapping(excludedColumns, columnCount)};
 
     QVector<QVector<QVariant>> dataContainer(
-        std::min(getRowCount(sheetName).second, rowLimit));
+        static_cast<int>(std::min(getRowCount(sheetName).second, rowLimit)));
 
     QVector<QVariant> currentDataRow(templateDataRow);
-    int charsToChop{1};
+    unsigned int charsToChop{1};
     int column{NOT_SET_COLUMN};
     QString currentColType{S_TAG};
     QString actualSTagValue;
@@ -640,7 +640,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
             column = NOT_SET_COLUMN;
             if (0 != rowCounter)
             {
-                dataContainer[rowCounter - 1] = currentDataRow;
+                dataContainer[static_cast<int>(rowCounter - 1)] =
+                    currentDataRow;
                 currentDataRow = QVector<QVariant>(templateDataRow);
                 double power = pow(DECIMAL_BASE, charsToChop);
                 if (static_cast<unsigned int>(qRound(power)) <= rowCounter + 2)
@@ -660,11 +661,14 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         }
 
         if (!xmlStreamReader.atEnd() && isVTagStart(xmlStreamReader) &&
-            (!excludedColumns.contains(column)))
+            (!excludedColumns.contains(static_cast<unsigned int>(column))))
         {
-            ColumnType format = columnTypes.at(column);
-            currentDataRow[activeColumnsMapping[column]] = getCurrentValue(
-                xmlStreamReader, format, currentColType, actualSTagValue);
+            const ColumnType format{columnTypes.at(column)};
+            const unsigned int mappedColumnIndex{
+                activeColumnsMapping[static_cast<unsigned int>(column)]};
+            currentDataRow[static_cast<int>(mappedColumnIndex)] =
+                getCurrentValue(xmlStreamReader, format, currentColType,
+                                actualSTagValue);
         }
         xmlStreamReader.readNextStartElement();
     }

@@ -96,7 +96,7 @@ QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
     unsigned int columnCount) const
 {
     QMap<unsigned int, unsigned int> activeColumnsMapping;
-    int columnToFill = 0;
+    unsigned int columnToFill{0};
     for (unsigned int i = 0; i < columnCount; ++i)
     {
         if (!excludedColumns.contains(i))
@@ -115,12 +115,14 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
     QVector<QVariant> templateDataRow;
     int columnToFill = 0;
     templateDataRow.resize(columnTypes.size() - excludedColumns.size());
-    for (int i = 0; i < columnTypes.size(); ++i)
+    for (unsigned int i = 0; i < static_cast<unsigned int>(columnTypes.size());
+         ++i)
     {
         if (!excludedColumns.contains(i))
         {
             templateDataRow[columnToFill] =
-                EibleUtilities::getDefaultVariantForFormat(columnTypes[i]);
+                EibleUtilities::getDefaultVariantForFormat(
+                    columnTypes[static_cast<int>(i)]);
             columnToFill++;
         }
     }
@@ -155,13 +157,15 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
     if (!success)
         return false;
 
-    const int actualColumnCount{
-        std::max(columnNames.size(), columnTypes.size())};
+    const unsigned int actualColumnCount{static_cast<unsigned int>(
+        std::max(columnNames.size(), columnTypes.size()))};
 
-    for (int i = columnNames.size(); i < actualColumnCount; ++i)
+    for (unsigned int i = static_cast<unsigned int>(columnNames.size());
+         i < actualColumnCount; ++i)
         columnNames << emptyColName_;
 
-    for (int i = columnTypes.size(); i < actualColumnCount; ++i)
+    for (unsigned int i = static_cast<unsigned int>(columnTypes.size());
+         i < actualColumnCount; ++i)
         columnTypes.append(ColumnType::STRING);
 
     rowCounts_[sheetName] = rowCount;
