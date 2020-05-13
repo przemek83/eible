@@ -116,12 +116,17 @@ const QList<int> ImportXlsxTest::allStyles_{
 
 void ImportXlsxTest::testRetrievingSheetNames()
 {
-    ImportCommon::checkRetrievingSheetNames<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkRetrievingSheetNames(importXlsx);
 }
 
 void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
 {
-    ImportCommon::checkRetrievingSheetNamesFromEmptyFile<ImportXlsx>();
+    QByteArray byteArray;
+    QBuffer emptyBuffer(&byteArray);
+    ImportXlsx importXlsx(emptyBuffer);
+    ImportCommon::checkRetrievingSheetNamesFromEmptyFile(importXlsx);
 }
 
 void ImportXlsxTest::testGetDateStyles()
@@ -185,17 +190,23 @@ void ImportXlsxTest::testGetColumnList_data()
 
 void ImportXlsxTest::testGetColumnList()
 {
-    ImportCommon::checkGetColumnList<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetColumnList(importXlsx);
 }
 
 void ImportXlsxTest::testSettingEmptyColumnName()
 {
-    ImportCommon::checkSettingEmptyColumnName<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkSettingEmptyColumnName(importXlsx);
 }
 
 void ImportXlsxTest::testGetColumnListTwoSheets()
 {
-    ImportCommon::checkGetColumnListTwoSheets<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetColumnListTwoSheets(importXlsx);
 }
 
 void ImportXlsxTest::testGetColumnTypes_data()
@@ -205,7 +216,9 @@ void ImportXlsxTest::testGetColumnTypes_data()
 
 void ImportXlsxTest::testGetColumnTypes()
 {
-    ImportCommon::checkGetColumnTypes<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetColumnTypes(importXlsx);
 }
 
 void ImportXlsxTest::testGetColumnCount_data()
@@ -215,7 +228,9 @@ void ImportXlsxTest::testGetColumnCount_data()
 
 void ImportXlsxTest::testGetColumnCount()
 {
-    ImportCommon::checkGetColumnCount<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetColumnCount(importXlsx);
 }
 
 void ImportXlsxTest::testGetRowCount_data()
@@ -225,7 +240,9 @@ void ImportXlsxTest::testGetRowCount_data()
 
 void ImportXlsxTest::testGetRowCount()
 {
-    ImportCommon::checkGetRowCount<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetRowCount(importXlsx);
 }
 
 void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes_data()
@@ -235,8 +252,9 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes_data()
 
 void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
 {
-    ImportCommon::testGetRowAndColumnCountViaGetColumnTypes<ImportXlsx>(
-        testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::testGetRowAndColumnCountViaGetColumnTypes(importXlsx);
 }
 
 QVector<QVector<QVariant>> ImportXlsxTest::convertDataToUseSharedStrings(
@@ -270,7 +288,9 @@ void ImportXlsxTest::testGetData_data()
 
 void ImportXlsxTest::testGetData()
 {
-    ImportCommon::checkGetData<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetData(importXlsx);
 }
 
 void ImportXlsxTest::testGetDataLimitRows_data()
@@ -290,7 +310,7 @@ void ImportXlsxTest::testGetDataLimitRows_data()
     const unsigned int rowLimit{12u};
     sheetData = ImportCommon::getDataForSheet(sheetName);
     for (unsigned int i = 0; i < rowLimit; ++i)
-        expectedValues.append(sheetData[i]);
+        expectedValues.append(sheetData[static_cast<int>(i)]);
     expectedValues = convertDataToUseSharedStrings(expectedValues);
     QTest::newRow(
         ("Limited data to " + QString::number(rowLimit) + " in " + sheetName)
@@ -301,7 +321,9 @@ void ImportXlsxTest::testGetDataLimitRows_data()
 
 void ImportXlsxTest::testGetDataLimitRows()
 {
-    ImportCommon::checkGetDataLimitRows<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetDataLimitRows(importXlsx);
 }
 
 void ImportXlsxTest::testGetDataExcludeColumns_data()
@@ -326,12 +348,16 @@ void ImportXlsxTest::testGetDataExcludeColumns_data()
 
 void ImportXlsxTest::testGetDataExcludeColumns()
 {
-    ImportCommon::checkGetDataExcludeColumns<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetDataExcludeColumns(importXlsx);
 }
 
 void ImportXlsxTest::testGetDataExcludeInvalidColumn()
 {
-    ImportCommon::checkGetDataExcludeInvalidColumn<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkGetDataExcludeInvalidColumn(importXlsx);
 }
 
 void ImportXlsxTest::benchmarkGetData_data()
@@ -361,23 +387,28 @@ void ImportXlsxTest::benchmarkGetData()
 
 void ImportXlsxTest::testEmittingProgressPercentChangedEmptyFile()
 {
-    ImportCommon::checkEmittingProgressPercentChangedEmptyFile<ImportXlsx>(
-        templateFileName_);
+    QFile testFile(templateFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkEmittingProgressPercentChangedEmptyFile(importXlsx);
 }
 
 void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile()
 {
-    ImportCommon::checkEmittingProgressPercentChangedSmallFile<ImportXlsx>(
-        testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkEmittingProgressPercentChangedSmallFile(importXlsx);
 }
 
 void ImportXlsxTest::testEmittingProgressPercentChangedBigFile()
 {
-    ImportCommon::checkEmittingProgressPercentChangedBigFile<ImportXlsx>(
-        ":/mediumFile.xlsx");
+    QFile testFile(":/mediumFile.xlsx");
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkEmittingProgressPercentChangedBigFile(importXlsx);
 }
 
 void ImportXlsxTest::testInvalidSheetName()
 {
-    ImportCommon::checkInvalidSheetName<ImportXlsx>(testFileName_);
+    QFile testFile(testFileName_);
+    ImportXlsx importXlsx(testFile);
+    ImportCommon::checkInvalidSheetName(importXlsx);
 }

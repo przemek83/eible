@@ -7,72 +7,56 @@
 class ImportCommon
 {
 public:
-    template <class T>
-    static void checkRetrievingSheetNames(const QString& fileName);
+    static void checkRetrievingSheetNames(ImportSpreadsheet& importer);
 
-    template <class T>
-    static void checkRetrievingSheetNamesFromEmptyFile();
+    static void checkRetrievingSheetNamesFromEmptyFile(
+        ImportSpreadsheet& importer);
 
     static void prepareDataForGetColumnListTest();
-    template <class T>
-    static void checkGetColumnList(const QString& fileName);
+    static void checkGetColumnList(ImportSpreadsheet& importer);
 
-    template <class T>
-    static void checkSettingEmptyColumnName(const QString& fileName);
+    static void checkSettingEmptyColumnName(ImportSpreadsheet& importer);
 
-    template <class T>
-    static void checkGetColumnListTwoSheets(const QString& fileName);
+    static void checkGetColumnListTwoSheets(ImportSpreadsheet& importer);
 
     static void prepareDataForGetColumnTypes();
-    template <class T>
-    static void checkGetColumnTypes(const QString& fileName);
+    static void checkGetColumnTypes(ImportSpreadsheet& importer);
 
     static void prepareDataForGetColumnCountTest();
-    template <class T>
-    static void checkGetColumnCount(const QString& fileName);
+    static void checkGetColumnCount(ImportSpreadsheet& importer);
 
     static void prepareDataForGetRowCountTest();
-    template <class T>
-    static void checkGetRowCount(const QString& fileName);
+    static void checkGetRowCount(ImportSpreadsheet& importer);
 
     static void prepareDataForGetRowAndColumnCountViaGetColumnTypes();
-    template <class T>
     static void testGetRowAndColumnCountViaGetColumnTypes(
-        const QString& fileName);
+        ImportSpreadsheet& importer);
 
     static void prepareDataForGetData();
-    template <class T>
-    static void checkGetData(const QString& fileName);
+    static void checkGetData(ImportSpreadsheet& importer);
 
     static void prepareDataForGetDataLimitRows();
-    template <class T>
-    static void checkGetDataLimitRows(const QString& fileName);
+    static void checkGetDataLimitRows(ImportSpreadsheet& importer);
 
     static void prepareDataForGetGetDataExcludeColumns();
-    template <class T>
-    static void checkGetDataExcludeColumns(const QString& fileName);
-    template <class T>
-    static void checkGetDataExcludeInvalidColumn(const QString& fileName);
+    static void checkGetDataExcludeColumns(ImportSpreadsheet& importer);
+    static void checkGetDataExcludeInvalidColumn(ImportSpreadsheet& importer);
 
     static QVector<QVector<QVariant>> getDataForSheet(const QString& fileName);
 
     static QVector<QVector<QVariant>> getDataWithoutColumns(
         const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
 
-    template <class T>
     static void checkEmittingProgressPercentChangedEmptyFile(
-        const QString& fileName);
-    template <class T>
+        ImportSpreadsheet& importer);
     static void checkEmittingProgressPercentChangedSmallFile(
-        const QString& fileName);
-    template <class T>
+        ImportSpreadsheet& importer);
     static void checkEmittingProgressPercentChangedBigFile(
-        const QString& fileName);
+        ImportSpreadsheet& importer);
 
     static QStringList getSheetNames();
 
-    template <class T>
-    static void checkInvalidSheetName(const QString& fileName);
+    static void checkInvalidSheetName(ImportSpreadsheet& importer);
 
 private:
     static const QStringList sheetNames_;

@@ -222,33 +222,20 @@ const QVector<QVector<QVector<QVariant>>> ImportCommon::sheetData_ = {
      {"test2", "test123", QVariant(QVariant::String), "konto zablokowane"},
      {"test3", "test123", "2011-09-30", QVariant(QVariant::String)}}};
 
-template <class T>
-void ImportCommon::checkRetrievingSheetNames(const QString& fileName)
+void ImportCommon::checkRetrievingSheetNames(ImportSpreadsheet& importer)
 {
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualSheetNames] = importer.getSheetNames();
     QCOMPARE(success, true);
     QCOMPARE(actualSheetNames, sheetNames_);
 }
-template void ImportCommon::checkRetrievingSheetNames<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkRetrievingSheetNames<ImportOds>(
-    const QString& fileName);
 
-template <class T>
-void ImportCommon::checkRetrievingSheetNamesFromEmptyFile()
+void ImportCommon::checkRetrievingSheetNamesFromEmptyFile(
+    ImportSpreadsheet& importer)
 {
-    QByteArray byteArray;
-    QBuffer emptyBuffer(&byteArray);
-    T importer(emptyBuffer);
     auto [success, actualNames] = importer.getSheetNames();
     QCOMPARE(success, false);
     QCOMPARE(actualNames, {});
 }
-template void
-ImportCommon::checkRetrievingSheetNamesFromEmptyFile<ImportXlsx>();
-template void ImportCommon::checkRetrievingSheetNamesFromEmptyFile<ImportOds>();
 
 void ImportCommon::prepareDataForGetColumnListTest()
 {
@@ -260,6 +247,15 @@ void ImportCommon::prepareDataForGetColumnListTest()
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
             << sheetName << testColumnNames_[i];
     }
+}
+
+void ImportCommon::checkGetColumnList(ImportSpreadsheet& importer)
+{
+    QFETCH(QString, sheetName);
+    QFETCH(QStringList, expectedColumnList);
+    auto [success, actualColumnList] = importer.getColumnNames(sheetName);
+    QCOMPARE(success, true);
+    QCOMPARE(actualColumnList, expectedColumnList);
 }
 
 void ImportCommon::prepareDataForGetColumnTypes()
@@ -275,44 +271,17 @@ void ImportCommon::prepareDataForGetColumnTypes()
     }
 }
 
-template <class T>
-void ImportCommon::checkGetColumnTypes(const QString& fileName)
+void ImportCommon::checkGetColumnTypes(ImportSpreadsheet& importer)
 {
     QFETCH(QString, sheetName);
     QFETCH(QVector<ColumnType>, expectedColumnTypes);
-
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, columnTypes] = importer.getColumnTypes(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(columnTypes, expectedColumnTypes);
 }
-template void ImportCommon::checkGetColumnTypes<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetColumnTypes<ImportOds>(
-    const QString& fileName);
 
-template <class T>
-void ImportCommon::checkGetColumnList(const QString& fileName)
+void ImportCommon::checkSettingEmptyColumnName(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QStringList, expectedColumnList);
-    QFile testFile(fileName);
-    T importer(testFile);
-    auto [success, actualColumnList] = importer.getColumnNames(sheetName);
-    QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, expectedColumnList);
-}
-template void ImportCommon::checkGetColumnList<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetColumnList<ImportOds>(
-    const QString& fileName);
-
-template <class T>
-void ImportCommon::checkSettingEmptyColumnName(const QString& fileName)
-{
-    QFile testFile(fileName);
-    T importer(testFile);
     const QString newEmptyColumnName{"<empty column>"};
     importer.setNameForEmptyColumn(newEmptyColumnName);
     auto [success, actualColumnList] = importer.getColumnNames(sheetNames_[4]);
@@ -326,16 +295,9 @@ void ImportCommon::checkSettingEmptyColumnName(const QString& fileName)
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, QStringList::fromStdList(expectedColumnList));
 }
-template void ImportCommon::checkSettingEmptyColumnName<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkSettingEmptyColumnName<ImportOds>(
-    const QString& fileName);
 
-template <class T>
-void ImportCommon::checkGetColumnListTwoSheets(const QString& fileName)
+void ImportCommon::checkGetColumnListTwoSheets(ImportSpreadsheet& importer)
 {
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualColumnList] = importer.getColumnNames(sheetNames_[4]);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, testColumnNames_[4]);
@@ -345,10 +307,6 @@ void ImportCommon::checkGetColumnListTwoSheets(const QString& fileName)
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, testColumnNames_[0]);
 }
-template void ImportCommon::checkGetColumnListTwoSheets<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetColumnListTwoSheets<ImportOds>(
-    const QString& fileName);
 
 void ImportCommon::prepareDataForGetColumnCountTest()
 {
@@ -362,22 +320,14 @@ void ImportCommon::prepareDataForGetColumnCountTest()
     }
 }
 
-template <class T>
-void ImportCommon::checkGetColumnCount(const QString& fileName)
+void ImportCommon::checkGetColumnCount(ImportSpreadsheet& importer)
 {
     QFETCH(QString, sheetName);
     QFETCH(int, expectedColumnCount);
-
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualColumnCount] = importer.getColumnCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
 }
-template void ImportCommon::checkGetColumnCount<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetColumnCount<ImportOds>(
-    const QString& fileName);
 
 void ImportCommon::prepareDataForGetRowCountTest()
 {
@@ -391,22 +341,14 @@ void ImportCommon::prepareDataForGetRowCountTest()
     }
 }
 
-template <class T>
-void ImportCommon::checkGetRowCount(const QString& fileName)
+void ImportCommon::checkGetRowCount(ImportSpreadsheet& importer)
 {
     QFETCH(QString, sheetName);
     QFETCH(unsigned int, expectedRowCount);
-
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualRowCount] = importer.getRowCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualRowCount, expectedRowCount);
 }
-template void ImportCommon::checkGetRowCount<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetRowCount<ImportOds>(
-    const QString& fileName);
 
 void ImportCommon::prepareDataForGetRowAndColumnCountViaGetColumnTypes()
 {
@@ -425,16 +367,12 @@ void ImportCommon::prepareDataForGetRowAndColumnCountViaGetColumnTypes()
     }
 }
 
-template <class T>
 void ImportCommon::testGetRowAndColumnCountViaGetColumnTypes(
-    const QString& fileName)
+    ImportSpreadsheet& importer)
 {
     QFETCH(QString, sheetName);
     QFETCH(unsigned int, expectedRowCount);
     QFETCH(unsigned int, expectedColumnCount);
-
-    QFile testFile(fileName);
-    T importer(testFile);
     importer.getColumnTypes(sheetName);
     auto [successRowCount, actualRowCount] = importer.getRowCount(sheetName);
     QCOMPARE(successRowCount, true);
@@ -444,10 +382,6 @@ void ImportCommon::testGetRowAndColumnCountViaGetColumnTypes(
     QCOMPARE(successColumnCount, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
 }
-template void ImportCommon::testGetRowAndColumnCountViaGetColumnTypes<
-    ImportXlsx>(const QString& fileName);
-template void ImportCommon::testGetRowAndColumnCountViaGetColumnTypes<
-    ImportOds>(const QString& fileName);
 
 void ImportCommon::prepareDataForGetData()
 {
@@ -461,20 +395,14 @@ void ImportCommon::prepareDataForGetData()
     }
 }
 
-template <class T>
-void ImportCommon::checkGetData(const QString& fileName)
+void ImportCommon::checkGetData(ImportSpreadsheet& importer)
 {
     QFETCH(QString, sheetName);
     QFETCH(QVector<QVector<QVariant>>, expectedData);
-
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualData] = importer.getData(sheetName, {});
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
-template void ImportCommon::checkGetData<ImportXlsx>(const QString& fileName);
-template void ImportCommon::checkGetData<ImportOds>(const QString& fileName);
 
 void ImportCommon::prepareDataForGetDataLimitRows()
 {
@@ -498,24 +426,16 @@ void ImportCommon::prepareDataForGetDataLimitRows()
         << sheetName << rowLimit << expectedValues;
 }
 
-template <class T>
-void ImportCommon::checkGetDataLimitRows(const QString& fileName)
+void ImportCommon::checkGetDataLimitRows(ImportSpreadsheet& importer)
 {
     QFETCH(QString, sheetName);
     QFETCH(unsigned int, rowLimit);
     QFETCH(QVector<QVector<QVariant>>, expectedData);
-
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualData] =
         importer.getLimitedData(sheetName, {}, rowLimit);
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
-template void ImportCommon::checkGetDataLimitRows<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetDataLimitRows<ImportOds>(
-    const QString& fileName);
 
 void ImportCommon::prepareDataForGetGetDataExcludeColumns()
 {
@@ -535,36 +455,21 @@ void ImportCommon::prepareDataForGetGetDataExcludeColumns()
         << getDataWithoutColumns(sheetData_[0], {2, 0});
 }
 
-template <class T>
-void ImportCommon::checkGetDataExcludeColumns(const QString& fileName)
+void ImportCommon::checkGetDataExcludeColumns(ImportSpreadsheet& importer)
 {
     QFETCH(QString, sheetName);
     QFETCH(QVector<unsigned int>, excludedColumns);
     QFETCH(QVector<QVector<QVariant>>, expectedData);
-
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualData] = importer.getData(sheetName, excludedColumns);
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
-template void ImportCommon::checkGetDataExcludeColumns<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetDataExcludeColumns<ImportOds>(
-    const QString& fileName);
 
-template <class T>
-void ImportCommon::checkGetDataExcludeInvalidColumn(const QString& fileName)
+void ImportCommon::checkGetDataExcludeInvalidColumn(ImportSpreadsheet& importer)
 {
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualData] = importer.getData(sheetNames_[0], {3});
     QCOMPARE(success, false);
 }
-template void ImportCommon::checkGetDataExcludeInvalidColumn<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkGetDataExcludeInvalidColumn<ImportOds>(
-    const QString& fileName);
 
 QVector<QVector<QVariant>> ImportCommon::getDataForSheet(
     const QString& fileName)
@@ -587,67 +492,39 @@ QVector<QVector<QVariant>> ImportCommon::getDataWithoutColumns(
 
 QStringList ImportCommon::getSheetNames() { return sheetNames_; }
 
-template <class T>
-void ImportCommon::checkInvalidSheetName(const QString& fileName)
+void ImportCommon::checkInvalidSheetName(ImportSpreadsheet& importer)
 {
-    QFile testFile(fileName);
-    T importer(testFile);
     auto [success, actualSharedStrings] =
         importer.getColumnCount("invalidSheetName");
     QCOMPARE(success, false);
 }
-template void ImportCommon::checkInvalidSheetName<ImportXlsx>(
-    const QString& fileName);
-template void ImportCommon::checkInvalidSheetName<ImportOds>(
-    const QString& fileName);
 
-template <class T>
 void ImportCommon::checkEmittingProgressPercentChangedEmptyFile(
-    const QString& fileName)
+    ImportSpreadsheet& importer)
 {
-    QFile testFile(fileName);
-    T importer(testFile);
     QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     QStringList sheetNames{importer.getSheetNames().second};
     auto [success, actualData] = importer.getData(sheetNames.first(), {});
     QCOMPARE(success, true);
     QCOMPARE(spy.count(), NO_SIGNAL);
 }
-template void ImportCommon::checkEmittingProgressPercentChangedEmptyFile<
-    ImportXlsx>(const QString& fileName);
-template void ImportCommon::checkEmittingProgressPercentChangedEmptyFile<
-    ImportOds>(const QString& fileName);
 
-template <class T>
 void ImportCommon::checkEmittingProgressPercentChangedSmallFile(
-    const QString& fileName)
+    ImportSpreadsheet& importer)
 {
-    QFile testFile(fileName);
-    T importer(testFile);
     QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     const unsigned int sheetIndex{1};
     auto [success, actualData] = importer.getData(sheetNames_[sheetIndex], {});
     QCOMPARE(success, true);
     QCOMPARE(spy.count(), 19);
 }
-template void ImportCommon::checkEmittingProgressPercentChangedSmallFile<
-    ImportXlsx>(const QString& fileName);
-template void ImportCommon::checkEmittingProgressPercentChangedSmallFile<
-    ImportOds>(const QString& fileName);
 
-template <class T>
 void ImportCommon::checkEmittingProgressPercentChangedBigFile(
-    const QString& fileName)
+    ImportSpreadsheet& importer)
 {
-    QFile testFile(fileName);
-    T importer(testFile);
     QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     QStringList sheetNames{importer.getSheetNames().second};
     auto [success, actualData] = importer.getData(sheetNames.first(), {});
     QCOMPARE(success, true);
     QCOMPARE(spy.count(), 100);
 }
-template void ImportCommon::checkEmittingProgressPercentChangedBigFile<
-    ImportXlsx>(const QString& fileName);
-template void ImportCommon::checkEmittingProgressPercentChangedBigFile<
-    ImportOds>(const QString& fileName);
