@@ -7,48 +7,6 @@
 
 #include "TestTableModel.h"
 
-QString ExportDsvTest::tableDataTsv_ =
-    "Text\tNumeric\tDate\nItem 0 0\t1.00\t2020-01-03\nItem 0 "
-    "1\t2.00\t2020-01-04\nItem 0 2\t3.00\t2020-01-05";
-QString ExportDsvTest::tableDataCsv_ =
-    "Text,Numeric,Date\nItem 0 0,1.00,2020-01-03\nItem 0 "
-    "1,2.00,2020-01-04\nItem 0 2,3.00,2020-01-05";
-QString ExportDsvTest::multiSelectionTableDataTsv_ =
-    "Text\tNumeric\tDate\nItem 0 0\t1.00\t2020-01-03\nItem 0 "
-    "2\t3.00\t2020-01-05";
-QString ExportDsvTest::multiSelectionTableDataCsv_ =
-    "Text,Numeric,Date\nItem 0 0,1.00,2020-01-03\nItem 0 "
-    "2,3.00,2020-01-05";
-QString ExportDsvTest::headersOnlyDataTsv_ = "Text\tNumeric\tDate";
-QString ExportDsvTest::headersOnlyDataCsv_ = "Text,Numeric,Date";
-QString ExportDsvTest::separatorInStringFieldDataTsv_ =
-    "Text\tNumeric\tDate\n\"Other\titem\"\t1.00\t2020-01-03\nItem 0 "
-    "1\t2.00\t2020-01-04";
-QString ExportDsvTest::separatorInStringFieldDataCsv_ =
-    "Text,Numeric,Date\n\"Other,item\",1.00,2020-01-03\nItem 0 "
-    "1,2.00,2020-01-04";
-QString ExportDsvTest::newLineInStringFieldDataTsv_ =
-    "Text\tNumeric\tDate\n\"Other\nitem\"\t1.00\t2020-01-03\nItem 0 "
-    "1\t2.00\t2020-01-04";
-QString ExportDsvTest::newLineInStringFieldDataCsv_ =
-    "Text,Numeric,Date\n\"Other\nitem\",1.00,2020-01-03\nItem 0 "
-    "1,2.00,2020-01-04";
-QString ExportDsvTest::doubleQuotesInStringFieldDataTsv_ =
-    "Text\tNumeric\tDate\n\"Other\"\"item\"\t1.00\t2020-01-03\nItem 0 "
-    "1\t2.00\t2020-01-04";
-QString ExportDsvTest::doubleQuotesInStringFieldDataCsv_ =
-    "Text,Numeric,Date\n\"Other\"\"item\",1.00,2020-01-03\nItem 0 "
-    "1,2.00,2020-01-04";
-QString ExportDsvTest::customDateFormatData_ =
-    QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,03/01/20");
-QString ExportDsvTest::defaultLocaleShortDateData_ =
-    QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020");
-QString ExportDsvTest::localeForNumbersData_ =
-    QStringLiteral("Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03");
-QString ExportDsvTest::emptyData_ = QStringLiteral("");
-QStringList ExportDsvTest::headers_{
-    QStringLiteral("Text"), QStringLiteral("Numeric"), QStringLiteral("Date")};
-
 ExportDsvTest::ExportDsvTest(QObject* parent) : QObject(parent) {}
 
 void ExportDsvTest::testEmptyTable_data()

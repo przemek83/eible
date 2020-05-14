@@ -8,10 +8,6 @@
 
 #include "ImportCommon.h"
 
-const QString ImportOdsTest::testFileName_{QStringLiteral(":/testOds.ods")};
-const QString ImportOdsTest::templateFileName_{
-    QStringLiteral(":/emptyOds.ods")};
-
 ImportOdsTest::ImportOdsTest(QObject* parent) : QObject(parent) {}
 
 void ImportOdsTest::testRetrievingSheetNames()

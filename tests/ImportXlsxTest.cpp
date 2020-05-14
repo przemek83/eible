@@ -10,111 +10,6 @@
 #include "ImportCommon.h"
 #include "TestTableModel.h"
 
-const QString ImportXlsxTest::testFileName_{QStringLiteral(":/testXlsx.xlsx")};
-const QString ImportXlsxTest::templateFileName_{
-    QStringLiteral(":/template.xlsx")};
-
-const QVector<std::pair<QString, QString>> ImportXlsxTest::sheets_{
-    {"Sheet1", "xl/worksheets/sheet1.xml"},
-    {"Sheet2", "xl/worksheets/sheet2.xml"},
-    {"Sheet3(empty)", "xl/worksheets/sheet3.xml"},
-    {"Sheet4", "xl/worksheets/sheet4.xml"},
-    {"Sheet5", "xl/worksheets/sheet5.xml"},
-    {"Sheet6", "xl/worksheets/sheet6.xml"},
-    {"Sheet7", "xl/worksheets/sheet7.xml"},
-    {"Sheet9", "xl/worksheets/sheet8.xml"},
-    {"testAccounts", "xl/worksheets/sheet9.xml"}};
-
-const QStringList ImportXlsxTest::sharedStrings_{
-    QStringLiteral("Text"),
-    QStringLiteral("Numeric"),
-    QStringLiteral("Date"),
-    QStringLiteral("Item 0, 0"),
-    QStringLiteral("Other item"),
-    QStringLiteral("Trait #1"),
-    QStringLiteral("Value #1"),
-    QStringLiteral("Transaction date"),
-    QStringLiteral("Units"),
-    QStringLiteral("Price"),
-    QStringLiteral("Price per unit"),
-    QStringLiteral("Another trait"),
-    QStringLiteral("trait 1"),
-    QStringLiteral("brown"),
-    QStringLiteral("trait 2"),
-    QStringLiteral("red"),
-    QStringLiteral("trait 3"),
-    QStringLiteral("yellow"),
-    QStringLiteral("trait 4"),
-    QStringLiteral("black"),
-    QStringLiteral("trait 16"),
-    QStringLiteral("trait 17"),
-    QStringLiteral("trait 18"),
-    QStringLiteral("white"),
-    QStringLiteral("trait 19"),
-    QStringLiteral("trait 20"),
-    QStringLiteral("trait 21"),
-    QStringLiteral("pink"),
-    QStringLiteral("trait 22"),
-    QStringLiteral("blue"),
-    QStringLiteral("trait 5"),
-    QStringLiteral("trait 6"),
-    QStringLiteral("trait 7"),
-    QStringLiteral("trait 8"),
-    QStringLiteral("cena nier"),
-    QStringLiteral("pow"),
-    QStringLiteral("cena metra"),
-    QStringLiteral("data transakcji"),
-    QStringLiteral("text"),
-    QStringLiteral("a"),
-    QStringLiteral("b"),
-    QStringLiteral("c"),
-    QStringLiteral("name"),
-    QStringLiteral("date"),
-    QStringLiteral("mass (kg)"),
-    QStringLiteral("height"),
-    QStringLiteral("Sx"),
-    QStringLiteral("Sy"),
-    QStringLiteral("Sxx"),
-    QStringLiteral("Syy"),
-    QStringLiteral("Sxy"),
-    QStringLiteral("n"),
-    QStringLiteral("a (beta w wiki)"),
-    QStringLiteral("b (alfa w wiki)"),
-    QStringLiteral("y=ax+b"),
-    QStringLiteral("modificator"),
-    QStringLiteral("x"),
-    QStringLiteral("y"),
-    QStringLiteral("Pow"),
-    QStringLiteral("Cena"),
-    QStringLiteral("cena_m"),
-    QStringLiteral("Średnia:"),
-    QStringLiteral("Mediana:"),
-    QStringLiteral("Q10"),
-    QStringLiteral("Q25"),
-    QStringLiteral("Q50"),
-    QStringLiteral("Q75"),
-    QStringLiteral("Q90"),
-    QStringLiteral("second"),
-    QStringLiteral("third"),
-    QStringLiteral("fourth"),
-    QStringLiteral("s"),
-    QStringLiteral("d"),
-    QStringLiteral("user"),
-    QStringLiteral("pass"),
-    QStringLiteral("lic_exp"),
-    QStringLiteral("uwagi"),
-    QStringLiteral("test1"),
-    QStringLiteral("test123"),
-    QStringLiteral("zawsze aktualna"),
-    QStringLiteral("test2"),
-    QStringLiteral("konto zablokowane"),
-    QStringLiteral("test3")};
-
-const QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22, 165,
-                                             167, 170, 171, 172, 173};
-const QList<int> ImportXlsxTest::allStyles_{
-    164, 164, 165, 164, 166, 167, 168, 169, 169, 170, 164, 164, 171, 172, 173};
-
 ImportXlsxTest::ImportXlsxTest(QObject* parent) : QObject(parent) {}
 
 void ImportXlsxTest::testRetrievingSheetNames()
@@ -261,7 +156,7 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
 }
 
 QVector<QVector<QVariant>> ImportXlsxTest::convertDataToUseSharedStrings(
-    QVector<QVector<QVariant>> inputData)
+    const QVector<QVector<QVariant>>& inputData)
 {
     QVector<QVector<QVariant>> outputData{inputData};
     for (auto& row : outputData)
@@ -278,9 +173,8 @@ void ImportXlsxTest::testGetData_data()
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
     QCOMPARE(sheets_.size(), ImportCommon::getSheetNames().size());
-    for (int i = 0; i < sheets_.size(); ++i)
+    for (const auto& [sheetName, sheetPath] : sheets_)
     {
-        const QString& sheetName{sheets_[i].first};
         QVector<QVector<QVariant>> sheetData{
             ImportCommon::getDataForSheet(sheetName)};
         sheetData = convertDataToUseSharedStrings(sheetData);
@@ -301,24 +195,33 @@ void ImportXlsxTest::testGetDataLimitRows_data()
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<unsigned int>("rowLimit");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
+
     QString sheetName{sheets_[0].first};
     QVector<QVector<QVariant>> sheetData{convertDataToUseSharedStrings(
         ImportCommon::getDataForSheet(sheetName))};
-    QTest::newRow(("Limited data to 10 in " + sheetName).toStdString().c_str())
-        << sheetName << 10u << sheetData;
-    QTest::newRow(("Limited data to 2 in " + sheetName).toStdString().c_str())
-        << sheetName << 2u << sheetData;
+    unsigned int rowLimit{10};
+    QString testName{"Limited data to " + QString::number(rowLimit) + " in " +
+                     sheetName};
+    QTest::newRow(testName.toStdString().c_str())
+        << sheetName << rowLimit << sheetData;
+
+    rowLimit = 2U;
+    testName =
+        "Limited data to " + QString::number(rowLimit) + " in " + sheetName;
+    QTest::newRow(testName.toStdString().c_str())
+        << sheetName << rowLimit << sheetData;
+
     sheetName = sheets_[5].first;
+    rowLimit = 12U;
     QVector<QVector<QVariant>> expectedValues;
-    const unsigned int rowLimit{12u};
+    expectedValues.reserve(rowLimit);
     sheetData = ImportCommon::getDataForSheet(sheetName);
     for (unsigned int i = 0; i < rowLimit; ++i)
         expectedValues.append(sheetData[static_cast<int>(i)]);
     expectedValues = convertDataToUseSharedStrings(expectedValues);
-    QTest::newRow(
-        ("Limited data to " + QString::number(rowLimit) + " in " + sheetName)
-            .toStdString()
-            .c_str())
+    testName =
+        "Limited data to " + QString::number(rowLimit) + " in " + sheetName;
+    QTest::newRow(testName.toStdString().c_str())
         << sheetName << rowLimit << expectedValues;
 }
 

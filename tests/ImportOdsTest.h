@@ -49,8 +49,8 @@ private Q_SLOTS:
     void testInvalidSheetName();
 
 private:
-    static const QString testFileName_;
-    static const QString templateFileName_;
+    const QString testFileName_{QStringLiteral(":/testOds.ods")};
+    const QString templateFileName_{QStringLiteral(":/emptyOds.ods")};
 };
 
 #endif  // IMPORTODSTEST_H

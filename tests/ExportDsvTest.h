@@ -38,23 +38,48 @@ private Q_SLOTS:
     void cleanupTestCase();
 
 private:
-    static QString tableDataTsv_;
-    static QString tableDataCsv_;
-    static QString multiSelectionTableDataTsv_;
-    static QString multiSelectionTableDataCsv_;
-    static QString headersOnlyDataTsv_;
-    static QString headersOnlyDataCsv_;
-    static QString separatorInStringFieldDataTsv_;
-    static QString separatorInStringFieldDataCsv_;
-    static QString newLineInStringFieldDataTsv_;
-    static QString newLineInStringFieldDataCsv_;
-    static QString doubleQuotesInStringFieldDataTsv_;
-    static QString doubleQuotesInStringFieldDataCsv_;
-    static QString customDateFormatData_;
-    static QString defaultLocaleShortDateData_;
-    static QString localeForNumbersData_;
-    static QString emptyData_;
-    static QStringList headers_;
+    QString tableDataTsv_ =
+        "Text\tNumeric\tDate\nItem 0 0\t1.00\t2020-01-03\nItem 0 "
+        "1\t2.00\t2020-01-04\nItem 0 2\t3.00\t2020-01-05";
+    QString tableDataCsv_ =
+        "Text,Numeric,Date\nItem 0 0,1.00,2020-01-03\nItem 0 "
+        "1,2.00,2020-01-04\nItem 0 2,3.00,2020-01-05";
+    QString multiSelectionTableDataTsv_ =
+        "Text\tNumeric\tDate\nItem 0 0\t1.00\t2020-01-03\nItem 0 "
+        "2\t3.00\t2020-01-05";
+    QString multiSelectionTableDataCsv_ =
+        "Text,Numeric,Date\nItem 0 0,1.00,2020-01-03\nItem 0 "
+        "2,3.00,2020-01-05";
+    QString headersOnlyDataTsv_ = "Text\tNumeric\tDate";
+    QString headersOnlyDataCsv_ = "Text,Numeric,Date";
+    QString separatorInStringFieldDataTsv_ =
+        "Text\tNumeric\tDate\n\"Other\titem\"\t1.00\t2020-01-03\nItem 0 "
+        "1\t2.00\t2020-01-04";
+    QString separatorInStringFieldDataCsv_ =
+        "Text,Numeric,Date\n\"Other,item\",1.00,2020-01-03\nItem 0 "
+        "1,2.00,2020-01-04";
+    QString newLineInStringFieldDataTsv_ =
+        "Text\tNumeric\tDate\n\"Other\nitem\"\t1.00\t2020-01-03\nItem 0 "
+        "1\t2.00\t2020-01-04";
+    QString newLineInStringFieldDataCsv_ =
+        "Text,Numeric,Date\n\"Other\nitem\",1.00,2020-01-03\nItem 0 "
+        "1,2.00,2020-01-04";
+    QString doubleQuotesInStringFieldDataTsv_ =
+        "Text\tNumeric\tDate\n\"Other\"\"item\"\t1.00\t2020-01-03\nItem 0 "
+        "1\t2.00\t2020-01-04";
+    QString doubleQuotesInStringFieldDataCsv_ =
+        "Text,Numeric,Date\n\"Other\"\"item\",1.00,2020-01-03\nItem 0 "
+        "1,2.00,2020-01-04";
+    QString customDateFormatData_ =
+        QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,03/01/20");
+    QString defaultLocaleShortDateData_ =
+        QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020");
+    QString localeForNumbersData_ =
+        QStringLiteral("Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03");
+    QString emptyData_ = QStringLiteral("");
+    QStringList headers_{QStringLiteral("Text"), QStringLiteral("Numeric"),
+                         QStringLiteral("Date")};
+
     TestTableModel* tableModelForBenchmarking_{nullptr};
 };
 
