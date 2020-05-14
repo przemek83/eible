@@ -106,17 +106,6 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
     return {true, columnNames_.value(sheetName)};
 }
 
-std::pair<bool, unsigned int> ImportOds::getColumnCount(
-    const QString& sheetName)
-{
-    return getCount(sheetName, columnCounts_);
-}
-
-std::pair<bool, unsigned int> ImportOds::getRowCount(const QString& sheetName)
-{
-    return getCount(sheetName, rowCounts_);
-}
-
 std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)

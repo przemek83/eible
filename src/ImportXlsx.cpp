@@ -508,17 +508,6 @@ std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
     return {success, *allStyles_};
 }
 
-std::pair<bool, unsigned int> ImportXlsx::getColumnCount(
-    const QString& sheetName)
-{
-    return getCount(sheetName, columnCounts_);
-}
-
-std::pair<bool, unsigned int> ImportXlsx::getRowCount(const QString& sheetName)
-{
-    return getCount(sheetName, rowCounts_);
-}
-
 QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
                                      ColumnType currentColumnFormat,
                                      const QString& currentColType,

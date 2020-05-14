@@ -22,6 +22,18 @@ void ImportSpreadsheet::setNameForEmptyColumn(const QString& name)
     emptyColName_ = name;
 }
 
+std::pair<bool, unsigned int> ImportSpreadsheet::getColumnCount(
+    const QString& sheetName)
+{
+    return getCount(sheetName, columnCounts_);
+}
+
+std::pair<bool, unsigned int> ImportSpreadsheet::getRowCount(
+    const QString& sheetName)
+{
+    return getCount(sheetName, rowCounts_);
+}
+
 std::pair<bool, QVector<QVector<QVariant> > > ImportSpreadsheet::getData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns)
 {

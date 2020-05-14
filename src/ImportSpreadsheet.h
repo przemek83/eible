@@ -64,16 +64,14 @@ public:
      * @param sheetName Sheet name.
      * @return First value indicating success, second is column count.
      */
-    virtual std::pair<bool, unsigned int> getColumnCount(
-        const QString& sheetName) = 0;
+    std::pair<bool, unsigned int> getColumnCount(const QString& sheetName);
 
     /**
      * @brief Get number of rows in given sheet.
      * @param sheetName Sheet name.
      * @return First value indicating success, second is row count.
      */
-    virtual std::pair<bool, unsigned int> getRowCount(
-        const QString& sheetName) = 0;
+    std::pair<bool, unsigned int> getRowCount(const QString& sheetName);
 
     /**
      * @brief Get data from sheet.
@@ -130,6 +128,10 @@ protected:
 
     bool isSheetNameValid(const QStringList& sheetNames,
                           const QString& sheetName);
+
+    virtual std::pair<bool, unsigned int> getCount(
+        const QString& sheetName,
+        const QHash<QString, unsigned int>& countMap) = 0;
 
     QHash<QString, unsigned int> rowCounts_{};
     QHash<QString, unsigned int> columnCounts_{};

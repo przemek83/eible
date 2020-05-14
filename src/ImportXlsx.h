@@ -54,12 +54,6 @@ public:
      */
     std::pair<bool, QList<int>> getAllStyles();
 
-    std::pair<bool, unsigned int> getColumnCount(
-        const QString& sheetName) override;
-
-    std::pair<bool, unsigned int> getRowCount(
-        const QString& sheetName) override;
-
     std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
         const QString& sheetName, const QVector<unsigned int>& excludedColumns,
         unsigned int rowLimit) override;
@@ -74,7 +68,8 @@ private:
                          QXmlStreamReader& xmlStreamReader) const;
 
     std::pair<bool, unsigned int> getCount(
-        const QString& sheetName, const QHash<QString, unsigned int>& countMap);
+        const QString& sheetName,
+        const QHash<QString, unsigned int>& countMap) override;
 
     std::pair<bool, QMap<QString, QString>> getSheetIdToUserFriendlyNameMap();
 
