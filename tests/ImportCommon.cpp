@@ -484,6 +484,7 @@ QVector<QVector<QVariant>> ImportCommon::getDataWithoutColumns(
     const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude)
 {
     QVector<QVector<QVariant>> expectedValues;
+    expectedValues.reserve(data.size());
     for (auto dataRow : data)
     {
         for (int column : columnsToExclude)
@@ -498,7 +499,7 @@ QStringList ImportCommon::getSheetNames() { return sheetNames_; }
 void ImportCommon::checkInvalidSheetName(ImportSpreadsheet& importer)
 {
     auto [success, actualSharedStrings] =
-        importer.getColumnCount("invalidSheetName");
+        importer.getColumnCount(QStringLiteral("invalidSheetName"));
     QCOMPARE(success, false);
 }
 

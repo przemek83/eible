@@ -154,7 +154,8 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
 
     const unsigned int actualColumnCount{static_cast<unsigned int>(
         std::max(columnNames.size(), columnTypes.size()))};
-    columnNames.reserve(actualColumnCount);
+    columnNames.reserve(static_cast<int>(actualColumnCount));
+    columnTypes.reserve(static_cast<int>(actualColumnCount));
 
     for (auto i = static_cast<unsigned int>(columnNames.size());
          i < actualColumnCount; ++i)

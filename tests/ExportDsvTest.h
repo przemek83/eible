@@ -50,8 +50,8 @@ private:
     QString multiSelectionTableDataCsv_ =
         "Text,Numeric,Date\nItem 0 0,1.00,2020-01-03\nItem 0 "
         "2,3.00,2020-01-05";
-    QString headersOnlyDataTsv_ = "Text\tNumeric\tDate";
-    QString headersOnlyDataCsv_ = "Text,Numeric,Date";
+    QString headersOnlyDataTsv_ = QStringLiteral("Text\tNumeric\tDate");
+    QString headersOnlyDataCsv_ = QStringLiteral("Text,Numeric,Date");
     QString separatorInStringFieldDataTsv_ =
         "Text\tNumeric\tDate\n\"Other\titem\"\t1.00\t2020-01-03\nItem 0 "
         "1\t2.00\t2020-01-04";
@@ -76,7 +76,7 @@ private:
         QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020");
     QString localeForNumbersData_ =
         QStringLiteral("Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03");
-    QString emptyData_ = QStringLiteral("");
+    QString emptyData_ = QLatin1String("");
     QStringList headers_{QStringLiteral("Text"), QStringLiteral("Numeric"),
                          QStringLiteral("Date")};
 
