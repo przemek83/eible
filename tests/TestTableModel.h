@@ -7,7 +7,7 @@ class TestTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    TestTableModel(int columnCount, int rowCount);
+    TestTableModel(int columnCount, int rowCount, QObject* parent = nullptr);
     ~TestTableModel() override = default;
 
     int rowCount([[maybe_unused]] const QModelIndex& parent =

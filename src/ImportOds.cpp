@@ -23,10 +23,10 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
     if (!initZipFile(zipFile, QStringLiteral("settings.xml")))
         return {false, {}};
 
-    QDomDocument xmlDocument(__FUNCTION__);
+    QDomDocument xmlDocument;
     if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__, "Xml file is damaged.");
+        setError(__FUNCTION__, QStringLiteral("Xml file is damaged."));
         return {false, {}};
     }
 

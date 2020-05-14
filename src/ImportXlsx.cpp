@@ -26,6 +26,7 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
     if (sheets_)
     {
         QStringList sheets;
+        sheets.reserve(sheets_->size());
         for (const auto& [sheetName, sheetPath] : *sheets_)
             sheets << sheetName;
         return {true, sheets};
@@ -41,6 +42,7 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
         return {false, {}};
 
     QStringList sheetsToReturn;
+    sheetsToReturn.reserve(sheets_->size());
     for (const auto& [sheetName, sheetPath] : *sheets_)
         sheetsToReturn << sheetName;
     return {true, sheetsToReturn};
@@ -92,6 +94,7 @@ QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
 QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes) const
 {
     QList<int> allStyles;
+    allStyles.reserve(sheetNodes.size());
     const QString searchedAttribute{QStringLiteral("numFmtId")};
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
@@ -109,10 +112,10 @@ ImportXlsx::getStyles()
     if (!initZipFile(zipFile, QStringLiteral("xl/styles.xml")))
         return {false, {}, {}};
 
-    QDomDocument xmlDocument(__FUNCTION__);
+    QDomDocument xmlDocument;
     if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__, "Xml file is corrupted.");
+        setError(__FUNCTION__, QStringLiteral("Xml file is corrupted."));
         return {false, std::nullopt, std::nullopt};
     }
 
@@ -134,6 +137,7 @@ std::pair<bool, QString> ImportXlsx::getSheetPath(const QString& sheetName)
             return {true, sheetPath};
 
     QStringList sheetNames;
+    sheetNames.reserve(sheets_->size());
     for (const auto& [currenSheetName, sheetPath] : *sheets_)
         sheetNames << currenSheetName;
     setError(__FUNCTION__,
@@ -242,12 +246,12 @@ int ImportXlsx::getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
 
 std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
     QuaZipFile& zipFile,
-    std::function<QDomNodeList(QDomElement)> nodesRetriever)
+    std::function<QDomNodeList(const QDomElement&)> nodesRetriever)
 {
-    QDomDocument xmlDocument{QDomDocument(__FUNCTION__)};
+    QDomDocument xmlDocument;
     if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__, "File is corrupted.");
+        setError(__FUNCTION__, QStringLiteral("File is corrupted."));
         return {false, {}};
     }
 
@@ -255,7 +259,8 @@ std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
     QDomNodeList sheetNodes{nodesRetriever(root)};
     if (sheetNodes.size() <= 0)
     {
-        setError(__FUNCTION__, "File is corrupted, no sheets in xml.");
+        setError(__FUNCTION__,
+                 QStringLiteral("File is corrupted, no sheets in xml."));
         return {false, {}};
     }
     return {true, sheetNodes};
@@ -374,9 +379,10 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
         xmlStreamReader.readNextStartElement();
     }
 
-    for (int i = 0; i < columnTypes.size(); ++i)
-        if (ColumnType::UNKNOWN == columnTypes.at(i))
-            columnTypes[i] = ColumnType::STRING;
+    std::replace_if(
+        columnTypes.begin(), columnTypes.end(),
+        [](ColumnType columnType) { return columnType == ColumnType::UNKNOWN; },
+        ColumnType::STRING);
 
     return {true, rowCounter, columnTypes};
 }
@@ -448,7 +454,7 @@ ImportXlsx::getSheetIdToUserFriendlyNameMap()
     if (!initZipFile(zipFile, QStringLiteral("xl/workbook.xml")))
         return {false, {}};
 
-    auto nodesRetriever{[](QDomElement root) {
+    auto nodesRetriever{[](const QDomElement& root) {
         return root.firstChildElement(QStringLiteral("sheets")).childNodes();
     }};
     auto [sucess, sheetNodes] = getSheetNodes(zipFile, nodesRetriever);
@@ -466,7 +472,8 @@ ImportXlsx::getSheetIdToUserFriendlyNameMap()
     return {true, sheetIdToUserFriendlyNameMap};
 }
 
-std::pair<bool, QList<std::pair<QString, QString>>> ImportXlsx::retrieveSheets(
+std::pair<bool, QVector<std::pair<QString, QString>>>
+ImportXlsx::retrieveSheets(
     const QMap<QString, QString>& sheetIdToUserFriendlyNameMap)
 {
     QuaZipFile zipFile;
@@ -474,11 +481,11 @@ std::pair<bool, QList<std::pair<QString, QString>>> ImportXlsx::retrieveSheets(
         return {false, {}};
 
     auto [sucess, sheetNodes] = getSheetNodes(
-        zipFile, [](QDomElement root) { return root.childNodes(); });
+        zipFile, [](const QDomElement& root) { return root.childNodes(); });
     if (!sucess)
         return {false, {}};
 
-    QList<std::pair<QString, QString>> sheets;
+    QVector<std::pair<QString, QString>> sheets;
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};

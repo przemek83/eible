@@ -9,6 +9,9 @@ class QBuffer;
 
 class ExportXlsxTest : public QObject
 {
+public:
+    explicit ExportXlsxTest(QObject* parent = nullptr);
+
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();

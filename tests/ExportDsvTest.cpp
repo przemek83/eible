@@ -49,6 +49,8 @@ QString ExportDsvTest::emptyData_ = QStringLiteral("");
 QStringList ExportDsvTest::headers_{
     QStringLiteral("Text"), QStringLiteral("Numeric"), QStringLiteral("Date")};
 
+ExportDsvTest::ExportDsvTest(QObject* parent) : QObject(parent) {}
+
 void ExportDsvTest::testEmptyTable_data()
 {
     QTest::addColumn<char>("separator");

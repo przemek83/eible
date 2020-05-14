@@ -3,8 +3,10 @@
 #include <QDate>
 #include <QDebug>
 
-TestTableModel::TestTableModel(int columnCount, int rowCount)
-    : QAbstractTableModel(), columnCount_(columnCount), rowCount_(rowCount)
+TestTableModel::TestTableModel(int columnCount, int rowCount, QObject* parent)
+    : QAbstractTableModel(parent),
+      columnCount_(columnCount),
+      rowCount_(rowCount)
 {
     data_.resize(columnCount);
     for (int column = 0; column < columnCount; ++column)

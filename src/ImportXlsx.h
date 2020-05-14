@@ -78,12 +78,12 @@ private:
 
     std::pair<bool, QMap<QString, QString>> getSheetIdToUserFriendlyNameMap();
 
-    std::pair<bool, QList<std::pair<QString, QString>>> retrieveSheets(
+    std::pair<bool, QVector<std::pair<QString, QString>>> retrieveSheets(
         const QMap<QString, QString>& sheetIdToUserFriendlyNameMap);
 
     std::pair<bool, QDomNodeList> getSheetNodes(
         QuaZipFile& zipFile,
-        std::function<QDomNodeList(QDomElement)> nodesRetriever);
+        std::function<QDomNodeList(const QDomElement&)> nodesRetriever);
 
     bool isRowStart(const QXmlStreamReader& xmlStreamReader) const;
     bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
@@ -123,7 +123,7 @@ private:
 
     bool isCommonDataOk();
 
-    std::optional<QList<std::pair<QString, QString>>> sheets_{std::nullopt};
+    std::optional<QVector<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
     std::optional<QList<int>> allStyles_{std::nullopt};

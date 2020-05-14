@@ -14,7 +14,7 @@ const QString ImportXlsxTest::testFileName_{QStringLiteral(":/testXlsx.xlsx")};
 const QString ImportXlsxTest::templateFileName_{
     QStringLiteral(":/template.xlsx")};
 
-const QList<std::pair<QString, QString>> ImportXlsxTest::sheets_{
+const QVector<std::pair<QString, QString>> ImportXlsxTest::sheets_{
     {"Sheet1", "xl/worksheets/sheet1.xml"},
     {"Sheet2", "xl/worksheets/sheet2.xml"},
     {"Sheet3(empty)", "xl/worksheets/sheet3.xml"},
@@ -114,6 +114,8 @@ const QList<int> ImportXlsxTest::dateStyles_{14,  15,  16,  17,  22, 165,
                                              167, 170, 171, 172, 173};
 const QList<int> ImportXlsxTest::allStyles_{
     164, 164, 165, 164, 166, 167, 168, 169, 169, 170, 164, 164, 171, 172, 173};
+
+ImportXlsxTest::ImportXlsxTest(QObject* parent) : QObject(parent) {}
 
 void ImportXlsxTest::testRetrievingSheetNames()
 {

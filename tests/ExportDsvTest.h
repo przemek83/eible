@@ -8,6 +8,9 @@ class TestTableModel;
 class ExportDsvTest : public QObject
 {
     Q_OBJECT
+public:
+    explicit ExportDsvTest(QObject* parent = nullptr);
+
 private Q_SLOTS:
     void testEmptyTable_data();
     void testEmptyTable();

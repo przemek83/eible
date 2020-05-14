@@ -10,6 +10,9 @@ class ImportXlsx;
 
 class ImportXlsxTest : public QObject
 {
+public:
+    explicit ImportXlsxTest(QObject* parent = nullptr);
+
     Q_OBJECT
 private Q_SLOTS:
     void testRetrievingSheetNames();
@@ -66,7 +69,7 @@ private:
 
     static const QString testFileName_;
     static const QString templateFileName_;
-    static const QList<std::pair<QString, QString>> sheets_;
+    static const QVector<std::pair<QString, QString>> sheets_;
     static const QStringList sharedStrings_;
     static const QList<int> dateStyles_;
     static const QList<int> allStyles_;

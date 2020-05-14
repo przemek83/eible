@@ -96,7 +96,7 @@ public:
         unsigned int rowLimit) = 0;
 
 protected:
-    void setError(QString functionName, QString errorContent);
+    void setError(const QString& functionName, const QString& errorContent);
 
     virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
                                 unsigned int& lastEmittedPercent);

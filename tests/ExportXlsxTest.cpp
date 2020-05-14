@@ -69,6 +69,8 @@ QString ExportXlsxTest::headersOnlySheetData_ =
 
 QString ExportXlsxTest::emptySheetData_ = R"(</sheetData>)";
 
+ExportXlsxTest::ExportXlsxTest(QObject* parent) : QObject(parent) {}
+
 QStringList ExportXlsxTest::headers_{
     QStringLiteral("Text"), QStringLiteral("Numeric"), QStringLiteral("Date")};
 

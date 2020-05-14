@@ -34,7 +34,8 @@ std::pair<bool, QVector<QVector<QVariant> > > ImportSpreadsheet::getData(
     return getLimitedData(sheetName, excludedColumns, rowCount);
 }
 
-void ImportSpreadsheet::setError(QString functionName, QString errorContent)
+void ImportSpreadsheet::setError(const QString& functionName,
+                                 const QString& errorContent)
 {
     error_ = {functionName, errorContent};
 }
@@ -47,7 +48,7 @@ void ImportSpreadsheet::updateProgress(unsigned int currentRow,
         static_cast<unsigned int>(100. * (currentRow + 1) / rowCount)};
     if (currentPercent > lastEmittedPercent)
     {
-        emit progressPercentChanged(currentPercent);
+        Q_EMIT progressPercentChanged(currentPercent);
         lastEmittedPercent = currentPercent;
         QCoreApplication::processEvents();
     }
@@ -162,11 +163,11 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
     const unsigned int actualColumnCount{static_cast<unsigned int>(
         std::max(columnNames.size(), columnTypes.size()))};
 
-    for (unsigned int i = static_cast<unsigned int>(columnNames.size());
+    for (auto i = static_cast<unsigned int>(columnNames.size());
          i < actualColumnCount; ++i)
         columnNames << emptyColName_;
 
-    for (unsigned int i = static_cast<unsigned int>(columnTypes.size());
+    for (auto i = static_cast<unsigned int>(columnTypes.size());
          i < actualColumnCount; ++i)
         columnTypes.append(ColumnType::STRING);
 

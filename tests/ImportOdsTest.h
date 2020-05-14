@@ -5,6 +5,9 @@
 
 class ImportOdsTest : public QObject
 {
+public:
+    explicit ImportOdsTest(QObject* parent = nullptr);
+
     Q_OBJECT
 private Q_SLOTS:
     void testRetrievingSheetNames();
