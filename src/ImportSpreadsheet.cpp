@@ -15,10 +15,7 @@ ImportSpreadsheet::ImportSpreadsheet(QIODevice& ioDevice)
 {
 }
 
-std::pair<QString, QString> ImportSpreadsheet::getError() const
-{
-    return error_;
-}
+QString ImportSpreadsheet::getLastError() const { return lastError_; }
 
 void ImportSpreadsheet::setNameForEmptyColumn(const QString& name)
 {
@@ -34,10 +31,9 @@ std::pair<bool, QVector<QVector<QVariant> > > ImportSpreadsheet::getData(
     return getLimitedData(sheetName, excludedColumns, rowCount);
 }
 
-void ImportSpreadsheet::setError(const QString& functionName,
-                                 const QString& errorContent)
+void ImportSpreadsheet::setError(const QString& errorContent)
 {
-    error_ = {functionName, errorContent};
+    lastError_ = errorContent;
 }
 
 void ImportSpreadsheet::updateProgress(unsigned int currentRow,
@@ -58,8 +54,7 @@ bool ImportSpreadsheet::openZip()
 {
     if (!zip_.isOpen() && !zip_.open(QuaZip::mdUnzip))
     {
-        setError(__FUNCTION__,
-                 "Can not open zip file " + zip_.getZipName() + ".");
+        setError("Can not open zip file " + zip_.getZipName() + ".");
         return false;
     }
     return true;
@@ -69,8 +64,7 @@ bool ImportSpreadsheet::setCurrentZipFile(const QString& zipFileName)
 {
     if (!zip_.setCurrentFile(zipFileName))
     {
-        setError(__FUNCTION__,
-                 "Can not find file " + zipFileName + " in archive.");
+        setError("Can not find file " + zipFileName + " in archive.");
         return false;
     }
     return true;
@@ -81,8 +75,7 @@ bool ImportSpreadsheet::openZipFile(QuaZipFile& zipFile)
     zipFile.setZip(&zip_);
     if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        setError(__FUNCTION__,
-                 "Can not open file " + zipFile.getFileName() + ".");
+        setError("Can not open file " + zipFile.getFileName() + ".");
         return false;
     }
     return true;
@@ -140,10 +133,9 @@ bool ImportSpreadsheet::columnsToExcludeAreValid(
         [=](unsigned int column) { return column >= columnCount; });
     if (it != excludedColumns.end())
     {
-        setError(__FUNCTION__, "Column to exclude " + QString::number(*it) +
-                                   " is invalid. Xlsx got only " +
-                                   QString::number(columnCount) +
-                                   " columns indexed from 0.");
+        setError("Column to exclude " + QString::number(*it) +
+                 " is invalid. Xlsx got only " + QString::number(columnCount) +
+                 " columns indexed from 0.");
         return false;
     }
     return true;
@@ -162,6 +154,7 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
 
     const unsigned int actualColumnCount{static_cast<unsigned int>(
         std::max(columnNames.size(), columnTypes.size()))};
+    columnNames.reserve(actualColumnCount);
 
     for (auto i = static_cast<unsigned int>(columnNames.size());
          i < actualColumnCount; ++i)
@@ -184,9 +177,8 @@ bool ImportSpreadsheet::isSheetNameValid(const QStringList& sheetNames,
 {
     if (!sheetNames.contains(sheetName))
     {
-        setError(__FUNCTION__,
-                 "Sheet " + sheetName +
-                     " not found. Available sheets: " + sheetNames.join(','));
+        setError("Sheet " + sheetName +
+                 " not found. Available sheets: " + sheetNames.join(','));
         return false;
     }
     return true;

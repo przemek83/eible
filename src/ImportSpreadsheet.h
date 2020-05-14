@@ -51,7 +51,7 @@ public:
      * @brief Get last error.
      * @return First value contains function name, second error.
      */
-    std::pair<QString, QString> getError() const;
+    QString getLastError() const;
 
     /**
      * @brief Set name used for empty columns.
@@ -96,7 +96,7 @@ public:
         unsigned int rowLimit) = 0;
 
 protected:
-    void setError(const QString& functionName, const QString& errorContent);
+    void setError(const QString& errorContent);
 
     virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
                                 unsigned int& lastEmittedPercent);
@@ -144,7 +144,7 @@ protected:
     static constexpr int NOT_SET_COLUMN{-1};
 
 private:
-    std::pair<QString, QString> error_;
+    QString lastError_;
 
     QuaZip zip_;
 

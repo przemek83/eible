@@ -26,7 +26,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
     QDomDocument xmlDocument;
     if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__, QStringLiteral("Xml file is damaged."));
+        setError(QStringLiteral("Xml file is damaged."));
         return {false, {}};
     }
 

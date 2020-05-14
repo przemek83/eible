@@ -115,7 +115,7 @@ ImportXlsx::getStyles()
     QDomDocument xmlDocument;
     if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__, QStringLiteral("Xml file is corrupted."));
+        setError(QStringLiteral("Xml file is corrupted."));
         return {false, std::nullopt, std::nullopt};
     }
 
@@ -140,9 +140,8 @@ std::pair<bool, QString> ImportXlsx::getSheetPath(const QString& sheetName)
     sheetNames.reserve(sheets_->size());
     for (const auto& [currenSheetName, sheetPath] : *sheets_)
         sheetNames << currenSheetName;
-    setError(__FUNCTION__,
-             "Can not find sheet path for sheet name " + sheetName +
-                 ". Available sheet names:" + sheetNames.join(','));
+    setError("Can not find sheet path for sheet name " + sheetName +
+             ". Available sheet names:" + sheetNames.join(','));
     return {false, {}};
 }
 
@@ -251,7 +250,7 @@ std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
     QDomDocument xmlDocument;
     if (!xmlDocument.setContent(zipFile.readAll()))
     {
-        setError(__FUNCTION__, QStringLiteral("File is corrupted."));
+        setError(QStringLiteral("File is corrupted."));
         return {false, {}};
     }
 
@@ -259,8 +258,7 @@ std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
     QDomNodeList sheetNodes{nodesRetriever(root)};
     if (sheetNodes.size() <= 0)
     {
-        setError(__FUNCTION__,
-                 QStringLiteral("File is corrupted, no sheets in xml."));
+        setError(QStringLiteral("File is corrupted, no sheets in xml."));
         return {false, {}};
     }
     return {true, sheetNodes};
