@@ -30,8 +30,7 @@ Base class for spreadsheet related import classes. Following pure virtual method
 + `getSheetNames()`
 + `getColumnNames()`
 + `getColumnTypes()`
-+ `getColumnCount()`
-+ `getRowCount()`
++ `getCount()`
 + `getLimitedData()`
 + `retrieveColumnNames()`
 + `retrieveRowCountAndColumnTypes()`
