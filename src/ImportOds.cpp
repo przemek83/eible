@@ -12,27 +12,6 @@
 
 #include "EibleUtilities.h"
 
-const QString ImportOds::TABLE_TAG{QStringLiteral("table")};
-const QString ImportOds::TABLE_ROW_TAG{QStringLiteral("table-row")};
-const QString ImportOds::TABLE_CELL_TAG{QStringLiteral("table-cell")};
-const QString ImportOds::OFFICE_VALUE_TYPE_TAG{
-    QStringLiteral("office:value-type")};
-const QString ImportOds::COLUMNS_REPEATED_TAG{
-    QStringLiteral("table:number-columns-repeated")};
-const QString ImportOds::STRING_TAG{QStringLiteral("string")};
-const QString ImportOds::DATE_TAG{QStringLiteral("date")};
-const QString ImportOds::FLOAT_TAG{QStringLiteral("float")};
-const QString ImportOds::PERCENTAGE_TAG{QStringLiteral("percentage")};
-const QString ImportOds::CURRENCY_TAG{QStringLiteral("currency")};
-const QString ImportOds::TIME_TAG{QStringLiteral("time")};
-const QString ImportOds::P_TAG{QStringLiteral("p")};
-const QString ImportOds::OFFICE_DATE_VALUE_TAG{
-    QStringLiteral("office:date-value")};
-const QString ImportOds::OFFICE_VALUE_TAG{QStringLiteral("office:value")};
-const QString ImportOds::DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
-const QString ImportOds::TABLE_QUALIFIED_NAME{QStringLiteral("table:table")};
-const QString ImportOds::TABLE_NAME_TAG{QStringLiteral("table:name")};
-
 ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
 std::pair<bool, QStringList> ImportOds::getSheetNames()

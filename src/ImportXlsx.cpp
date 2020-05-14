@@ -14,15 +14,6 @@
 
 #include "EibleUtilities.h"
 
-const QString ImportXlsx::ROW_TAG{QStringLiteral("row")};
-const QString ImportXlsx::CELL_TAG{QStringLiteral("c")};
-const QString ImportXlsx::SHEET_DATA_TAG{QStringLiteral("sheetData")};
-const QString ImportXlsx::S_TAG{QStringLiteral("s")};
-const QString ImportXlsx::V_TAG{QStringLiteral("v")};
-const QString ImportXlsx::R_TAG{QStringLiteral("r")};
-const QString ImportXlsx::T_TAG{QStringLiteral("t")};
-const QString ImportXlsx::STR_TAG{QStringLiteral("str")};
-
 ImportXlsx::ImportXlsx(QIODevice& ioDevice)
     : ImportSpreadsheet(ioDevice),
       excelColNames_(EibleUtilities::generateExcelColumnNames(

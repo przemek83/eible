@@ -10,24 +10,20 @@ QDate getStartOfExcelWorld()
 
 QList<QByteArray> generateExcelColumnNames(int columnsNumber)
 {
-    static QList<QByteArray> templateNames;
-
-    if (templateNames.isEmpty())
-    {
-        templateNames << QByteArrayLiteral("A") << QByteArrayLiteral("B")
-                      << QByteArrayLiteral("C") << QByteArrayLiteral("D")
-                      << QByteArrayLiteral("E") << QByteArrayLiteral("F")
-                      << QByteArrayLiteral("G") << QByteArrayLiteral("H")
-                      << QByteArrayLiteral("I") << QByteArrayLiteral("J")
-                      << QByteArrayLiteral("K") << QByteArrayLiteral("L")
-                      << QByteArrayLiteral("M") << QByteArrayLiteral("N")
-                      << QByteArrayLiteral("O") << QByteArrayLiteral("P")
-                      << QByteArrayLiteral("Q") << QByteArrayLiteral("R")
-                      << QByteArrayLiteral("S") << QByteArrayLiteral("T")
-                      << QByteArrayLiteral("U") << QByteArrayLiteral("V")
-                      << QByteArrayLiteral("W") << QByteArrayLiteral("X")
-                      << QByteArrayLiteral("Y") << QByteArrayLiteral("Z");
-    }
+    QList<QByteArray> templateNames;
+    templateNames << QByteArrayLiteral("A") << QByteArrayLiteral("B")
+                  << QByteArrayLiteral("C") << QByteArrayLiteral("D")
+                  << QByteArrayLiteral("E") << QByteArrayLiteral("F")
+                  << QByteArrayLiteral("G") << QByteArrayLiteral("H")
+                  << QByteArrayLiteral("I") << QByteArrayLiteral("J")
+                  << QByteArrayLiteral("K") << QByteArrayLiteral("L")
+                  << QByteArrayLiteral("M") << QByteArrayLiteral("N")
+                  << QByteArrayLiteral("O") << QByteArrayLiteral("P")
+                  << QByteArrayLiteral("Q") << QByteArrayLiteral("R")
+                  << QByteArrayLiteral("S") << QByteArrayLiteral("T")
+                  << QByteArrayLiteral("U") << QByteArrayLiteral("V")
+                  << QByteArrayLiteral("W") << QByteArrayLiteral("X")
+                  << QByteArrayLiteral("Y") << QByteArrayLiteral("Z");
 
     QByteArray currentPrefix(QByteArrayLiteral(""));
     QList<QByteArray> columnNames;

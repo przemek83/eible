@@ -9,11 +9,6 @@
 
 #include "EibleUtilities.h"
 
-const QByteArray ExportXlsx::CELL_START{QByteArrayLiteral("<c r=\"")};
-const QByteArray ExportXlsx::ROW_NUMBER_CLOSE{QByteArrayLiteral("\" ")};
-const QByteArray ExportXlsx::VALUE_START{QByteArrayLiteral("><v>")};
-const QByteArray ExportXlsx::CELL_END{QByteArrayLiteral("</v></c>")};
-
 ExportXlsx::ExportXlsx(QObject* parent) : ExportData(parent) {}
 
 bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
@@ -73,8 +68,9 @@ QByteArray ExportXlsx::getEmptyContent()
 
 QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
 {
-    const QList<QByteArray> columnNames =
-        EibleUtilities::generateExcelColumnNames(model.columnCount());
+    if (columnNames_.size() != model.columnCount())
+        columnNames_ =
+            EibleUtilities::generateExcelColumnNames(model.columnCount());
 
     QByteArray headersContent{QByteArrayLiteral("<sheetData>")};
     headersContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
@@ -86,7 +82,7 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
                 .replace(QRegExp(QStringLiteral("[<>&\"']")),
                          QStringLiteral(" "))
                 .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
-        headersContent.append("<c r=\"" + columnNames.at(j));
+        headersContent.append("<c r=\"" + columnNames_.at(j));
         headersContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader +
                               "</v></c>");
     }
@@ -141,22 +137,13 @@ const QByteArray& ExportXlsx::getCellTypeTag(const QVariant& cell)
     {
         case QVariant::Date:
         case QVariant::DateTime:
-        {
-            static const QByteArray dateTag{"s=\"3\""};
-            return dateTag;
-        }
+            return DATE_TAG;
 
         case QVariant::Int:
         case QVariant::Double:
-        {
-            static const QByteArray numericTag{"s=\"4\""};
-            return numericTag;
-        }
+            return NUMERIC_TAG;
 
         default:
-        {
-            static const QByteArray stringTag{"t=\"str\""};
-            return stringTag;
-        }
+            return STRING_TAG;
     }
 }

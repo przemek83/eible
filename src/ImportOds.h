@@ -79,23 +79,24 @@ private:
 
     std::optional<QStringList> sheetNames_{std::nullopt};
 
-    static const QString TABLE_TAG;
-    static const QString TABLE_ROW_TAG;
-    static const QString TABLE_CELL_TAG;
-    static const QString OFFICE_VALUE_TYPE_TAG;
-    static const QString COLUMNS_REPEATED_TAG;
-    static const QString STRING_TAG;
-    static const QString DATE_TAG;
-    static const QString FLOAT_TAG;
-    static const QString PERCENTAGE_TAG;
-    static const QString CURRENCY_TAG;
-    static const QString TIME_TAG;
-    static const QString P_TAG;
-    static const QString OFFICE_DATE_VALUE_TAG;
-    static const QString OFFICE_VALUE_TAG;
-    static const QString DATE_FORMAT;
-    static const QString TABLE_QUALIFIED_NAME;
-    static const QString TABLE_NAME_TAG;
+    const QString TABLE_TAG{QStringLiteral("table")};
+    const QString TABLE_ROW_TAG{QStringLiteral("table-row")};
+    const QString TABLE_CELL_TAG{QStringLiteral("table-cell")};
+    const QString OFFICE_VALUE_TYPE_TAG{QStringLiteral("office:value-type")};
+    const QString COLUMNS_REPEATED_TAG{
+        QStringLiteral("table:number-columns-repeated")};
+    const QString STRING_TAG{QStringLiteral("string")};
+    const QString DATE_TAG{QStringLiteral("date")};
+    const QString FLOAT_TAG{QStringLiteral("float")};
+    const QString PERCENTAGE_TAG{QStringLiteral("percentage")};
+    const QString CURRENCY_TAG{QStringLiteral("currency")};
+    const QString TIME_TAG{QStringLiteral("time")};
+    const QString P_TAG{QStringLiteral("p")};
+    const QString OFFICE_DATE_VALUE_TAG{QStringLiteral("office:date-value")};
+    const QString OFFICE_VALUE_TAG{QStringLiteral("office:value")};
+    const QString DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
+    const QString TABLE_QUALIFIED_NAME{QStringLiteral("table:table")};
+    const QString TABLE_NAME_TAG{QStringLiteral("table:name")};
 };
 
 #endif  // IMPORTODS_H

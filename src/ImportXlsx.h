@@ -130,14 +130,14 @@ private:
     const QList<QByteArray> excelColNames_;
 
     static constexpr int DECIMAL_BASE{10};
-    static const QString ROW_TAG;
-    static const QString CELL_TAG;
-    static const QString SHEET_DATA_TAG;
-    static const QString S_TAG;
-    static const QString V_TAG;
-    static const QString R_TAG;
-    static const QString T_TAG;
-    static const QString STR_TAG;
+    const QString ROW_TAG{QStringLiteral("row")};
+    const QString CELL_TAG{QStringLiteral("c")};
+    const QString SHEET_DATA_TAG{QStringLiteral("sheetData")};
+    const QString S_TAG{QStringLiteral("s")};
+    const QString V_TAG{QStringLiteral("v")};
+    const QString R_TAG{QStringLiteral("r")};
+    const QString T_TAG{QStringLiteral("t")};
+    const QString STR_TAG{QStringLiteral("str")};
 };
 
 #endif  // IMPORTXLSX_H
