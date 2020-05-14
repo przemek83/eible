@@ -7,7 +7,7 @@
  + ImportOds
  + ImportXlsx  
 
-Library uses Zlib and QuaZip projects.
+Library is based on Qt 5 and C++17. It uses Zlib and QuaZip projects.
 # Building
 Clone and use Cmake directly or via QtCreator. Cmake **should**:
 + configure everything automatically,
