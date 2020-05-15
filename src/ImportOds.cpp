@@ -5,6 +5,7 @@
 
 #include <Qt5Quazip/quazip.h>
 #include <Qt5Quazip/quazipfile.h>
+#include <QDebug>
 #include <QVariant>
 #include <QVector>
 #include <QXmlStreamReader>
@@ -472,11 +473,11 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
         case ColumnType::DATE:
         {
             static const int odsStringDateLength{10};
-            value = QVariant(QDate::fromString(xmlStreamReader.attributes()
-                                                   .value(OFFICE_DATE_VALUE_TAG)
-                                                   .toString()
-                                                   .left(odsStringDateLength),
-                                               DATE_FORMAT));
+            QString dateValue{xmlStreamReader.attributes()
+                                  .value(OFFICE_DATE_VALUE_TAG)
+                                  .toString()};
+            dateValue.chop(dateValue.size() - odsStringDateLength);
+            value = QDate::fromString(dateValue, DATE_FORMAT);
 
             break;
         }
