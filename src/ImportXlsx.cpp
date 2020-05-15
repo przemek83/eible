@@ -232,17 +232,6 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
     return {true, countMap.find(sheetName).value()};
 }
 
-int ImportXlsx::getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
-                                       unsigned int charsToChop) const
-{
-    QString stringToChop{xmlStreamReader.attributes().value(R_TAG).toString()};
-    unsigned int numberOfCharsToRemove{
-        static_cast<unsigned int>(stringToChop.size()) - charsToChop};
-    int expectedColumnIndex{excelColNames_.indexOf(
-        stringToChop.left(static_cast<int>(numberOfCharsToRemove)).toUtf8())};
-    return expectedColumnIndex;
-}
-
 std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
     QuaZipFile& zipFile,
     std::function<QDomNodeList(const QDomElement&)> nodesRetriever)
@@ -311,7 +300,7 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
         {
             columnIndex++;
             const int currentColumnNumber{
-                getCurrentColumnNumber(xmlStreamReader)};
+                getCurrentColumnNumber(xmlStreamReader, 1)};
             while (currentColumnNumber > columnIndex)
             {
                 columnNames << emptyColName_;
@@ -353,20 +342,20 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     int column{NOT_SET_COLUMN};
     int maxColumnIndex{NOT_SET_COLUMN};
     int rowCounter{0};
-    unsigned int charsToChop{1};
+    int rowCountDigitsInXlsx;
     while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
     {
         if (isRowStart(xmlStreamReader))
         {
+            rowCountDigitsInXlsx =
+                xmlStreamReader.attributes().value(R_TAG).size();
             rowCounter++;
-            double power{pow(DECIMAL_BASE, charsToChop)};
-            if (power <= rowCounter + 1)
-                charsToChop++;
         }
 
         if (isCellStart(xmlStreamReader))
         {
-            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
+            column =
+                getCurrentColumnNumber(xmlStreamReader, rowCountDigitsInXlsx);
             maxColumnIndex = std::max(maxColumnIndex, column);
             if (column >= columnTypes.size())
                 for (int i = columnTypes.size(); i <= column; ++i)
@@ -409,12 +398,12 @@ void ImportXlsx::skipToFirstRow(QXmlStreamReader& xmlStreamReader) const
     xmlStreamReader.readNext();
 }
 
-int ImportXlsx::getCurrentColumnNumber(
-    const QXmlStreamReader& xmlStreamReader) const
+int ImportXlsx::getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader,
+                                       int rowCountDigitsInXlsx) const
 {
-    const QRegExp regExp(QLatin1String("[0-9]"));
     QString rowNumber{xmlStreamReader.attributes().value(R_TAG).toString()};
-    return excelColNames_.indexOf(rowNumber.remove(regExp).toUtf8());
+    rowNumber.chop(rowCountDigitsInXlsx);
+    return excelColNames_.indexOf(rowNumber.toUtf8());
 }
 
 ColumnType ImportXlsx::recognizeColumnType(
@@ -612,34 +601,34 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         static_cast<int>(std::min(getRowCount(sheetName).second, rowLimit)));
 
     QVector<QVariant> currentDataRow(templateDataRow);
-    unsigned int charsToChop{1};
     int column{NOT_SET_COLUMN};
     QString currentColType{S_TAG};
     QString actualSTagValue;
     unsigned int rowCounter{0};
     unsigned int lastEmittedPercent{0};
+    int rowCountDigitsInXlsx;
     while (!xmlStreamReader.atEnd() &&
            xmlStreamReader.name() != SHEET_DATA_TAG && rowCounter <= rowLimit)
     {
         if (isRowStart(xmlStreamReader))
         {
             column = NOT_SET_COLUMN;
-            if (0 != rowCounter)
+            if (rowCounter != 0)
             {
                 dataContainer[static_cast<int>(rowCounter - 1)] =
                     currentDataRow;
                 currentDataRow = QVector<QVariant>(templateDataRow);
-                double power = pow(DECIMAL_BASE, charsToChop);
-                if (static_cast<unsigned int>(qRound(power)) <= rowCounter + 2)
-                    charsToChop++;
             }
+            rowCountDigitsInXlsx =
+                xmlStreamReader.attributes().value(R_TAG).size();
             rowCounter++;
             updateProgress(rowCounter, rowLimit, lastEmittedPercent);
         }
 
         if (isCellStart(xmlStreamReader))
         {
-            column = getExpectedColumnIndex(xmlStreamReader, charsToChop);
+            column =
+                getCurrentColumnNumber(xmlStreamReader, rowCountDigitsInXlsx);
             currentColType =
                 xmlStreamReader.attributes().value(T_TAG).toString();
             actualSTagValue =

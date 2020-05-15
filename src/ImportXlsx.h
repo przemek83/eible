@@ -94,15 +94,13 @@ private:
     QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes) const;
     QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes) const;
 
-    int getExpectedColumnIndex(QXmlStreamReader& xmlStreamReader,
-                               unsigned int charsToChop) const;
-
     QString getColumnName(QXmlStreamReader& xmlStreamReader,
                           const QString& currentColType) const;
 
     void skipToFirstRow(QXmlStreamReader& xmlStreamReader) const;
 
-    int getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader) const;
+    int getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader,
+                               int rowCountDigitsInXlsx) const;
 
     ColumnType recognizeColumnType(ColumnType currentType,
                                    QXmlStreamReader& xmlStreamReader) const;
