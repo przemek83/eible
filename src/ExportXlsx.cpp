@@ -69,8 +69,7 @@ QByteArray ExportXlsx::getEmptyContent()
 QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
 {
     if (columnNames_.size() != model.columnCount())
-        columnNames_ =
-            EibleUtilities::generateExcelColumnNames(model.columnCount());
+        initColumnNames(model.columnCount());
 
     QByteArray headersContent{QByteArrayLiteral("<sheetData>")};
     headersContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
@@ -82,7 +81,7 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
                 .replace(QRegExp(QStringLiteral("[<>&\"']")),
                          QStringLiteral(" "))
                 .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
-        headersContent.append("<c r=\"" + columnNames_.at(j));
+        headersContent.append("<c r=\"" + columnNames_[j]);
         headersContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader +
                               "</v></c>");
     }
@@ -94,8 +93,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
                                           int row, int skippedRowsCount)
 {
     if (columnNames_.size() != model.columnCount())
-        columnNames_ =
-            EibleUtilities::generateExcelColumnNames(model.columnCount());
+        initColumnNames(model.columnCount());
 
     QByteArray rowContent;
     const QByteArray rowNumber{QByteArray::number(row - skippedRowsCount + 2)};
@@ -109,7 +107,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
             continue;
 
         rowContent.append(CELL_START);
-        rowContent.append(columnNames_.at(column));
+        rowContent.append(columnNames_[column]);
         rowContent.append(rowNumber);
         rowContent.append(ROW_NUMBER_CLOSE);
         rowContent.append(getCellTypeTag(cell));
@@ -146,4 +144,14 @@ const QByteArray& ExportXlsx::getCellTypeTag(const QVariant& cell)
         default:
             return STRING_TAG;
     }
+}
+
+void ExportXlsx::initColumnNames(int modelColumnCount)
+{
+    columnNames_.clear();
+    QHash<QByteArray, int> nameToIndexMap{
+        EibleUtilities::generateExcelColumnNames(modelColumnCount)};
+    columnNames_.resize(nameToIndexMap.size());
+    for (auto it = nameToIndexMap.begin(); it != nameToIndexMap.end(); ++it)
+        columnNames_[it.value()] = it.key();
 }

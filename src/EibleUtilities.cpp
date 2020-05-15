@@ -8,7 +8,7 @@ QDate getStartOfExcelWorld()
     return startOfTheExcelWorld;
 }
 
-QList<QByteArray> generateExcelColumnNames(int columnsNumber)
+QHash<QByteArray, int> generateExcelColumnNames(int columnsNumber)
 {
     QList<QByteArray> templateNames;
     templateNames << QByteArrayLiteral("A") << QByteArrayLiteral("B")
@@ -26,18 +26,16 @@ QList<QByteArray> generateExcelColumnNames(int columnsNumber)
                   << QByteArrayLiteral("Y") << QByteArrayLiteral("Z");
 
     QByteArray currentPrefix(QByteArrayLiteral(""));
-    QList<QByteArray> columnNames;
-    columnNames.reserve(columnsNumber);
+    QHash<QByteArray, int> columnNamesWithIndexes;
     for (int i = 0; i < columnsNumber; ++i)
     {
-        columnNames.append(currentPrefix +
-                           templateNames[i % templateNames.count()]);
+        columnNamesWithIndexes[currentPrefix +
+                               templateNames[i % templateNames.count()]] = i;
 
         if (i != 0 && (i + 1) % templateNames.count() == 0)
             currentPrefix = templateNames[i / (templateNames.count() - 1) - 1];
     }
-
-    return columnNames;
+    return columnNamesWithIndexes;
 }
 
 int getMaxExcelColumns()

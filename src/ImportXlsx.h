@@ -120,7 +120,7 @@ private:
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
     std::optional<QList<int>> allStyles_{std::nullopt};
-    const QList<QByteArray> excelColNames_;
+    const QHash<QByteArray, int> excelColNames_;
 
     static constexpr int DECIMAL_BASE{10};
     const QString ROW_TAG{QStringLiteral("row")};

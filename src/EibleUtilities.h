@@ -10,7 +10,7 @@ namespace EibleUtilities
 {
 QDate getStartOfExcelWorld();
 
-QList<QByteArray> generateExcelColumnNames(int columnsNumber);
+QHash<QByteArray, int> generateExcelColumnNames(int columnsNumber);
 
 int getMaxExcelColumns();
 

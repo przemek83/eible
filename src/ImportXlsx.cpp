@@ -403,7 +403,7 @@ int ImportXlsx::getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader,
 {
     QString rowNumber{xmlStreamReader.attributes().value(R_TAG).toString()};
     rowNumber.chop(rowCountDigitsInXlsx);
-    return excelColNames_.indexOf(rowNumber.toUtf8());
+    return excelColNames_[rowNumber.toUtf8()];
 }
 
 ColumnType ImportXlsx::recognizeColumnType(
