@@ -21,12 +21,6 @@ public:
     explicit ExportXlsx(QObject* parent = nullptr);
     ~ExportXlsx() override = default;
 
-    ExportXlsx& operator=(const ExportXlsx& other) = delete;
-    ExportXlsx(const ExportXlsx& other) = delete;
-
-    ExportXlsx& operator=(ExportXlsx&& other) = delete;
-    ExportXlsx(ExportXlsx&& other) = delete;
-
 protected:
     bool writeContent(const QByteArray& content, QIODevice& ioDevice) override;
 

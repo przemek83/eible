@@ -20,12 +20,6 @@ public:
     explicit ExportData(QObject* parent = nullptr);
     ~ExportData() override = default;
 
-    ExportData& operator=(const ExportData& other) = delete;
-    ExportData(const ExportData& other) = delete;
-
-    ExportData& operator=(ExportData&& other) = delete;
-    ExportData(ExportData&& other) = delete;
-
     /**
      * @brief Export data from view to ioDevice.
      * @param view Source of data.

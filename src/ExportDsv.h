@@ -25,12 +25,6 @@ public:
     explicit ExportDsv(char separator, QObject* parent = nullptr);
     ~ExportDsv() override = default;
 
-    ExportDsv& operator=(const ExportDsv& other) = delete;
-    ExportDsv(const ExportDsv& other) = delete;
-
-    ExportDsv& operator=(ExportDsv&& other) = delete;
-    ExportDsv(ExportDsv&& other) = delete;
-
     /**
      * @brief Change date format to given one via Qt::DateFormat. (overloaded)
      * @param format New format for dates as Qt::DateFormat.

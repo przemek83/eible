@@ -3,7 +3,6 @@
 #include <ExportXlsx.h>
 #include <ImportXlsx.h>
 #include <QBuffer>
-#include <QSignalSpy>
 #include <QTableView>
 #include <QTest>
 
