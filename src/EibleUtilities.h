@@ -1,5 +1,4 @@
-#ifndef TOOLS_H
-#define TOOLS_H
+#pragma once
 
 #include <QDate>
 #include <QVariant>
@@ -18,5 +17,3 @@ QString getXlsxTemplateName();
 
 QVariant getDefaultVariantForFormat(ColumnType format);
 }  // namespace EibleUtilities
-
-#endif  // TOOLS_H

@@ -1,5 +1,4 @@
-#ifndef IMPORTXLSX_H
-#define IMPORTXLSX_H
+#pragma once
 
 #include <functional>
 
@@ -132,5 +131,3 @@ private:
     const QString T_TAG{QStringLiteral("t")};
     const QString STR_TAG{QStringLiteral("str")};
 };
-
-#endif  // IMPORTXLSX_H

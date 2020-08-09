@@ -1,5 +1,4 @@
-#ifndef IMPORTODS_H
-#define IMPORTODS_H
+#pragma once
 
 #include "ImportSpreadsheet.h"
 
@@ -93,5 +92,3 @@ private:
     const QString TABLE_QUALIFIED_NAME{QStringLiteral("table:table")};
     const QString TABLE_NAME_TAG{QStringLiteral("table:name")};
 };
-
-#endif  // IMPORTODS_H

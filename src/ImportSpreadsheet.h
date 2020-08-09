@@ -1,5 +1,4 @@
-#ifndef IMPORTSPREADSHEET_H
-#define IMPORTSPREADSHEET_H
+#pragma once
 
 #include <Qt5Quazip/quazip.h>
 #include <QObject>
@@ -157,5 +156,3 @@ Q_SIGNALS:
      */
     void progressPercentChanged(unsigned int progressPercent);
 };
-
-#endif  // IMPORTSPREADSHEET_H

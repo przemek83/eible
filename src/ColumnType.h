@@ -1,5 +1,4 @@
-#ifndef COLUMNTYPE_H
-#define COLUMNTYPE_H
+#pragma once
 
 #include <QMetaType>
 
@@ -14,5 +13,3 @@ enum class ColumnType : char
 };
 
 Q_DECLARE_METATYPE(ColumnType)
-
-#endif  // COLUMNTYPE_H

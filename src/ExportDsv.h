@@ -1,5 +1,4 @@
-#ifndef EXPORTDSV_H
-#define EXPORTDSV_H
+#pragma once
 
 #include "ExportData.h"
 
@@ -65,5 +64,3 @@ private:
 
     const char separator_;
 };
-
-#endif  // EXPORTDSV_H

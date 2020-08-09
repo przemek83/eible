@@ -1,5 +1,4 @@
-#ifndef EXPORTXLSX_H
-#define EXPORTXLSX_H
+#pragma once
 
 #include <QVector>
 
@@ -48,5 +47,3 @@ private:
 
     QVector<QByteArray> columnNames_{};
 };
-
-#endif  // EXPORTXLSX_H

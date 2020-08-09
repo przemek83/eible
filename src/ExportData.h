@@ -1,5 +1,4 @@
-#ifndef EXPORTDATA_H
-#define EXPORTDATA_H
+#pragma once
 
 #include <QObject>
 
@@ -54,5 +53,3 @@ Q_SIGNALS:
      */
     void progressPercentChanged(unsigned int currentPercent);
 };
-
-#endif  // EXPORTDATA_H

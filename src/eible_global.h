@@ -1,5 +1,4 @@
-#ifndef EIBLE_GLOBAL_H
-#define EIBLE_GLOBAL_H
+#pragma once
 
 #include <QtCore/qglobal.h>
 
@@ -8,5 +7,3 @@
 #else
 #define EIBLE_EXPORT Q_DECL_IMPORT
 #endif
-
-#endif  // EIBLE_GLOBAL_H
