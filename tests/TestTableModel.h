@@ -1,5 +1,4 @@
-#ifndef TESTTABLEMODEL_H
-#define TESTTABLEMODEL_H
+#pragma once
 
 #include <QAbstractTableModel>
 
@@ -38,5 +37,3 @@ private:
 
     QVector<QVector<QVariant>> data_;
 };
-
-#endif  // TESTTABLEMODEL_H

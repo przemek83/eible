@@ -1,5 +1,4 @@
-#ifndef UTILITIES_H
-#define UTILITIES_H
+#pragma once
 
 #include <QString>
 
@@ -7,5 +6,3 @@ namespace Utilities
 {
 QByteArray composeXlsxSheet(const QString& sheetData);
 };
-
-#endif  // UTILITIES_H

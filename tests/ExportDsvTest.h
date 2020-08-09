@@ -1,5 +1,4 @@
-#ifndef EXPORTDSVTEST_H
-#define EXPORTDSVTEST_H
+#pragma once
 
 #include <QObject>
 
@@ -82,5 +81,3 @@ private:
 
     TestTableModel* tableModelForBenchmarking_{nullptr};
 };
-
-#endif  // EXPORTDSVTEST_H

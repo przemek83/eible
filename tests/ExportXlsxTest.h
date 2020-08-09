@@ -1,5 +1,4 @@
-#ifndef EXPORTXLSXTEST
-#define EXPORTXLSXTEST
+#pragma once
 
 #include <QObject>
 
@@ -100,5 +99,3 @@ private:
 
     TestTableModel* tableModelForBenchmarking_{nullptr};
 };
-
-#endif  // EXPORTXLSXTEST

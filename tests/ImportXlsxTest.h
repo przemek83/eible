@@ -1,5 +1,4 @@
-#ifndef IMPORTXLSXTEST_H
-#define IMPORTXLSXTEST_H
+#pragma once
 
 #include <QObject>
 #include <QSet>
@@ -175,5 +174,3 @@ private:
 
     static constexpr int NO_SIGNAL{0};
 };
-
-#endif  // IMPORTXLSXTEST_H

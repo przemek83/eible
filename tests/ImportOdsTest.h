@@ -1,5 +1,4 @@
-#ifndef IMPORTODSTEST_H
-#define IMPORTODSTEST_H
+#pragma once
 
 #include <QObject>
 
@@ -52,5 +51,3 @@ private:
     const QString testFileName_{QStringLiteral(":/testOds.ods")};
     const QString templateFileName_{QStringLiteral(":/emptyOds.ods")};
 };
-
-#endif  // IMPORTODSTEST_H

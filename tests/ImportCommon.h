@@ -1,5 +1,4 @@
-#ifndef IMPORTCOMMON_H
-#define IMPORTCOMMON_H
+#pragma once
 
 #include <ImportSpreadsheet.h>
 #include <QStringList>
@@ -67,5 +66,3 @@ private:
 
     static constexpr int NO_SIGNAL{0};
 };
-
-#endif  // IMPORTCOMMON_H
