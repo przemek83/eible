@@ -67,7 +67,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
 QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
 {
     QList<int> dateStyles;
-    const QList predefinedExcelStylesForDates{14, 15, 16, 17, 22};
+    const QList predefinedExcelStylesForDates({14, 15, 16, 17, 22});
     dateStyles.append(predefinedExcelStylesForDates);
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
@@ -234,7 +234,7 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
 
 std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
     QuaZipFile& zipFile,
-    std::function<QDomNodeList(const QDomElement&)> nodesRetriever)
+    const std::function<QDomNodeList(const QDomElement&)>& nodesRetriever)
 {
     QDomDocument xmlDocument;
     if (!xmlDocument.setContent(zipFile.readAll()))
@@ -342,7 +342,7 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     int column{NOT_SET_COLUMN};
     int maxColumnIndex{NOT_SET_COLUMN};
     int rowCounter{0};
-    int rowCountDigitsInXlsx;
+    int rowCountDigitsInXlsx{0};
     while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
     {
         if (isRowStart(xmlStreamReader))
@@ -606,7 +606,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QString actualSTagValue;
     unsigned int rowCounter{0};
     unsigned int lastEmittedPercent{0};
-    int rowCountDigitsInXlsx;
+    int rowCountDigitsInXlsx{0};
     while (!xmlStreamReader.atEnd() &&
            xmlStreamReader.name() != SHEET_DATA_TAG && rowCounter <= rowLimit)
     {

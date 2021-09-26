@@ -77,7 +77,7 @@ private:
 
     std::pair<bool, QDomNodeList> getSheetNodes(
         QuaZipFile& zipFile,
-        std::function<QDomNodeList(const QDomElement&)> nodesRetriever);
+        const std::function<QDomNodeList(const QDomElement&)>& nodesRetriever);
 
     bool isRowStart(const QXmlStreamReader& xmlStreamReader) const;
     bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
