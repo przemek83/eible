@@ -38,8 +38,8 @@ int TestTableModel::rowCount([[maybe_unused]] const QModelIndex& parent) const
     return rowCount_;
 }
 
-int TestTableModel::columnCount([
-    [maybe_unused]] const QModelIndex& parent) const
+int TestTableModel::columnCount(
+    [[maybe_unused]] const QModelIndex& parent) const
 {
     return columnCount_;
 }

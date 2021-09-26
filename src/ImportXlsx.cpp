@@ -67,7 +67,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
 QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
 {
     QList<int> dateStyles;
-    const QList predefinedExcelStylesForDates({14, 15, 16, 17, 22});
+    const QList predefinedExcelStylesForDates{14, 15, 16, 17, 22};
     dateStyles.append(predefinedExcelStylesForDates);
     for (int i = 0; i < sheetNodes.size(); ++i)
     {

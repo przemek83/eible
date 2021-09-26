@@ -2,67 +2,64 @@
 
 #include <ImportSpreadsheet.h>
 #include <QStringList>
+#include <QVariant>
 
-class ImportCommon
+namespace ImportCommon
 {
-public:
-    static void checkRetrievingSheetNames(ImportSpreadsheet& importer);
+void checkRetrievingSheetNames(ImportSpreadsheet& importer);
 
-    static void checkRetrievingSheetNamesFromEmptyFile(
-        ImportSpreadsheet& importer);
+void checkRetrievingSheetNamesFromEmptyFile(ImportSpreadsheet& importer);
 
-    static void prepareDataForGetColumnListTest();
-    static void checkGetColumnList(ImportSpreadsheet& importer);
+void prepareDataForGetColumnListTest();
 
-    static void checkSettingEmptyColumnName(ImportSpreadsheet& importer);
+void checkGetColumnList(ImportSpreadsheet& importer);
 
-    static void checkGetColumnListTwoSheets(ImportSpreadsheet& importer);
+void checkSettingEmptyColumnName(ImportSpreadsheet& importer);
 
-    static void prepareDataForGetColumnTypes();
-    static void checkGetColumnTypes(ImportSpreadsheet& importer);
+void checkGetColumnListTwoSheets(ImportSpreadsheet& importer);
 
-    static void prepareDataForGetColumnCountTest();
-    static void checkGetColumnCount(ImportSpreadsheet& importer);
+void prepareDataForGetColumnTypes();
 
-    static void prepareDataForGetRowCountTest();
-    static void checkGetRowCount(ImportSpreadsheet& importer);
+void checkGetColumnTypes(ImportSpreadsheet& importer);
 
-    static void prepareDataForGetRowAndColumnCountViaGetColumnTypes();
-    static void testGetRowAndColumnCountViaGetColumnTypes(
-        ImportSpreadsheet& importer);
+void prepareDataForGetColumnCountTest();
 
-    static void prepareDataForGetData();
-    static void checkGetData(ImportSpreadsheet& importer);
+void checkGetColumnCount(ImportSpreadsheet& importer);
 
-    static void prepareDataForGetDataLimitRows();
-    static void checkGetDataLimitRows(ImportSpreadsheet& importer);
+void prepareDataForGetRowCountTest();
 
-    static void prepareDataForGetGetDataExcludeColumns();
-    static void checkGetDataExcludeColumns(ImportSpreadsheet& importer);
-    static void checkGetDataExcludeInvalidColumn(ImportSpreadsheet& importer);
+void checkGetRowCount(ImportSpreadsheet& importer);
 
-    static QVector<QVector<QVariant>> getDataForSheet(const QString& fileName);
+void prepareDataForGetRowAndColumnCountViaGetColumnTypes();
 
-    static QVector<QVector<QVariant>> getDataWithoutColumns(
-        const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
+void testGetRowAndColumnCountViaGetColumnTypes(ImportSpreadsheet& importer);
 
-    static void checkEmittingProgressPercentChangedEmptyFile(
-        ImportSpreadsheet& importer);
-    static void checkEmittingProgressPercentChangedSmallFile(
-        ImportSpreadsheet& importer);
-    static void checkEmittingProgressPercentChangedBigFile(
-        ImportSpreadsheet& importer);
+void prepareDataForGetData();
 
-    static QStringList getSheetNames();
+void checkGetData(ImportSpreadsheet& importer);
 
-    static void checkInvalidSheetName(ImportSpreadsheet& importer);
+void prepareDataForGetDataLimitRows();
 
-private:
-    static const QStringList sheetNames_;
-    static const QList<QStringList> testColumnNames_;
-    static const QVector<unsigned int> expectedRowCounts_;
-    static const QVector<QVector<ColumnType>> columnTypes_;
-    static const QVector<QVector<QVector<QVariant>>> sheetData_;
+void checkGetDataLimitRows(ImportSpreadsheet& importer);
 
-    static constexpr int NO_SIGNAL{0};
-};
+void prepareDataForGetGetDataExcludeColumns();
+
+void checkGetDataExcludeColumns(ImportSpreadsheet& importer);
+
+void checkGetDataExcludeInvalidColumn(ImportSpreadsheet& importer);
+
+QVector<QVector<QVariant>> getDataForSheet(const QString& fileName);
+
+QVector<QVector<QVariant>> getDataWithoutColumns(
+    const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
+
+void checkEmittingProgressPercentChangedEmptyFile(ImportSpreadsheet& importer);
+
+void checkEmittingProgressPercentChangedSmallFile(ImportSpreadsheet& importer);
+
+void checkEmittingProgressPercentChangedBigFile(ImportSpreadsheet& importer);
+
+QStringList& getSheetNames();
+
+void checkInvalidSheetName(ImportSpreadsheet& importer);
+};  // namespace ImportCommon
