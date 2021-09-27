@@ -219,7 +219,7 @@ const QVector<QVector<QVector<QVariant>>> sheetData_{
      {"test2", "test123", QVariant(QVariant::String), "konto zablokowane"},
      {"test3", "test123", "2011-09-30", QVariant(QVariant::String)}}};
 
-static constexpr int NO_SIGNAL{0};
+constexpr int NO_SIGNAL{0};
 }  // namespace
 
 namespace ImportCommon
@@ -440,7 +440,8 @@ void checkGetDataLimitRows(ImportSpreadsheet& importer)
 }
 
 QVector<QVector<QVariant>> getDataWithoutColumns(
-    const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude)
+    const QVector<QVector<QVariant>>& data,
+    const QVector<int>& columnsToExclude)
 {
     QVector<QVector<QVariant>> expectedValues;
     expectedValues.reserve(data.size());

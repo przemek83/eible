@@ -51,7 +51,8 @@ void checkGetDataExcludeInvalidColumn(ImportSpreadsheet& importer);
 QVector<QVector<QVariant>> getDataForSheet(const QString& fileName);
 
 QVector<QVector<QVariant>> getDataWithoutColumns(
-    const QVector<QVector<QVariant>>& data, QVector<int> columnsToExclude);
+    const QVector<QVector<QVariant>>& data,
+    const QVector<int>& columnsToExclude);
 
 void checkEmittingProgressPercentChangedEmptyFile(ImportSpreadsheet& importer);
 
