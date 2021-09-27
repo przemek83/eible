@@ -16,7 +16,8 @@ QByteArray ExportDsv::generateHeaderContent(const QAbstractItemModel& model)
     QByteArray headersContent;
     for (int j = 0; j < model.columnCount(); ++j)
     {
-        headersContent.append(model.headerData(j, Qt::Horizontal).toString());
+        headersContent.append(
+            model.headerData(j, Qt::Horizontal).toString().toUtf8());
         if (j != model.columnCount() - 1)
             headersContent.append(separator_);
     }
@@ -62,7 +63,7 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QVariant::Int:
         {
             destinationArray.append(
-                locale_.toString(variant.toDouble(), 'f', 2));
+                locale_.toString(variant.toDouble(), 'f', 2).toUtf8());
             break;
         }
 
@@ -71,9 +72,10 @@ void ExportDsv::variantToString(const QVariant& variant,
         {
             if (dateFormat_.isEmpty())
                 destinationArray.append(
-                    variant.toDate().toString(qtDateFormat_));
+                    variant.toDate().toString(qtDateFormat_).toUtf8());
             else
-                destinationArray.append(variant.toDate().toString(dateFormat_));
+                destinationArray.append(
+                    variant.toDate().toString(dateFormat_).toUtf8());
             break;
         }
 
@@ -84,7 +86,7 @@ void ExportDsv::variantToString(const QVariant& variant,
             if (value.contains(separator) || value.contains('\"') ||
                 value.contains('\n'))
             {
-                value.replace('"', QStringLiteral("\"\""));
+                value.replace('"', QByteArrayLiteral("\"\""));
                 destinationArray.append("\"" + value + "\"");
             }
             else

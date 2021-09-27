@@ -27,7 +27,7 @@ private Q_SLOTS:
     void testSpecialCharInStringField();
 
     void testCustomDateFormat();
-    void testDefaultLocaleShortDate();
+    void testIsoShortDate();
 
     void testLocaleForNumbers();
 
@@ -71,8 +71,8 @@ private:
         "1,2.00,2020-01-04";
     QString customDateFormatData_ =
         QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,03/01/20");
-    QString defaultLocaleShortDateData_ =
-        QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,3 Jan 2020");
+    QString isoShortDateData_ =
+        QStringLiteral("Text,Numeric,Date\nItem 0 0,1.00,2020-01-03");
     QString localeForNumbersData_ =
         QStringLiteral("Text\tNumeric\tDate\nItem 0 0\t1,00\t2020-01-03");
     QString emptyData_ = QLatin1String("");

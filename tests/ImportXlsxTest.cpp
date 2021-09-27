@@ -213,7 +213,7 @@ void ImportXlsxTest::testGetDataLimitRows_data()
     sheetName = sheets_[5].first;
     rowLimit = 12U;
     QVector<QVector<QVariant>> expectedValues;
-    expectedValues.reserve(rowLimit);
+    expectedValues.reserve(static_cast<int>(rowLimit));
     sheetData = ImportCommon::getDataForSheet(sheetName);
     for (unsigned int i = 0; i < rowLimit; ++i)
         expectedValues.append(sheetData[static_cast<int>(i)]);

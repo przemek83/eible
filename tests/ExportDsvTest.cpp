@@ -184,7 +184,7 @@ void ExportDsvTest::testCustomDateFormat()
     QCOMPARE(exportedByteArray, customDateFormatData_);
 }
 
-void ExportDsvTest::testDefaultLocaleShortDate()
+void ExportDsvTest::testIsoShortDate()
 {
     TestTableModel model(3, 1);
     QTableView view;
@@ -195,10 +195,10 @@ void ExportDsvTest::testDefaultLocaleShortDate()
     exportedBuffer.open(QIODevice::WriteOnly);
 
     ExportDsv exportDsv(',');
-    exportDsv.setDateFormat(Qt::DefaultLocaleShortDate);
+    exportDsv.setDateFormat(Qt::ISODate);
     exportDsv.exportView(view, exportedBuffer);
 
-    QCOMPARE(exportedByteArray, defaultLocaleShortDateData_);
+    QCOMPARE(exportedByteArray, isoShortDateData_);
 }
 
 void ExportDsvTest::testLocaleForNumbers()

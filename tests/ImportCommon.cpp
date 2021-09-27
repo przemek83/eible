@@ -295,7 +295,8 @@ void checkSettingEmptyColumnName(ImportSpreadsheet& importer)
                       newEmptyColumnName);
 
     QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, QStringList::fromStdList(expectedColumnList));
+    QCOMPARE(actualColumnList,
+             QList(expectedColumnList.begin(), expectedColumnList.end()));
 }
 
 void checkGetColumnListTwoSheets(ImportSpreadsheet& importer)

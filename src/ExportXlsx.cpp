@@ -82,8 +82,8 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
                          QStringLiteral(" "))
                 .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
         headersContent.append("<c r=\"" + columnNames_[j]);
-        headersContent.append(R"(1" t="str" s="6"><v>)" + clearedHeader +
-                              "</v></c>");
+        headersContent.append(R"(1" t="str" s="6"><v>)" +
+                              clearedHeader.toUtf8() + "</v></c>");
     }
     headersContent.append("</row>");
     return headersContent;
