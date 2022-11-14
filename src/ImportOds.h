@@ -2,6 +2,8 @@
 
 #include "ImportSpreadsheet.h"
 
+#include <optional>
+
 #include <QHash>
 
 #include "eible_global.h"
