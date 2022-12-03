@@ -283,7 +283,7 @@ void checkGetColumnTypes(ImportSpreadsheet& importer)
 
 void checkSettingEmptyColumnName(ImportSpreadsheet& importer)
 {
-    const QString newEmptyColumnName{"<empty column>"};
+    const QString newEmptyColumnName{QStringLiteral("<empty column>")};
     importer.setNameForEmptyColumn(newEmptyColumnName);
     auto [success, actualColumnList] =
         importer.getColumnNames(getSheetNames()[4]);
@@ -291,7 +291,7 @@ void checkSettingEmptyColumnName(ImportSpreadsheet& importer)
     std::list<QString> expectedColumnList(
         static_cast<size_t>(testColumnNames_[4].size()));
     std::replace_copy(testColumnNames_[4].begin(), testColumnNames_[4].end(),
-                      expectedColumnList.begin(), QString("---"),
+                      expectedColumnList.begin(), QStringLiteral("---"),
                       newEmptyColumnName);
 
     QCOMPARE(success, true);
