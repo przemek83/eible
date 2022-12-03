@@ -34,10 +34,10 @@ Check my other project called Volbx to familiarize yourself how to use it via CM
 | GCC | 8.1.0 | 9.5.0 |
 | CMake | 3.25.0 | 3.25.0 |
 | Git | 2.38.1 | 2.34.1 |
-| Svn | 1.14.2 | 1.14.1 |
 | Qt | 5.15.2 | 5.15.2 |
 | QtCreator | 9.0.0 |9.0.0 |
-| Qwt | 6.1.6 | 6.1.6 |
+| Zlib | 1.2.11 | 1.2.11 |
+| QuaZip | 0.9 | 0.9 |
 
 # Usage
 Easiest way is to check examples subproject where you can find how to create and interact with each class included in this library.  
