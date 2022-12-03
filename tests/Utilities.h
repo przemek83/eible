@@ -5,4 +5,4 @@
 namespace Utilities
 {
 QByteArray composeXlsxSheet(const QString& sheetData);
-};
+}  // namespace Utilities
