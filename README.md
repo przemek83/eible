@@ -36,7 +36,7 @@ Check my other project called Volbx to familiarize yourself how to use it via CM
 | Git | 2.38.1 | 2.34.1 |
 | Qt | 5.15.2 | 5.15.2 |
 | QtCreator | 9.0.0 |9.0.0 |
-| Zlib | 1.2.11 | 1.2.11 |
+| Zlib | 1.2.13 | 1.2.13 |
 | QuaZip | 0.9 | 0.9 |
 
 # Usage
