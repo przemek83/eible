@@ -1,3 +1,10 @@
+## Table of content
+- [About project](#about-project)
+- [Building](#building)
+- [Usage](#usage)
+- [Classes](#classes)
+
+
 # About project
  Library for importing and exporting data. Created as a result of division of  Volbx project code and moving parts of it to independent library. Library contains classes:  
  + ExportData (base class for exporting)
@@ -8,6 +15,7 @@
  + ImportXlsx  
 
 Library is based on Qt 5 and C++17. It uses Zlib and QuaZip projects.
+
 # Building
 Clone and use Cmake directly or via QtCreator. Cmake **should**:
 + configure everything automatically,
