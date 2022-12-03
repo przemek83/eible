@@ -10,40 +10,40 @@ public:
     Q_OBJECT
 private Q_SLOTS:
     void testRetrievingSheetNames();
-    void testRetrievingSheetNamesFromEmptyFile();
+    static void testRetrievingSheetNamesFromEmptyFile();
 
     void testGetColumnList_data();
     void testGetColumnList();
     void testSettingEmptyColumnName();
     void testGetColumnListTwoSheets();
 
-    void testGetColumnTypes_data();
+    static void testGetColumnTypes_data();
     void testGetColumnTypes();
 
-    void testGetColumnCount_data();
+    static void testGetColumnCount_data();
     void testGetColumnCount();
 
-    void testGetRowCount_data();
+    static void testGetRowCount_data();
     void testGetRowCount();
 
-    void testGetRowAndColumnCountViaGetColumnTypes_data();
+    static void testGetRowAndColumnCountViaGetColumnTypes_data();
     void testGetRowAndColumnCountViaGetColumnTypes();
 
-    void testGetData_data();
+    static void testGetData_data();
     void testGetData();
 
-    void testGetDataLimitRows_data();
+    static void testGetDataLimitRows_data();
     void testGetDataLimitRows();
 
-    void testGetDataExcludeColumns_data();
+    static void testGetDataExcludeColumns_data();
     void testGetDataExcludeColumns();
     void testGetDataExcludeInvalidColumn();
 
-    void benchmarkGetData();
+    static void benchmarkGetData();
 
     void testEmittingProgressPercentChangedEmptyFile();
     void testEmittingProgressPercentChangedSmallFile();
-    void testEmittingProgressPercentChangedBigFile();
+    static void testEmittingProgressPercentChangedBigFile();
 
     void testInvalidSheetName();
 

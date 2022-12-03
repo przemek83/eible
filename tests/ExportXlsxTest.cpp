@@ -15,7 +15,7 @@
 ExportXlsxTest::ExportXlsxTest(QObject* parent) : QObject(parent) {}
 
 QByteArray ExportXlsxTest::retrieveFileFromZip(QBuffer& exportedZip,
-                                               const QString& fileName) const
+                                               const QString& fileName)
 {
     QuaZip inZip(&exportedZip);
     inZip.open(QuaZip::mdUnzip);
@@ -35,7 +35,7 @@ void ExportXlsxTest::compareWorkSheets(QBuffer& exportedZip,
 }
 
 void ExportXlsxTest::exportZip(const QAbstractItemView& view,
-                               QBuffer& exportedZip) const
+                               QBuffer& exportedZip)
 {
     exportedZip.open(QIODevice::WriteOnly);
     ExportXlsx exportXlsx;

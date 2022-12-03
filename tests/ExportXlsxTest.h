@@ -30,13 +30,13 @@ private Q_SLOTS:
     void cleanupTestCase();
 
 private:
-    QByteArray retrieveFileFromZip(QBuffer& exportedZip,
-                                   const QString& fileName) const;
+    static QByteArray retrieveFileFromZip(QBuffer& exportedZip,
+                                          const QString& fileName);
 
     void compareWorkSheets(QBuffer& exportedZip,
                            const QString& sheetData) const;
 
-    void exportZip(const QAbstractItemView& view, QBuffer& exportedZip) const;
+    static void exportZip(const QAbstractItemView& view, QBuffer& exportedZip);
 
     QString zipWorkSheetPath_{QStringLiteral("xl/worksheets/sheet1.xml")};
 
@@ -92,7 +92,7 @@ private:
         R"(</row>)"
         R"(</sheetData>)";
 
-    QString emptySheetData_ = R"(</sheetData>)";
+    QString emptySheetData_ = QStringLiteral(R"(</sheetData>)");
 
     QStringList headers_{QStringLiteral("Text"), QStringLiteral("Numeric"),
                          QStringLiteral("Date")};

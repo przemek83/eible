@@ -11,20 +11,20 @@ public:
     explicit ExportDsvTest(QObject* parent = nullptr);
 
 private Q_SLOTS:
-    void testEmptyTable_data();
+    static void testEmptyTable_data();
     void testEmptyTable();
 
     void testHeadersOnly_data();
-    void testHeadersOnly();
+    static void testHeadersOnly();
 
     void testSimpleTable_data();
-    void testSimpleTable();
+    static void testSimpleTable();
 
     void testViewWithMultiSelection_data();
-    void testViewWithMultiSelection();
+    static void testViewWithMultiSelection();
 
     void testSpecialCharInStringField_data();
-    void testSpecialCharInStringField();
+    static void testSpecialCharInStringField();
 
     void testCustomDateFormat();
     void testIsoShortDate();
