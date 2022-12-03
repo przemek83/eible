@@ -252,8 +252,8 @@ void prepareDataForGetColumnListTest()
 
 void checkGetColumnList(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QStringList, expectedColumnList);
+    QFETCH(const QString, sheetName);
+    QFETCH(const QStringList, expectedColumnList);
     auto [success, actualColumnList] = importer.getColumnNames(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, expectedColumnList);
@@ -274,8 +274,8 @@ void prepareDataForGetColumnTypes()
 
 void checkGetColumnTypes(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QVector<ColumnType>, expectedColumnTypes);
+    QFETCH(const QString, sheetName);
+    QFETCH(const QVector<ColumnType>, expectedColumnTypes);
     auto [success, columnTypes] = importer.getColumnTypes(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(columnTypes, expectedColumnTypes);
@@ -326,8 +326,8 @@ void prepareDataForGetColumnCountTest()
 
 void checkGetColumnCount(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(int, expectedColumnCount);
+    QFETCH(const QString, sheetName);
+    QFETCH(const int, expectedColumnCount);
     auto [success, actualColumnCount] = importer.getColumnCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
@@ -347,8 +347,8 @@ void prepareDataForGetRowCountTest()
 
 void checkGetRowCount(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(unsigned int, expectedRowCount);
+    QFETCH(const QString, sheetName);
+    QFETCH(const unsigned int, expectedRowCount);
     auto [success, actualRowCount] = importer.getRowCount(sheetName);
     QCOMPARE(success, true);
     QCOMPARE(actualRowCount, expectedRowCount);
@@ -373,9 +373,9 @@ void prepareDataForGetRowAndColumnCountViaGetColumnTypes()
 
 void testGetRowAndColumnCountViaGetColumnTypes(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(unsigned int, expectedRowCount);
-    QFETCH(unsigned int, expectedColumnCount);
+    QFETCH(const QString, sheetName);
+    QFETCH(const unsigned int, expectedRowCount);
+    QFETCH(const unsigned int, expectedColumnCount);
     importer.getColumnTypes(sheetName);
     auto [successRowCount, actualRowCount] = importer.getRowCount(sheetName);
     QCOMPARE(successRowCount, true);
@@ -400,8 +400,8 @@ void prepareDataForGetData()
 
 void checkGetData(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QVector<QVector<QVariant>>, expectedData);
+    QFETCH(const QString, sheetName);
+    QFETCH(const QVector<QVector<QVariant>>, expectedData);
     auto [success, actualData] = importer.getData(sheetName, {});
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
@@ -431,9 +431,9 @@ void prepareDataForGetDataLimitRows()
 
 void checkGetDataLimitRows(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(unsigned int, rowLimit);
-    QFETCH(QVector<QVector<QVariant>>, expectedData);
+    QFETCH(const QString, sheetName);
+    QFETCH(const unsigned int, rowLimit);
+    QFETCH(const QVector<QVector<QVariant>>, expectedData);
     auto [success, actualData] =
         importer.getLimitedData(sheetName, {}, rowLimit);
     QCOMPARE(success, true);
@@ -448,7 +448,7 @@ QVector<QVector<QVariant>> getDataWithoutColumns(
     expectedValues.reserve(data.size());
     for (auto dataRow : data)
     {
-        for (int column : columnsToExclude)
+        for (const int column : columnsToExclude)
             dataRow.remove(column);
         expectedValues.append(dataRow);
     }
@@ -461,7 +461,7 @@ void prepareDataForGetGetDataExcludeColumns()
     QTest::addColumn<QVector<unsigned int>>("excludedColumns");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
 
-    QString sheetName{getSheetNames()[0]};
+    const QString sheetName{getSheetNames()[0]};
     QString testName{"Get data with excluded column 1 in " + sheetName};
     QTest::newRow(qUtf8Printable(testName))
         << sheetName << QVector<unsigned int>{1}
@@ -475,9 +475,9 @@ void prepareDataForGetGetDataExcludeColumns()
 
 void checkGetDataExcludeColumns(ImportSpreadsheet& importer)
 {
-    QFETCH(QString, sheetName);
-    QFETCH(QVector<unsigned int>, excludedColumns);
-    QFETCH(QVector<QVector<QVariant>>, expectedData);
+    QFETCH(const QString, sheetName);
+    QFETCH(const QVector<unsigned int>, excludedColumns);
+    QFETCH(const QVector<QVector<QVariant>>, expectedData);
     auto [success, actualData] = importer.getData(sheetName, excludedColumns);
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
@@ -514,7 +514,7 @@ void checkInvalidSheetName(ImportSpreadsheet& importer)
 
 void checkEmittingProgressPercentChangedEmptyFile(ImportSpreadsheet& importer)
 {
-    QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
+    const QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     QStringList sheetNames{importer.getSheetNames().second};
     auto [success, actualData] = importer.getData(sheetNames.first(), {});
     QCOMPARE(success, true);
@@ -523,7 +523,7 @@ void checkEmittingProgressPercentChangedEmptyFile(ImportSpreadsheet& importer)
 
 void checkEmittingProgressPercentChangedSmallFile(ImportSpreadsheet& importer)
 {
-    QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
+    const QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     const unsigned int sheetIndex{1};
     auto [success, actualData] =
         importer.getData(getSheetNames()[sheetIndex], {});
@@ -533,7 +533,7 @@ void checkEmittingProgressPercentChangedSmallFile(ImportSpreadsheet& importer)
 
 void checkEmittingProgressPercentChangedBigFile(ImportSpreadsheet& importer)
 {
-    QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
+    const QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     QStringList sheetNames{importer.getSheetNames().second};
     auto [success, actualData] = importer.getData(sheetNames.first(), {});
     QCOMPARE(success, true);

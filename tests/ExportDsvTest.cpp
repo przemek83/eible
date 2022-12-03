@@ -19,7 +19,7 @@ void ExportDsvTest::testEmptyTable_data()
 
 void ExportDsvTest::testEmptyTable()
 {
-    QFETCH(char, separator);
+    QFETCH(const char, separator);
 
     TestTableModel model(0, 0);
     QTableView view;
@@ -46,8 +46,8 @@ void ExportDsvTest::testHeadersOnly_data()
 
 void ExportDsvTest::testHeadersOnly()
 {
-    QFETCH(char, separator);
-    QFETCH(QString, expected);
+    QFETCH(const char, separator);
+    QFETCH(const QString, expected);
 
     TestTableModel model(3, 0);
     QTableView view;
@@ -74,8 +74,8 @@ void ExportDsvTest::testSimpleTable_data()
 
 void ExportDsvTest::testSimpleTable()
 {
-    QFETCH(char, separator);
-    QFETCH(QString, expected);
+    QFETCH(const char, separator);
+    QFETCH(const QString, expected);
 
     TestTableModel model(3, 3);
     QTableView view;
@@ -101,8 +101,8 @@ void ExportDsvTest::testViewWithMultiSelection_data()
 }
 void ExportDsvTest::testViewWithMultiSelection()
 {
-    QFETCH(char, separator);
-    QFETCH(QString, expected);
+    QFETCH(const char, separator);
+    QFETCH(const QString, expected);
 
     TestTableModel model(3, 3);
     QTableView view;
@@ -148,9 +148,9 @@ void ExportDsvTest::testSpecialCharInStringField_data()
 
 void ExportDsvTest::testSpecialCharInStringField()
 {
-    QFETCH(char, separator);
-    QFETCH(char, specialChar);
-    QFETCH(QString, expected);
+    QFETCH(const char, separator);
+    QFETCH(const char, specialChar);
+    QFETCH(const QString, expected);
 
     TestTableModel model(3, 2);
     QTableView view;
@@ -212,7 +212,7 @@ void ExportDsvTest::testLocaleForNumbers()
     exportedBuffer.open(QIODevice::WriteOnly);
 
     ExportDsv exportDsv('\t');
-    QLocale locale(QLocale::Polish, QLocale::Poland);
+    const QLocale locale(QLocale::Polish, QLocale::Poland);
     exportDsv.setNumbersLocale(locale);
     exportDsv.exportView(view, exportedBuffer);
 

@@ -25,8 +25,8 @@ static void initTable(QTableWidget& tableWidget)
     for (int column = 0; column < columnCount; ++column)
         for (int row = 0; row < rowCount; ++row)
         {
-            auto item = new QTableWidgetItem("Item " + QString::number(column) +
-                                             " " + QString::number(row));
+            auto* item = new QTableWidgetItem(
+                "Item " + QString::number(column) + " " + QString::number(row));
             switch (column)
             {
                 case 0:
@@ -48,7 +48,8 @@ static void initTable(QTableWidget& tableWidget)
 
 static bool exportXlsx(const QTableWidget& tableWidget)
 {
-    QString file{QCoreApplication::applicationDirPath() + "/ExportedFile.xlsx"};
+    const QString file{QCoreApplication::applicationDirPath() +
+                       "/ExportedFile.xlsx"};
     ExportXlsx exportXlsx;
     QObject::connect(&exportXlsx, &ExportData::progressPercentChanged,
                      &tableWidget, [](unsigned int progress) {
@@ -59,7 +60,7 @@ static bool exportXlsx(const QTableWidget& tableWidget)
     std::cout << "Exporting XLSX to " << file.toStdString() << "." << std::endl;
     QFile outFile(file);
     outFile.open(QIODevice::WriteOnly);
-    bool success = exportXlsx.exportView(tableWidget, outFile);
+    const bool success = exportXlsx.exportView(tableWidget, outFile);
     if (success)
         std::cout << "Exporting XLSX successful." << std::endl;
     else
@@ -70,7 +71,8 @@ static bool exportXlsx(const QTableWidget& tableWidget)
 
 static bool exportCsv(const QTableWidget& tableWidget)
 {
-    QString file{QCoreApplication::applicationDirPath() + "/ExportedFile.csv"};
+    const QString file{QCoreApplication::applicationDirPath() +
+                       "/ExportedFile.csv"};
     ExportDsv exportDsv(',');
     QObject::connect(&exportDsv, &ExportData::progressPercentChanged,
                      &tableWidget, [](int progress) {
@@ -81,7 +83,7 @@ static bool exportCsv(const QTableWidget& tableWidget)
     std::cout << "Exporting CSV to " << file.toStdString() << "." << std::endl;
     QFile outFile(file);
     outFile.open(QIODevice::WriteOnly);
-    bool success = exportDsv.exportView(tableWidget, outFile);
+    const bool success = exportDsv.exportView(tableWidget, outFile);
     if (success)
         std::cout << "Exporting CSV successful." << std::endl;
     else
@@ -151,7 +153,7 @@ static bool performOperations() { return importFiles() && exportFiles(); }
 
 int main(int argc, char* argv[])
 {
-    QApplication a(argc, argv);
+    const QApplication a(argc, argv);
     QTimer::singleShot(0, []() {
         QApplication::exit(performOperations() ? EXIT_SUCCESS : EXIT_FAILURE);
     });

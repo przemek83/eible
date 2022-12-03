@@ -237,9 +237,9 @@ void ImportXlsxTest::testGetDataExcludeColumns_data()
     QTest::addColumn<QVector<unsigned int>>("excludedColumns");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
 
-    QString sheetName{sheets_[0].first};
+    const QString sheetName{sheets_[0].first};
     QString testName{"Get data with excluded column 1 in " + sheetName};
-    QVector<QVector<QVariant>> sheetData{convertDataToUseSharedStrings(
+    const QVector<QVector<QVariant>> sheetData{convertDataToUseSharedStrings(
         ImportCommon::getDataForSheet(sheetName))};
     QTest::newRow(qUtf8Printable(testName))
         << sheetName << QVector<unsigned int>{1}

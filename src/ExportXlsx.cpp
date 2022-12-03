@@ -19,7 +19,7 @@ bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
     inZip.open(QuaZip::mdUnzip);
 
     // Files list in template.
-    QStringList fileList = inZip.getFileNameList();
+    const QStringList fileList = inZip.getFileNameList();
 
     // Create out xlsx.
     QuaZip outZip(&ioDevice);
@@ -76,7 +76,7 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
     for (int j = 0; j < model.columnCount(); ++j)
     {
         QString header = model.headerData(j, Qt::Horizontal).toString();
-        QString clearedHeader(
+        const QString clearedHeader(
             header
                 .replace(QRegExp(QStringLiteral("[<>&\"']")),
                          QStringLiteral(" "))

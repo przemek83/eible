@@ -38,7 +38,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
         QStringLiteral("config:config-item-map-entry"));
     const QString tables(QStringLiteral("Tables"));
 
-    QDomElement root = xmlDocument.documentElement();
+    const QDomElement root = xmlDocument.documentElement();
     const int elementsCount = root.elementsByTagName(configMapNamed).size();
     QStringList sheetNames{};
     for (int i = 0; i < elementsCount; i++)
@@ -52,7 +52,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
                 currentElement.elementsByTagName(configMapEntry).size();
             for (int j = 0; j < innerElementsCount; j++)
             {
-                QDomElement element =
+                const QDomElement element =
                     currentElement.elementsByTagName(configMapEntry)
                         .at(j)
                         .toElement();
@@ -127,7 +127,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return {false, {}};
 
-    QVector<QVariant> templateDataRow{
+    const QVector<QVariant> templateDataRow{
         createTemplateDataRow(excludedColumns, columnTypes)};
 
     QMap<unsigned int, unsigned int> activeColumnsMapping{
@@ -441,15 +441,14 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
         xmlStreamReader.attributes().value(OFFICE_VALUE_TYPE_TAG).toString()};
     QVariant value{};
     const QString emptyString(QLatin1String(""));
-    QString currentDateValue{};
 
     switch (columnType)
     {
         case ColumnType::STRING:
         {
-            currentDateValue = xmlStreamReader.attributes()
-                                   .value(OFFICE_DATE_VALUE_TAG)
-                                   .toString();
+            const QString currentDateValue = xmlStreamReader.attributes()
+                                                 .value(OFFICE_DATE_VALUE_TAG)
+                                                 .toString();
 
             while (!xmlStreamReader.atEnd() &&
                    0 != xmlStreamReader.name().compare(P_TAG))
@@ -502,7 +501,7 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
 bool ImportOds::isOfficeValueTagEmpty(
     const QXmlStreamReader& xmlStreamReader) const
 {
-    QString xmlColTypeValue{
+    const QString xmlColTypeValue{
         xmlStreamReader.attributes().value(OFFICE_VALUE_TYPE_TAG).toString()};
     return xmlColTypeValue.isEmpty();
 }

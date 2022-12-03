@@ -140,14 +140,14 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
 bool ImportSpreadsheet::columnsToExcludeAreValid(
     const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
 {
-    auto it = std::find_if(
+    const auto* it = std::find_if(
         excludedColumns.begin(), excludedColumns.end(),
         [=](unsigned int column) { return column >= columnCount; });
     if (it != excludedColumns.end())
     {
         setError("Column to exclude " + QString::number(*it) +
                  " is invalid. Xlsx got only " + QString::number(columnCount) +
-                 " columns indexed from 0.");
+                 " columns (indexed from 0).");
         return false;
     }
     return true;

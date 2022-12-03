@@ -71,16 +71,17 @@ QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
     dateStyles.append(predefinedExcelStylesForDates);
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
-        QDomElement sheet{sheetNodes.at(i).toElement()};
+        const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (sheet.hasAttribute(QStringLiteral("numFmtId")) &&
             sheet.hasAttribute(QStringLiteral("formatCode")))
         {
-            QString formatCode = sheet.attribute(QStringLiteral("formatCode"));
-            bool gotD =
+            const QString formatCode =
+                sheet.attribute(QStringLiteral("formatCode"));
+            const bool gotD =
                 formatCode.contains(QStringLiteral("d"), Qt::CaseInsensitive);
-            bool gotM =
+            const bool gotM =
                 formatCode.contains(QStringLiteral("m"), Qt::CaseInsensitive);
-            bool gotY =
+            const bool gotY =
                 formatCode.contains(QStringLiteral("y"), Qt::CaseInsensitive);
 
             if ((gotD && gotY) || (gotD && gotM) || (gotM && gotY))
@@ -98,7 +99,7 @@ QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes) const
     const QString searchedAttribute{QStringLiteral("numFmtId")};
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
-        QDomElement sheet{sheetNodes.at(i).toElement()};
+        const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (!sheet.isNull() && sheet.hasAttribute(searchedAttribute))
             allStyles.push_back(sheet.attribute(searchedAttribute).toInt());
     }
@@ -119,13 +120,13 @@ ImportXlsx::getStyles()
         return {false, std::nullopt, std::nullopt};
     }
 
-    QDomElement root{xmlDocument.documentElement()};
+    const QDomElement root{xmlDocument.documentElement()};
     QDomNodeList sheetNodes{
         root.firstChildElement(QStringLiteral("numFmts")).childNodes()};
-    QList<int> dateStyles{retrieveDateStyles(sheetNodes)};
+    const QList<int> dateStyles{retrieveDateStyles(sheetNodes)};
 
     sheetNodes = root.firstChildElement(QStringLiteral("cellXfs")).childNodes();
-    QList<int> allStyles{retrieveAllStyles(sheetNodes)};
+    const QList<int> allStyles{retrieveAllStyles(sheetNodes)};
 
     return {true, dateStyles, allStyles};
 }
@@ -243,8 +244,8 @@ std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
         return {false, {}};
     }
 
-    QDomElement root{xmlDocument.documentElement()};
-    QDomNodeList sheetNodes{nodesRetriever(root)};
+    const QDomElement root{xmlDocument.documentElement()};
+    const QDomNodeList sheetNodes{nodesRetriever(root)};
     if (sheetNodes.size() <= 0)
     {
         setError(QStringLiteral("File is corrupted, no sheets in xml."));
@@ -380,7 +381,7 @@ QString ImportXlsx::getColumnName(QXmlStreamReader& xmlStreamReader,
     QString columnName;
     if (currentColType == S_TAG)
     {
-        int value{xmlStreamReader.readElementText().toInt()};
+        const int value{xmlStreamReader.readElementText().toInt()};
         columnName = (*sharedStrings_)[value];
     }
     else
@@ -412,7 +413,8 @@ ColumnType ImportXlsx::recognizeColumnType(
     if (ColumnType::STRING == currentType)
         return currentType;
 
-    QXmlStreamAttributes xmlStreamAtrributes{xmlStreamReader.attributes()};
+    const QXmlStreamAttributes xmlStreamAtrributes{
+        xmlStreamReader.attributes()};
     const QString value{xmlStreamAtrributes.value(T_TAG).toString()};
     if (value == S_TAG || value == STR_TAG)
         return ColumnType::STRING;
@@ -451,7 +453,7 @@ ImportXlsx::getSheetIdToUserFriendlyNameMap()
     QMap<QString, QString> sheetIdToUserFriendlyNameMap;
     for (int i = 0; i < sheetNodes.size(); ++i)
     {
-        QDomElement sheet{sheetNodes.at(i).toElement()};
+        const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (!sheet.isNull())
             sheetIdToUserFriendlyNameMap[sheet.attribute(QStringLiteral(
                 "r:id"))] = sheet.attribute(QStringLiteral("name"));
@@ -591,7 +593,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QXmlStreamReader xmlStreamReader;
     moveToSecondRow(zipFile, xmlStreamReader);
 
-    QVector<QVariant> templateDataRow{
+    const QVector<QVariant> templateDataRow{
         createTemplateDataRow(excludedColumns, columnTypes)};
 
     QMap<unsigned int, unsigned int> activeColumnsMapping{

@@ -7,7 +7,7 @@ ExportData::ExportData(QObject* parent) : QObject(parent) {}
 
 bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {
-    const auto model = view.model();
+    const auto* model = view.model();
     Q_ASSERT(model != nullptr);
 
     if (model->columnCount() == 0)
@@ -34,7 +34,7 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 
 bool ExportData::rowShouldBeSkipped(const QAbstractItemView& view, int row)
 {
-    const auto model = view.model();
+    const auto* model = view.model();
     const bool multiSelection =
         (QAbstractItemView::MultiSelection == view.selectionMode());
     QItemSelectionModel* selectionModel = view.selectionModel();
