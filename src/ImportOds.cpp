@@ -11,7 +11,6 @@
 #include <QXmlStreamReader>
 #include <QtXml/QDomDocument>
 
-#include "EibleUtilities.h"
 
 ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
@@ -75,7 +74,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     if (!sheetNames_ && !getSheetNames().first)
         return {false, {}};
 
-    if (!isSheetNameValid(*sheetNames_, sheetName))
+    if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
     QuaZipFile zipFile;
@@ -97,7 +96,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
     if (!sheetNames_ && !getSheetNames().first)
         return {false, {}};
 
-    if (!isSheetNameValid(*sheetNames_, sheetName))
+    if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
     const auto it = columnNames_.constFind(sheetName);
@@ -198,7 +197,7 @@ std::pair<bool, unsigned int> ImportOds::getCount(
     if (!sheetNames_ && !getSheetNames().first)
         return {false, {}};
 
-    if (!isSheetNameValid(*sheetNames_, sheetName))
+    if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
     if (const auto it = countMap.find(sheetName); it != countMap.end())
@@ -225,18 +224,14 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
         xmlStreamReader.readNext();
     xmlStreamReader.readNext();
 
-    int column = NOT_SET_COLUMN;
     QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
     QStringList columnNames;
 
     while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != TABLE_ROW_TAG)
     {
-        if (isCellStart(xmlStreamReader))
-        {
-            if (getColumnRepeatCount(xmlStreamReader.attributes()) > 1)
-                break;
-            column++;
-        }
+        if (isCellStart(xmlStreamReader) &&
+            getColumnRepeatCount(xmlStreamReader.attributes()) > 1)
+            break;
 
         if (xmlStreamReader.name().toString() == P_TAG &&
             xmlStreamReader.isStartElement())
