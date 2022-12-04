@@ -42,7 +42,7 @@ bool ExportData::rowShouldBeSkipped(const QAbstractItemView& view, int row)
     return multiSelection && !selectionModel->isSelected(model->index(row, 0));
 }
 
-QByteArray ExportData::getContentEnding() { return QByteArray(); }
+QByteArray ExportData::getContentEnding() { return {}; }
 
 void ExportData::updateProgress(unsigned int currentRow, unsigned int rowCount,
                                 unsigned int& lastEmittedPercent)

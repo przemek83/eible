@@ -55,18 +55,18 @@ QVariant getDefaultVariantForFormat(ColumnType format)
     switch (format)
     {
         case ColumnType::STRING:
-            return QVariant(QVariant::String);
+            return {QVariant::String};
 
         case ColumnType::NUMBER:
-            return QVariant(QVariant::Double);
+            return {QVariant::Double};
 
         case ColumnType::DATE:
-            return QVariant(QVariant::Date);
+            return {QVariant::Date};
 
         case ColumnType::UNKNOWN:
             Q_ASSERT(false);
     }
-    return QVariant(QVariant::String);
+    return {QVariant::String};
 }
 
 }  // namespace EibleUtilities

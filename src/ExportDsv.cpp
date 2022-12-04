@@ -9,7 +9,7 @@ ExportDsv::ExportDsv(char separator, QObject* parent)
 {
 }
 
-QByteArray ExportDsv::getEmptyContent() { return QByteArray(); }
+QByteArray ExportDsv::getEmptyContent() { return {}; }
 
 QByteArray ExportDsv::generateHeaderContent(const QAbstractItemModel& model)
 {
