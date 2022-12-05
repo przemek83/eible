@@ -106,13 +106,12 @@ protected:
 
     bool initZipFile(QuaZipFile& zipFile, const QString& zipFileName);
 
-    QVector<QVariant> createTemplateDataRow(
+    static QVector<QVariant> createTemplateDataRow(
         const QVector<unsigned int>& excludedColumns,
-        const QVector<ColumnType>& columnTypes) const;
+        const QVector<ColumnType>& columnTypes);
 
-    QMap<unsigned int, unsigned int> createActiveColumnMapping(
-        const QVector<unsigned int>& excludedColumns,
-        unsigned int columnCount) const;
+    static QMap<unsigned int, unsigned int> createActiveColumnMapping(
+        const QVector<unsigned int>& excludedColumns, unsigned int columnCount);
 
     bool columnsToExcludeAreValid(const QVector<unsigned int>& excludedColumns,
                                   unsigned int columnCount);
@@ -139,7 +138,7 @@ protected:
 
     QIODevice& ioDevice_;
 
-    /// If empty column is encountered insert defined string.
+    /// If empty column is encountered than insert defined string.
     QString emptyColName_;
 
     static constexpr int NOT_SET_COLUMN{-1};

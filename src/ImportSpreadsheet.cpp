@@ -100,8 +100,7 @@ bool ImportSpreadsheet::initZipFile(QuaZipFile& zipFile,
 }
 
 QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
-    const QVector<unsigned int>& excludedColumns,
-    unsigned int columnCount) const
+    const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
 {
     QMap<unsigned int, unsigned int> activeColumnsMapping;
     unsigned int columnToFill{0};
@@ -118,7 +117,7 @@ QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
 
 QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
     const QVector<unsigned int>& excludedColumns,
-    const QVector<ColumnType>& columnTypes) const
+    const QVector<ColumnType>& columnTypes)
 {
     QVector<QVariant> templateDataRow;
     int columnToFill = 0;
