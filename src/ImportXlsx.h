@@ -90,8 +90,8 @@ private:
     std::tuple<bool, unsigned int, QVector<ColumnType>>
     retrieveRowCountAndColumnTypes(const QString& sheetName) override;
 
-    QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes) const;
-    QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes) const;
+    static QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes);
+    static QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes);
 
     QString getColumnName(QXmlStreamReader& xmlStreamReader,
                           const QString& currentColType) const;
@@ -109,7 +109,7 @@ private:
                              const QString& currentColType,
                              const QString& actualSTagValue) const;
 
-    QDate getDateFromString(const QString& dateAsString) const;
+    static QDate getDateFromString(const QString& dateAsString);
 
     bool isDateStyle(const QString& sTagValue) const;
 

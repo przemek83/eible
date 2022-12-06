@@ -64,7 +64,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     return {true, columnNames_.value(sheetName)};
 }
 
-QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
+QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes)
 {
     QList<int> dateStyles;
     const QList predefinedExcelStylesForDates{14, 15, 16, 17, 22};
@@ -92,7 +92,7 @@ QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes) const
     return dateStyles;
 }
 
-QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes) const
+QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes)
 {
     QList<int> allStyles;
     allStyles.reserve(sheetNodes.size());
@@ -544,7 +544,7 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
     return currentValue;
 }
 
-QDate ImportXlsx::getDateFromString(const QString& dateAsString) const
+QDate ImportXlsx::getDateFromString(const QString& dateAsString)
 {
     const int daysToAdd{static_cast<int>(dateAsString.toDouble())};
     return EibleUtilities::getStartOfExcelWorld().addDays(daysToAdd);
