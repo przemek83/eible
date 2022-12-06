@@ -31,8 +31,6 @@ protected:
     virtual bool writeContent(const QByteArray& content,
                               QIODevice& ioDevice) = 0;
 
-    bool rowShouldBeSkipped(const QAbstractItemView& view, int row);
-
     virtual QByteArray getEmptyContent() = 0;
 
     virtual QByteArray generateHeaderContent(
@@ -45,6 +43,9 @@ protected:
 
     virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
                                 unsigned int& lastEmittedPercent);
+
+private:
+    static bool rowShouldBeSkipped(const QAbstractItemView& view, int row);
 
 Q_SIGNALS:
     /**
