@@ -420,6 +420,7 @@ void prepareDataForGetDataLimitRows()
     sheetName = getSheetNames()[5];
     QVector<QVector<QVariant>> expectedValues;
     const unsigned int rowLimit{12U};
+    expectedValues.reserve(rowLimit);
     for (unsigned int i = 0; i < rowLimit; ++i)
         expectedValues.append(sheetData_[5][static_cast<int>(i)]);
     QTest::newRow(
