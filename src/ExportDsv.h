@@ -22,7 +22,6 @@ public:
      * @param separator Separator to be used during export (comma, tab, ...).
      */
     explicit ExportDsv(char separator, QObject* parent = nullptr);
-    ~ExportDsv() override = default;
 
     /**
      * @brief Change date format to given one via Qt::DateFormat. (overloaded)

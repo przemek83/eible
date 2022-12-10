@@ -17,7 +17,6 @@ class EIBLE_EXPORT ExportData : public QObject
     Q_OBJECT
 public:
     explicit ExportData(QObject* parent = nullptr);
-    ~ExportData() override = default;
 
     /**
      * @brief Export data from view to ioDevice.
