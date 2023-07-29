@@ -21,7 +21,9 @@ Clone and use CMake directly or via Qt Creator. CMake **should**:
 + configure everything automatically,
 + compile library and create binaries.
 
-**TIP**: remember to set properly `CMAKE_PREFIX_PATH` env variable. It should have a Qt installation path to let CMake use `find_package` command.  
+**TIP 1**: remember to set properly `CMAKE_PREFIX_PATH` env variable. It should have a Qt installation path to let CMake use `find_package` command.  
+
+**TIP 2**: make sure you install the `Core5Compat` module, which is part of Qt 6 as Quazip needs it.  
 
 As a result of compilation, a dynamic lib should be created along with a headers' dir.
 
