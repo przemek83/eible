@@ -1,10 +1,11 @@
 #include "ExportXlsx.h"
 
-#include <Qt5Quazip/quazipfile.h>
+#include <quazip/quazipfile.h>
 
 #include <QAbstractItemView>
 #include <QCoreApplication>
 #include <QFile>
+#include <QRegExp>
 #include <QVariant>
 
 #include "EibleUtilities.h"
@@ -78,7 +79,7 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
         QString header = model.headerData(j, Qt::Horizontal).toString();
         const QString clearedHeader(
             header
-                .replace(QRegExp(QStringLiteral("[<>&\"']")),
+                .replace(QRegularExpression(QStringLiteral("[<>&\"']")),
                          QStringLiteral(" "))
                 .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
         headersContent.append("<c r=\"" + columnNames_[j]);
@@ -112,7 +113,8 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
         rowContent.append(ROW_NUMBER_CLOSE);
         rowContent.append(getCellTypeTag(cell));
         rowContent.append(VALUE_START);
-        if (cell.type() == QVariant::Date || cell.type() == QVariant::DateTime)
+        if (cell.typeId() == QMetaType::QDate ||
+            cell.typeId() == QMetaType::QDateTime)
             rowContent.append(QByteArray::number(
                 -1 *
                 cell.toDate().daysTo(EibleUtilities::getStartOfExcelWorld())));
@@ -131,14 +133,14 @@ QByteArray ExportXlsx::getContentEnding()
 
 const QByteArray& ExportXlsx::getCellTypeTag(const QVariant& cell)
 {
-    switch (cell.type())
+    switch (cell.typeId())
     {
-        case QVariant::Date:
-        case QVariant::DateTime:
+        case QMetaType::QDate:
+        case QMetaType::QDateTime:
             return DATE_TAG;
 
-        case QVariant::Int:
-        case QVariant::Double:
+        case QMetaType::Int:
+        case QMetaType::Double:
             return NUMERIC_TAG;
 
         default:

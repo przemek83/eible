@@ -1,6 +1,6 @@
 #include "ImportSpreadsheet.h"
 
-#include <Qt5Quazip/quazipfile.h>
+#include <quazip/quazipfile.h>
 #include <QCoreApplication>
 #include <QIODevice>
 #include <QVariant>
@@ -139,9 +139,9 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
 bool ImportSpreadsheet::columnsToExcludeAreValid(
     const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
 {
-    const auto* it = std::find_if(
-        excludedColumns.begin(), excludedColumns.end(),
-        [=](unsigned int column) { return column >= columnCount; });
+    const auto it = std::find_if(excludedColumns.begin(), excludedColumns.end(),
+                                 [=](unsigned int column)
+                                 { return column >= columnCount; });
     if (it != excludedColumns.end())
     {
         setError("Column to exclude " + QString::number(*it) +

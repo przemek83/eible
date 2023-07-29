@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Qt5Quazip/quazip.h>
+#include <quazip/quazip.h>
 #include <QObject>
 #include <QVector>
 

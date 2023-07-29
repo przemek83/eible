@@ -160,7 +160,7 @@ QVector<QVector<QVariant>> ImportXlsxTest::convertDataToUseSharedStrings(
     QVector<QVector<QVariant>> outputData{inputData};
     for (auto& row : outputData)
         for (auto& item : row)
-            if (item.type() == QVariant::String && !item.isNull())
+            if (item.typeId() == QMetaType::QString && !item.isNull())
                 item = (sharedStrings_.contains(item.toString())
                             ? QVariant(sharedStrings_.indexOf(item.toString()))
                             : item);

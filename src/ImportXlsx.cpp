@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include <Qt5Quazip/quazip.h>
-#include <Qt5Quazip/quazipfile.h>
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 #include <QIODevice>
 #include <QMap>
 #include <QSet>
@@ -593,8 +593,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     QXmlStreamReader xmlStreamReader;
     moveToSecondRow(zipFile, xmlStreamReader);
 
-    const QVector<QVariant> templateDataRow{
-        createTemplateDataRow(excludedColumns, columnTypes)};
+    const QVector<QVariant> templateDataRow(
+        createTemplateDataRow(excludedColumns, columnTypes));
 
     QMap<unsigned int, unsigned int> activeColumnsMapping{
         createActiveColumnMapping(excludedColumns, columnCount)};

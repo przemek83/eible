@@ -2,6 +2,7 @@
 
 #include <QAbstractItemView>
 #include <QDate>
+#include <QIODevice>
 #include <QVariant>
 
 ExportDsv::ExportDsv(char separator, QObject* parent)
@@ -57,18 +58,18 @@ void ExportDsv::variantToString(const QVariant& variant,
                                 QByteArray& destinationArray,
                                 char separator) const
 {
-    switch (variant.type())
+    switch (variant.typeId())
     {
-        case QVariant::Double:
-        case QVariant::Int:
+        case QMetaType::Double:
+        case QMetaType::Int:
         {
             destinationArray.append(
                 locale_.toString(variant.toDouble(), 'f', 2).toUtf8());
             break;
         }
 
-        case QVariant::Date:
-        case QVariant::DateTime:
+        case QMetaType::QDate:
+        case QMetaType::QDateTime:
         {
             if (dateFormat_.isEmpty())
                 destinationArray.append(
@@ -79,7 +80,7 @@ void ExportDsv::variantToString(const QVariant& variant,
             break;
         }
 
-        case QVariant::String:
+        case QMetaType::QString:
         {
             // Following https://tools.ietf.org/html/rfc4180
             QByteArray value{variant.toByteArray()};

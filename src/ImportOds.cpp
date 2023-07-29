@@ -3,8 +3,8 @@
 #include <cmath>
 #include <utility>
 
-#include <Qt5Quazip/quazip.h>
-#include <Qt5Quazip/quazipfile.h>
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 #include <QDebug>
 #include <QVariant>
 #include <QVector>
@@ -126,8 +126,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return {false, {}};
 
-    const QVector<QVariant> templateDataRow{
-        createTemplateDataRow(excludedColumns, columnTypes)};
+    const QVector<QVariant> templateDataRow(
+        createTemplateDataRow(excludedColumns, columnTypes));
 
     QMap<unsigned int, unsigned int> activeColumnsMapping{
         createActiveColumnMapping(excludedColumns, columnCount)};
@@ -457,9 +457,9 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
                 value = QVariant(currentDateValue);
             else
             {
-                const QString* stringPointer = xmlStreamReader.text().string();
-                value = QVariant(stringPointer == nullptr ? emptyString
-                                                          : *stringPointer);
+                const QStringView stringView = xmlStreamReader.text();
+                value = QVariant(stringView.isNull() ? emptyString
+                                                     : stringView.toString());
             }
             break;
         }

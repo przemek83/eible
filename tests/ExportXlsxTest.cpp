@@ -1,8 +1,8 @@
 #include "ExportXlsxTest.h"
 
 #include <ExportXlsx.h>
-#include <Qt5Quazip/quazip.h>
-#include <Qt5Quazip/quazipfile.h>
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 #include <QBuffer>
 #include <QCryptographicHash>

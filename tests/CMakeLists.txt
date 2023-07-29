@@ -1,35 +1,31 @@
 project(tests)
 
-qt5_add_resources(RESOURCES_TESTS testResources.qrc)
-add_custom_target(generatedTest_qrc DEPENDS ${RESOURCES_TESTS})
-
-set(${PROJECT_NAME}_SOURCES
-    qrc_testResources.cpp
+set(SOURCES
     Tests.cpp
     ExportXlsxTest.cpp
-    ExportXlsxTest.h
     Utilities.cpp
-    Utilities.h
     TestTableModel.cpp
-    TestTableModel.h
     ExportDsvTest.cpp
-    ExportDsvTest.h
     ImportXlsxTest.cpp
-    ImportXlsxTest.h
     ImportOdsTest.cpp
-    ImportOdsTest.h
     ImportCommon.cpp
+)
+qt_add_resources(SOURCES testResources.qrc)
+
+set(HEADERS
+    ExportXlsxTest.h
+    Utilities.h
+    TestTableModel.h
+    ExportDsvTest.h
+    ImportXlsxTest.h
+    ImportOdsTest.h
     ImportCommon.h
-    )
+ )
 
-add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-add_dependencies(${PROJECT_NAME} generatedTest_qrc)
-
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE eible Qt5::Test Qt5::Core Qt5::Widgets)
-target_link_libraries(${PROJECT_NAME} PRIVATE optimized Qt5Quazip)
-target_link_libraries(${PROJECT_NAME} PRIVATE debug Qt5Quazipd)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Test QuaZip::QuaZip eible)
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+
 
