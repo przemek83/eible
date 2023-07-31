@@ -52,19 +52,21 @@ set(HEADERS
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 
+set(PUBLIC_HEADERS
+    src/eible_global.h
+    src/ExportXlsx.h
+    src/ExportDsv.h
+    src/ExportData.h
+    src/ImportSpreadsheet.h
+    src/ImportXlsx.h
+    src/ImportOds.h
+    src/ColumnType.h
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
-    PUBLIC_HEADER
-        src/eible_global.h
-        src/EibleUtilities.h
-        src/ExportXlsx.h
-        src/ExportDsv.h
-        src/ExportData.h
-        src/ImportSpreadsheet.h
-        src/ImportXlsx.h
-        src/ImportOds.h
-        src/ColumnType.h
+    PUBLIC_HEADER "${PUBLIC_HEADERS}"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
