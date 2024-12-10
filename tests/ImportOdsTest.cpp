@@ -1,6 +1,6 @@
 #include "ImportOdsTest.h"
 
-#include <ImportOds.h>
+#include <eible/ImportOds.h>
 #include <QBuffer>
 #include <QFile>
 #include <QStringLiteral>

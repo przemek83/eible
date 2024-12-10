@@ -1,7 +1,7 @@
 #include "ImportXlsxTest.h"
 
-#include <ExportXlsx.h>
-#include <ImportXlsx.h>
+#include <eible/ExportXlsx.h>
+#include <eible/ImportXlsx.h>
 #include <QBuffer>
 #include <QTableView>
 #include <QTest>

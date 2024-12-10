@@ -1,8 +1,8 @@
 #include "ImportCommon.h"
 
-#include <ImportOds.h>
-#include <ImportSpreadsheet.h>
-#include <ImportXlsx.h>
+#include <eible/ImportOds.h>
+#include <eible/ImportSpreadsheet.h>
+#include <eible/ImportXlsx.h>
 #include <QBuffer>
 #include <QFile>
 #include <QSignalSpy>

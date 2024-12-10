@@ -8,10 +8,10 @@
 #include <QTableWidget>
 #include <QTimer>
 
-#include "ExportDsv.h"
-#include "ExportXlsx.h"
-#include "ImportOds.h"
-#include "ImportXlsx.h"
+#include <eible/ExportDsv.h>
+#include <eible/ExportXlsx.h>
+#include <eible/ImportOds.h>
+#include <eible/ImportXlsx.h>
 
 static void initTable(QTableWidget& tableWidget)
 {

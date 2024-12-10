@@ -3,7 +3,7 @@
 #include <QDate>
 #include <QVariant>
 
-#include "ColumnType.h"
+#include <eible/ColumnType.h>
 
 namespace EibleUtilities
 {

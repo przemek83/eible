@@ -1,4 +1,4 @@
-#include "ImportSpreadsheet.h"
+#include <eible/ImportSpreadsheet.h>
 
 #include <quazip/quazipfile.h>
 #include <QCoreApplication>

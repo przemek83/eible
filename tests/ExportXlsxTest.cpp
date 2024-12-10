@@ -1,6 +1,6 @@
 #include "ExportXlsxTest.h"
 
-#include <ExportXlsx.h>
+#include <eible/ExportXlsx.h>
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 

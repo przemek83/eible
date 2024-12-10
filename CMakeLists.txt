@@ -20,6 +20,9 @@ endif()
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Test Xml Core5Compat)
 qt_standard_project_setup()
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 set(THIRD_PARTY_LIBS zlib quazip)
 foreach(library ${THIRD_PARTY_LIBS})
     configure_file(CMakeLists.txt.${library} ${library}/CMakeLists.txt)
@@ -34,7 +37,8 @@ find_package(ZLIB REQUIRED)
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/quazip/install/")
 find_package(QuaZip-Qt6 CONFIG REQUIRED)
 
-set(SOURCES
+set(${PROJECT_NAME}_SOURCES 
+    src/EibleUtilities.h
     src/EibleUtilities.cpp
     src/ExportXlsx.cpp
     src/ExportDsv.cpp
@@ -42,49 +46,49 @@ set(SOURCES
     src/ImportSpreadsheet.cpp
     src/ImportXlsx.cpp
     src/ImportOds.cpp
+
 )
-qt_add_resources(SOURCES res/resources.qrc)
-
-set(HEADERS
-    src/eible_global.h
-    src/EibleUtilities.h
-    src/ExportXlsx.h
-    src/ExportDsv.h
-    src/ExportData.h
-    src/ImportSpreadsheet.h
-    src/ImportXlsx.h
-    src/ImportOds.h
-    src/ColumnType.h
- )
-
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
+qt_add_resources(${PROJECT_NAME}_RESOURCES res/resources.qrc)
 
 set(PUBLIC_HEADERS
-    src/eible_global.h
-    src/ExportXlsx.h
-    src/ExportDsv.h
-    src/ExportData.h
-    src/ImportSpreadsheet.h
-    src/ImportXlsx.h
-    src/ImportOds.h
-    src/ColumnType.h
+    include/${PROJECT_NAME}/eible_global.h
+    include/${PROJECT_NAME}/ExportXlsx.h
+    include/${PROJECT_NAME}/ExportDsv.h
+    include/${PROJECT_NAME}/ExportData.h
+    include/${PROJECT_NAME}/ImportSpreadsheet.h
+    include/${PROJECT_NAME}/ImportXlsx.h
+    include/${PROJECT_NAME}/ImportOds.h
+    include/${PROJECT_NAME}/ColumnType.h
 )
+
+add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES} ${PUBLIC_HEADERS} ${${PROJECT_NAME}_RESOURCES})
+
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  PRIVATE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
-    SOVERSION 1
-    PUBLIC_HEADER "${PUBLIC_HEADERS}"
-)
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
-target_include_directories(${PROJECT_NAME} PUBLIC src)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml Qt6::Core5Compat QuaZip::QuaZip)
+configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE EIBLE_LIBRARY)
 
-include(GNUInstallDirs)
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME} 
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml Qt6::Core5Compat QuaZip::QuaZip)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_subdirectory(examples)

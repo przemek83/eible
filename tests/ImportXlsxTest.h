@@ -4,7 +4,7 @@
 #include <QSet>
 #include <QVector>
 
-#include <ColumnType.h>
+#include <eible/ColumnType.h>
 
 class ImportXlsx;
 

@@ -1,10 +1,11 @@
-project(examples)
+SET(PROJECT_EXAMPLES ${PROJECT_NAME}-examples)
 
-set(SOURCES
+set(${PROJECT_EXAMPLES}_SOURCES
     example.cpp
 )
-qt_add_resources(SOURCES examplesResources.qrc)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+qt_add_resources(${PROJECT_EXAMPLES}_SOURCES examplesResources.qrc)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets QuaZip::QuaZip eible)
+add_executable(${PROJECT_EXAMPLES} ${${PROJECT_EXAMPLES}_SOURCES})
+
+target_link_libraries(${PROJECT_EXAMPLES} PRIVATE eible Qt6::Core Qt6::Widgets QuaZip::QuaZip)

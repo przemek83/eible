@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ImportSpreadsheet.h>
+#include <eible/ImportSpreadsheet.h>
 #include <QStringList>
 #include <QVariant>
 
