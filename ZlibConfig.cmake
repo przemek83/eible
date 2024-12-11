@@ -5,5 +5,4 @@ execute_process(COMMAND ${CMAKE_COMMAND} --build .
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zlib )
 
 set(ZLIB_ROOT ${CMAKE_CURRENT_BINARY_DIR}/zlib/install)
-find_package(ZLIB REQUIRED)
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/zlib/install/include)

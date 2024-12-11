@@ -7,5 +7,3 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(QuaZip)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/_deps/quazip-src)
