@@ -38,7 +38,7 @@ Check out my other project, Volbx to familiarize yourself with how to use it via
 | Git | 2.38.1 | 2.34.1 |
 | Qt | 6.5.2 | 6.5.2 |
 | Qt Creator | 10.0.2 | 10.0.2 |
-| Zlib | 1.2.13 | 1.2.13 |
+| Zlib | 1.3.1 | 1.3.1 |
 | QuaZip | 1.4 | 1.4 |
 
 # Usage
