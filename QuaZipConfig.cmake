@@ -1,5 +1,6 @@
 include(FetchContent)
 
+set(QUAZIP_BZIP2 OFF)
 FetchContent_Declare(
     QuaZip
     GIT_REPOSITORY https://github.com/stachenov/quazip.git
