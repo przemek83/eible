@@ -21,7 +21,7 @@ qt_add_resources(${PROJECT_TESTS}_SOURCES testResources.qrc)
 
 add_executable(${PROJECT_TESTS} ${${PROJECT_TESTS}_SOURCES})
 
-target_link_libraries(${PROJECT_TESTS} PRIVATE eible Qt6::Core Qt6::Widgets Qt6::Test QuaZip::QuaZip)
+target_link_libraries(${PROJECT_TESTS} PRIVATE eible Qt6::Core Qt6::Widgets Qt6::Test QuaZip)
 
 add_test(NAME ${PROJECT_TESTS} COMMAND ${PROJECT_TESTS})
 

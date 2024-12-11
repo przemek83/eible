@@ -23,19 +23,18 @@ qt_standard_project_setup()
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(THIRD_PARTY_LIBS zlib quazip)
-foreach(library ${THIRD_PARTY_LIBS})
-    configure_file(CMakeLists.txt.${library} ${library}/CMakeLists.txt)
-    execute_process(COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/${library})
-    execute_process(COMMAND ${CMAKE_COMMAND} --build .
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/${library} )
-endforeach(library)
+configure_file(CMakeLists.txt.zlib zlib/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zlib)
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zlib )
 
-set(ZLIB_ROOT ${CMAKE_BINARY_DIR}/zlib/install)
+set(ZLIB_ROOT ${CMAKE_CURRENT_BINARY_DIR}/zlib/install)
 find_package(ZLIB REQUIRED)
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/quazip/install/")
-find_package(QuaZip-Qt6 CONFIG REQUIRED)
+include_directories( ${CMAKE_CURRENT_BINARY_DIR}/zlib/install/include)
+
+include(CMakeLists.txt.quazip)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/_deps/quazip-src)
 
 set(${PROJECT_NAME}_SOURCES 
     src/EibleUtilities.h
@@ -88,7 +87,7 @@ install(TARGETS ${PROJECT_NAME}
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml Qt6::Core5Compat QuaZip::QuaZip)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml Qt6::Core5Compat QuaZip)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_subdirectory(examples)
