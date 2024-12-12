@@ -4,5 +4,5 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
 execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zlib )
 
-set(ZLIB_ROOT ${CMAKE_CURRENT_BINARY_DIR}/zlib/install)
-include_directories( ${CMAKE_CURRENT_BINARY_DIR}/zlib/install/include)
+set(ZLIB_ROOT ${CMAKE_BINARY_DIR}/zlib/install)
+include_directories( ${CMAKE_BINARY_DIR}/zlib/install/include)
