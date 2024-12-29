@@ -407,7 +407,7 @@ int ImportXlsx::getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader,
 }
 
 ColumnType ImportXlsx::recognizeColumnType(
-    ColumnType currentType, QXmlStreamReader& xmlStreamReader) const
+    ColumnType currentType, const QXmlStreamReader& xmlStreamReader) const
 {
     if (ColumnType::STRING == currentType)
         return currentType;

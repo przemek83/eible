@@ -102,8 +102,8 @@ private:
     int getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader,
                                int rowCountDigitsInXlsx) const;
 
-    ColumnType recognizeColumnType(ColumnType currentType,
-                                   QXmlStreamReader& xmlStreamReader) const;
+    ColumnType recognizeColumnType(
+        ColumnType currentType, const QXmlStreamReader& xmlStreamReader) const;
 
     QVariant getCurrentValue(QXmlStreamReader& xmlStreamReader,
                              ColumnType currentColumnFormat,
