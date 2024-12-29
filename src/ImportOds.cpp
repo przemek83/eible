@@ -11,7 +11,6 @@
 #include <QXmlStreamReader>
 #include <QtXml/QDomDocument>
 
-
 ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
 std::pair<bool, QStringList> ImportOds::getSheetNames()
@@ -306,9 +305,8 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
     }
 
     std::replace_if(
-        columnTypes.begin(), columnTypes.end(),
-        [](ColumnType columnType) { return columnType == ColumnType::UNKNOWN; },
-        ColumnType::STRING);
+        columnTypes.begin(), columnTypes.end(), [](ColumnType columnType)
+        { return columnType == ColumnType::UNKNOWN; }, ColumnType::STRING);
 
     return {true, rowCounter, columnTypes};
 }
@@ -458,8 +456,10 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
             else
             {
                 const QStringView stringView = xmlStreamReader.text();
-                value = QVariant(stringView.isNull() ? emptyString
-                                                     : stringView.toString());
+                if (stringView.isNull())
+                    value = QVariant(emptyString);
+                else
+                    value = stringView.toString();
             }
             break;
         }
