@@ -37,7 +37,7 @@ bool ExportData::rowShouldBeSkipped(const QAbstractItemView& view, int row)
     const auto* model = view.model();
     const bool multiSelection =
         (QAbstractItemView::MultiSelection == view.selectionMode());
-    QItemSelectionModel* selectionModel = view.selectionModel();
+    const QItemSelectionModel* selectionModel = view.selectionModel();
 
     return multiSelection && !selectionModel->isSelected(model->index(row, 0));
 }
