@@ -140,8 +140,8 @@ bool ImportSpreadsheet::columnsToExcludeAreValid(
     const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
 {
     const auto it = std::find_if(excludedColumns.begin(), excludedColumns.end(),
-                                 [=](unsigned int column)
-                                 { return column >= columnCount; });
+                                 [count = columnCount](unsigned int column)
+                                 { return column >= count; });
     if (it != excludedColumns.end())
     {
         setError("Column to exclude " + QString::number(*it) +
