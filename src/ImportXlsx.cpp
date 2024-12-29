@@ -424,8 +424,11 @@ ColumnType ImportXlsx::recognizeColumnType(
     {
         if (currentType == ColumnType::UNKNOWN)
             detectedType = ColumnType::DATE;
-        else if (currentType != ColumnType::DATE)
-            detectedType = ColumnType::STRING;
+        else
+        {
+            if (currentType != ColumnType::DATE)
+                detectedType = ColumnType::STRING;
+        }
     }
     else
     {
