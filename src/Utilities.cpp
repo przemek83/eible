@@ -1,6 +1,6 @@
-#include "EibleUtilities.h"
+#include "Utilities.h"
 
-namespace EibleUtilities
+namespace utilities
 {
 QDate getStartOfExcelWorld()
 {
@@ -69,4 +69,4 @@ QVariant getDefaultVariantForFormat(ColumnType format)
     return QVariant(QMetaType(QMetaType::QString));
 }
 
-}  // namespace EibleUtilities
+}  // namespace utilities

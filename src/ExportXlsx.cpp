@@ -8,14 +8,13 @@
 #include <QRegExp>
 #include <QVariant>
 
-#include "EibleUtilities.h"
+#include "Utilities.h"
 
 ExportXlsx::ExportXlsx(QObject* parent) : ExportData(parent) {}
 
 bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
 {
-    QFile xlsxTemplate(QStringLiteral(":/") +
-                       EibleUtilities::getXlsxTemplateName());
+    QFile xlsxTemplate(QStringLiteral(":/") + utilities::getXlsxTemplateName());
     QuaZip inZip(&xlsxTemplate);
     inZip.open(QuaZip::mdUnzip);
 
@@ -116,8 +115,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
         if (cell.typeId() == QMetaType::QDate ||
             cell.typeId() == QMetaType::QDateTime)
             rowContent.append(QByteArray::number(
-                -1 *
-                cell.toDate().daysTo(EibleUtilities::getStartOfExcelWorld())));
+                -1 * cell.toDate().daysTo(utilities::getStartOfExcelWorld())));
         else
             rowContent.append(cell.toByteArray());
         rowContent.append(CELL_END);
@@ -152,7 +150,7 @@ void ExportXlsx::initColumnNames(int modelColumnCount)
 {
     columnNames_.clear();
     QHash<QByteArray, int> nameToIndexMap{
-        EibleUtilities::generateExcelColumnNames(modelColumnCount)};
+        utilities::generateExcelColumnNames(modelColumnCount)};
     columnNames_.resize(nameToIndexMap.size());
     for (auto it = nameToIndexMap.begin(); it != nameToIndexMap.end(); ++it)
         columnNames_[it.value()] = it.key();

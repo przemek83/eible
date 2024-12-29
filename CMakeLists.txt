@@ -27,8 +27,8 @@ include(ZlibConfig.cmake)
 include(QuaZipConfig.cmake)
 
 set(${PROJECT_NAME}_SOURCES 
-    src/EibleUtilities.h
-    src/EibleUtilities.cpp
+    src/Utilities.h
+    src/Utilities.cpp
     src/ExportXlsx.cpp
     src/ExportDsv.cpp
     src/ExportData.cpp

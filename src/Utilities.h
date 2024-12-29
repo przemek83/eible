@@ -5,7 +5,7 @@
 
 #include <eible/ColumnType.h>
 
-namespace EibleUtilities
+namespace utilities
 {
 QDate getStartOfExcelWorld();
 
@@ -16,4 +16,4 @@ int getMaxExcelColumns();
 QString getXlsxTemplateName();
 
 QVariant getDefaultVariantForFormat(ColumnType format);
-}  // namespace EibleUtilities
+}  // namespace utilities

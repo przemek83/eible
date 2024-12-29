@@ -6,7 +6,7 @@
 #include <QVariant>
 #include <QVector>
 
-#include "EibleUtilities.h"
+#include "Utilities.h"
 
 ImportSpreadsheet::ImportSpreadsheet(QIODevice& ioDevice)
     : ioDevice_(ioDevice),
@@ -128,7 +128,7 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
         if (!excludedColumns.contains(i))
         {
             templateDataRow[columnToFill] =
-                EibleUtilities::getDefaultVariantForFormat(
+                utilities::getDefaultVariantForFormat(
                     columnTypes[static_cast<int>(i)]);
             columnToFill++;
         }

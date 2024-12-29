@@ -12,12 +12,12 @@
 #include <QXmlStreamReader>
 #include <QtXml/QDomDocument>
 
-#include "EibleUtilities.h"
+#include "Utilities.h"
 
 ImportXlsx::ImportXlsx(QIODevice& ioDevice)
     : ImportSpreadsheet(ioDevice),
-      excelColNames_(EibleUtilities::generateExcelColumnNames(
-          EibleUtilities::getMaxExcelColumns()))
+      excelColNames_(
+          utilities::generateExcelColumnNames(utilities::getMaxExcelColumns()))
 {
 }
 
@@ -368,9 +368,8 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     }
 
     std::replace_if(
-        columnTypes.begin(), columnTypes.end(),
-        [](ColumnType columnType) { return columnType == ColumnType::UNKNOWN; },
-        ColumnType::STRING);
+        columnTypes.begin(), columnTypes.end(), [](ColumnType columnType)
+        { return columnType == ColumnType::UNKNOWN; }, ColumnType::STRING);
 
     return {true, rowCounter, columnTypes};
 }
@@ -547,7 +546,7 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
 QDate ImportXlsx::getDateFromString(const QString& dateAsString)
 {
     const int daysToAdd{static_cast<int>(dateAsString.toDouble())};
-    return EibleUtilities::getStartOfExcelWorld().addDays(daysToAdd);
+    return utilities::getStartOfExcelWorld().addDays(daysToAdd);
 }
 
 bool ImportXlsx::isDateStyle(const QString& sTagValue) const
