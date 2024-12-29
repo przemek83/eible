@@ -64,7 +64,7 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QMetaType::Int:
         {
             destinationArray.append(
-                locale_.toString(variant.toDouble(), 'f', 2).toUtf8());
+                locale_.toString(variant.toDouble(), 'f', precision_).toUtf8());
             break;
         }
 

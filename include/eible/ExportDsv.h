@@ -62,4 +62,6 @@ private:
     Qt::DateFormat qtDateFormat_{Qt::ISODate};
 
     const char separator_;
+
+    const int precision_{2};
 };
