@@ -122,14 +122,14 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
     QVector<QVariant> templateDataRow;
     int columnToFill{0};
     templateDataRow.resize(columnTypes.size() - excludedColumns.size());
-    for (unsigned int i{0}; i < static_cast<unsigned int>(columnTypes.size());
-         ++i)
+
+    const int columnCount{static_cast<int>(columnTypes.size())};
+    for (int i{0}; i < columnCount; ++i)
     {
         if (!excludedColumns.contains(i))
         {
             templateDataRow[columnToFill] =
-                utilities::getDefaultVariantForFormat(
-                    columnTypes[static_cast<int>(i)]);
+                utilities::getDefaultVariantForFormat(columnTypes[i]);
             ++columnToFill;
         }
     }

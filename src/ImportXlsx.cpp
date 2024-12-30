@@ -69,7 +69,9 @@ QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes)
     QList<int> dateStyles;
     const QList predefinedExcelStylesForDates{14, 15, 16, 17, 22};
     dateStyles.append(predefinedExcelStylesForDates);
-    for (int i{0}; i < sheetNodes.size(); ++i)
+
+    const int sheetsNodesCount{sheetNodes.size()};
+    for (int i{0}; i < sheetsNodesCount; ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (sheet.hasAttribute(QStringLiteral("numFmtId")) &&
@@ -95,9 +97,11 @@ QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes)
 QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes)
 {
     QList<int> allStyles;
-    allStyles.reserve(sheetNodes.size());
+
+    const int sheetsNodesCount{sheetNodes.size()};
+    allStyles.reserve(sheetsNodesCount);
     const QString searchedAttribute{QStringLiteral("numFmtId")};
-    for (int i{0}; i < sheetNodes.size(); ++i)
+    for (int i{0}; i < sheetsNodesCount; ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if ((!sheet.isNull()) && sheet.hasAttribute(searchedAttribute))
@@ -456,7 +460,8 @@ ImportXlsx::getSheetIdToUserFriendlyNameMap()
         return {false, {}};
 
     QMap<QString, QString> sheetIdToUserFriendlyNameMap;
-    for (int i{0}; i < sheetNodes.size(); ++i)
+    const int sheetNodesCount{sheetNodes.size()};
+    for (int i{0}; i < sheetNodesCount; ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (!sheet.isNull())
@@ -480,7 +485,8 @@ ImportXlsx::retrieveSheets(
         return {false, {}};
 
     QVector<std::pair<QString, QString>> sheets;
-    for (int i{0}; i < sheetNodes.size(); ++i)
+    const int sheetNodesCount{sheetNodes.size()};
+    for (int i{0}; i < sheetNodesCount; ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (!sheet.isNull())
