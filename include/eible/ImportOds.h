@@ -50,7 +50,7 @@ private:
     retrieveRowCountAndColumnTypes(const QString& sheetName) override;
 
     bool moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
-                         QXmlStreamReader& xmlStreamReader);
+                         QXmlStreamReader& xmlStreamReader) const;
 
     void skipToSheet(QXmlStreamReader& xmlStreamReader,
                      const QString& sheetName) const;

@@ -129,7 +129,7 @@ QByteArray ExportXlsx::getContentEnding()
     return QByteArrayLiteral("</sheetData>");
 }
 
-const QByteArray& ExportXlsx::getCellTypeTag(const QVariant& cell)
+const QByteArray& ExportXlsx::getCellTypeTag(const QVariant& cell) const
 {
     switch (cell.typeId())
     {

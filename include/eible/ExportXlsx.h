@@ -32,7 +32,7 @@ protected:
     QByteArray getContentEnding() override;
 
 private:
-    const QByteArray& getCellTypeTag(const QVariant& cell);
+    const QByteArray& getCellTypeTag(const QVariant& cell) const;
 
     void initColumnNames(int modelColumnCount);
 

@@ -312,7 +312,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
 }
 
 bool ImportOds::moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
-                                QXmlStreamReader& xmlStreamReader)
+                                QXmlStreamReader& xmlStreamReader) const
 {
     xmlStreamReader.setDevice(&zipFile);
     skipToSheet(xmlStreamReader, sheetName);
