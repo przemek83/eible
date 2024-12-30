@@ -5,14 +5,14 @@
 
 TestTableModel::TestTableModel(int columnCount, int rowCount, QObject* parent)
     : QAbstractTableModel(parent),
-      columnCount_(columnCount),
-      rowCount_(rowCount)
+      columnCount_{columnCount},
+      rowCount_{rowCount}
 {
     data_.resize(columnCount);
-    for (int column = 0; column < columnCount; ++column)
+    for (int column{0}; column < columnCount; ++column)
     {
         const int columnIndex{column % 3};
-        for (int row = 0; row < std::min(rowCount, MAX_DATA_ROWS); ++row)
+        for (int row{0}; row < std::min(rowCount, MAX_DATA_ROWS); ++row)
         {
             switch (columnIndex)
             {

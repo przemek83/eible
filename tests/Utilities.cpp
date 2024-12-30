@@ -4,7 +4,7 @@ namespace Utilities
 {
 QByteArray composeXlsxSheet(const QString& sheetData)
 {
-    const std::string sheetTopPart =
+    const std::string sheetTopPart{
         R"(<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 )"
         R"(<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" )"
@@ -21,11 +21,11 @@ QByteArray composeXlsxSheet(const QString& sheetData)
         R"(<col min="1" max="32" width="14.42578125" customWidth="1"/>)"
         R"(<col min="23" max="23" width="10.5703125"  customWidth="1"/>)"
         R"(<col min="24" max="24" width="11.5703125"  customWidth="1"/>)"
-        R"(</cols>)";
+        R"(</cols>)"};
 
-    const std::string sheetBottomPart =
+    const std::string sheetBottomPart{
         R"(<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" )"
-        R"(footer="0.3"/></worksheet>)";
+        R"(footer="0.3"/></worksheet>)"};
 
     QString sheet;
     sheet.append(QString::fromStdString(sheetTopPart));

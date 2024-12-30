@@ -271,14 +271,14 @@ namespace ImportCommon
 {
 void checkRetrievingSheetNames(ImportSpreadsheet& importer)
 {
-    auto [success, actualSheetNames] = importer.getSheetNames();
+    auto [success, actualSheetNames]{importer.getSheetNames()};
     QCOMPARE(success, true);
     QCOMPARE(actualSheetNames, getSheetNames());
 }
 
 void checkRetrievingSheetNamesFromEmptyFile(ImportSpreadsheet& importer)
 {
-    auto [success, actualNames] = importer.getSheetNames();
+    auto [success, actualNames]{importer.getSheetNames()};
     QCOMPARE(success, false);
     QCOMPARE(actualNames, {});
 }
@@ -287,7 +287,7 @@ void prepareDataForGetColumnListTest()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QStringList>("expectedColumnList");
-    for (int i = 0; i < testColumnNames_.size(); ++i)
+    for (int i{0}; i < testColumnNames_.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
@@ -299,7 +299,7 @@ void checkGetColumnList(ImportSpreadsheet& importer)
 {
     QFETCH(const QString, sheetName);
     QFETCH(const QStringList, expectedColumnList);
-    auto [success, actualColumnList] = importer.getColumnNames(sheetName);
+    auto [success, actualColumnList]{importer.getColumnNames(sheetName)};
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, expectedColumnList);
 }
@@ -309,7 +309,7 @@ void prepareDataForGetColumnTypes()
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
 
-    for (int i = 0; i < testColumnNames_.size(); ++i)
+    for (int i{0}; i < testColumnNames_.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns types in " + sheetName).toStdString().c_str())
@@ -321,7 +321,7 @@ void checkGetColumnTypes(ImportSpreadsheet& importer)
 {
     QFETCH(const QString, sheetName);
     QFETCH(const QVector<ColumnType>, expectedColumnTypes);
-    auto [success, columnTypes] = importer.getColumnTypes(sheetName);
+    auto [success, columnTypes]{importer.getColumnTypes(sheetName)};
     QCOMPARE(success, true);
     QCOMPARE(columnTypes, expectedColumnTypes);
 }
@@ -330,8 +330,8 @@ void checkSettingEmptyColumnName(ImportSpreadsheet& importer)
 {
     const QString newEmptyColumnName{QStringLiteral("<empty column>")};
     importer.setNameForEmptyColumn(newEmptyColumnName);
-    auto [success, actualColumnList] =
-        importer.getColumnNames(getSheetNames()[4]);
+    auto [success,
+          actualColumnList]{importer.getColumnNames(getSheetNames()[4])};
 
     std::list<QString> expectedColumnList(
         static_cast<size_t>(testColumnNames_[4].size()));
@@ -346,8 +346,8 @@ void checkSettingEmptyColumnName(ImportSpreadsheet& importer)
 
 void checkGetColumnListTwoSheets(ImportSpreadsheet& importer)
 {
-    auto [success, actualColumnList] =
-        importer.getColumnNames(getSheetNames()[4]);
+    auto [success,
+          actualColumnList]{importer.getColumnNames(getSheetNames()[4])};
     QCOMPARE(success, true);
     QCOMPARE(actualColumnList, testColumnNames_[4]);
 
@@ -361,7 +361,7 @@ void prepareDataForGetColumnCountTest()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<int>("expectedColumnCount");
-    for (int i = 0; i < testColumnNames_.size(); ++i)
+    for (int i{0}; i < testColumnNames_.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
@@ -373,7 +373,7 @@ void checkGetColumnCount(ImportSpreadsheet& importer)
 {
     QFETCH(const QString, sheetName);
     QFETCH(const int, expectedColumnCount);
-    auto [success, actualColumnCount] = importer.getColumnCount(sheetName);
+    auto [success, actualColumnCount]{importer.getColumnCount(sheetName)};
     QCOMPARE(success, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
 }
@@ -382,7 +382,7 @@ void prepareDataForGetRowCountTest()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<unsigned int>("expectedRowCount");
-    for (int i = 0; i < testColumnNames_.size(); ++i)
+    for (int i{0}; i < testColumnNames_.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Rows in " + sheetName).toStdString().c_str())
@@ -394,7 +394,7 @@ void checkGetRowCount(ImportSpreadsheet& importer)
 {
     QFETCH(const QString, sheetName);
     QFETCH(const unsigned int, expectedRowCount);
-    auto [success, actualRowCount] = importer.getRowCount(sheetName);
+    auto [success, actualRowCount]{importer.getRowCount(sheetName)};
     QCOMPARE(success, true);
     QCOMPARE(actualRowCount, expectedRowCount);
 }
@@ -405,7 +405,7 @@ void prepareDataForGetRowAndColumnCountViaGetColumnTypes()
     QTest::addColumn<unsigned int>("expectedRowCount");
     QTest::addColumn<unsigned int>("expectedColumnCount");
 
-    for (int i = 0; i < testColumnNames_.size(); ++i)
+    for (int i{0}; i < testColumnNames_.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Rows and columns via GetColumnTypes() in " + sheetName)
@@ -422,11 +422,11 @@ void testGetRowAndColumnCountViaGetColumnTypes(ImportSpreadsheet& importer)
     QFETCH(const unsigned int, expectedRowCount);
     QFETCH(const unsigned int, expectedColumnCount);
     importer.getColumnTypes(sheetName);
-    auto [successRowCount, actualRowCount] = importer.getRowCount(sheetName);
+    auto [successRowCount, actualRowCount]{importer.getRowCount(sheetName)};
     QCOMPARE(successRowCount, true);
     QCOMPARE(actualRowCount, expectedRowCount);
-    auto [successColumnCount, actualColumnCount] =
-        importer.getColumnCount(sheetName);
+    auto [successColumnCount,
+          actualColumnCount]{importer.getColumnCount(sheetName)};
     QCOMPARE(successColumnCount, true);
     QCOMPARE(actualColumnCount, expectedColumnCount);
 }
@@ -435,7 +435,7 @@ void prepareDataForGetData()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
-    for (int i = 0; i < sheetData_.size(); ++i)
+    for (int i{0}; i < sheetData_.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Data in " + sheetName).toStdString().c_str())
@@ -447,7 +447,7 @@ void checkGetData(ImportSpreadsheet& importer)
 {
     QFETCH(const QString, sheetName);
     QFETCH(const QVector<QVector<QVariant>>, expectedData);
-    auto [success, actualData] = importer.getData(sheetName, {});
+    auto [success, actualData]{importer.getData(sheetName, {})};
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
@@ -466,7 +466,7 @@ void prepareDataForGetDataLimitRows()
     QVector<QVector<QVariant>> expectedValues;
     const unsigned int rowLimit{12U};
     expectedValues.reserve(rowLimit);
-    for (unsigned int i = 0; i < rowLimit; ++i)
+    for (unsigned int i{0}; i < rowLimit; ++i)
         expectedValues.append(sheetData_[5][static_cast<int>(i)]);
     QTest::newRow(
         ("Limited data to " + QString::number(rowLimit) + " in " + sheetName)
@@ -480,8 +480,8 @@ void checkGetDataLimitRows(ImportSpreadsheet& importer)
     QFETCH(const QString, sheetName);
     QFETCH(const unsigned int, rowLimit);
     QFETCH(const QVector<QVector<QVariant>>, expectedData);
-    auto [success, actualData] =
-        importer.getLimitedData(sheetName, {}, rowLimit);
+    auto [success,
+          actualData]{importer.getLimitedData(sheetName, {}, rowLimit)};
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
@@ -524,14 +524,14 @@ void checkGetDataExcludeColumns(ImportSpreadsheet& importer)
     QFETCH(const QString, sheetName);
     QFETCH(const QVector<unsigned int>, excludedColumns);
     QFETCH(const QVector<QVector<QVariant>>, expectedData);
-    auto [success, actualData] = importer.getData(sheetName, excludedColumns);
+    auto [success, actualData]{importer.getData(sheetName, excludedColumns)};
     QCOMPARE(success, true);
     QCOMPARE(actualData, expectedData);
 }
 
 void checkGetDataExcludeInvalidColumn(ImportSpreadsheet& importer)
 {
-    auto [success, actualData] = importer.getData(getSheetNames()[0], {3});
+    auto [success, actualData]{importer.getData(getSheetNames()[0], {3})};
     QCOMPARE(success, false);
 }
 
@@ -553,8 +553,8 @@ QStringList& getSheetNames()
 
 void checkInvalidSheetName(ImportSpreadsheet& importer)
 {
-    auto [success, actualSharedStrings] =
-        importer.getColumnCount(QStringLiteral("invalidSheetName"));
+    auto [success, actualSharedStrings]{
+        importer.getColumnCount(QStringLiteral("invalidSheetName"))};
     QCOMPARE(success, false);
 }
 
@@ -562,7 +562,7 @@ void checkEmittingProgressPercentChangedEmptyFile(ImportSpreadsheet& importer)
 {
     const QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     QStringList sheetNames{importer.getSheetNames().second};
-    auto [success, actualData] = importer.getData(sheetNames.first(), {});
+    auto [success, actualData]{importer.getData(sheetNames.first(), {})};
     QCOMPARE(success, true);
     QCOMPARE(spy.count(), NO_SIGNAL);
 }
@@ -571,8 +571,8 @@ void checkEmittingProgressPercentChangedSmallFile(ImportSpreadsheet& importer)
 {
     const QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     const unsigned int sheetIndex{1};
-    auto [success, actualData] =
-        importer.getData(getSheetNames()[sheetIndex], {});
+    auto [success,
+          actualData]{importer.getData(getSheetNames()[sheetIndex], {})};
     QCOMPARE(success, true);
     QCOMPARE(spy.count(), 19);
 }
@@ -581,7 +581,7 @@ void checkEmittingProgressPercentChangedBigFile(ImportSpreadsheet& importer)
 {
     const QSignalSpy spy(&importer, &ImportSpreadsheet::progressPercentChanged);
     QStringList sheetNames{importer.getSheetNames().second};
-    auto [success, actualData] = importer.getData(sheetNames.first(), {});
+    auto [success, actualData]{importer.getData(sheetNames.first(), {})};
     QCOMPARE(success, true);
     QCOMPARE(spy.count(), 100);
 }

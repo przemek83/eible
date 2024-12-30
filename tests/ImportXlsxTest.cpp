@@ -30,7 +30,7 @@ void ImportXlsxTest::testGetDateStyles()
 {
     QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualDateStyle] = importXlsx.getDateStyles();
+    auto [success, actualDateStyle]{importXlsx.getDateStyles()};
     QCOMPARE(success, true);
     QCOMPARE(actualDateStyle, dateStyles_);
 }
@@ -39,7 +39,7 @@ void ImportXlsxTest::testGetDateStylesNoContent()
 {
     QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualDateStyle] = importXlsx.getDateStyles();
+    auto [success, actualDateStyle]{importXlsx.getDateStyles()};
     QCOMPARE(success, true);
     QCOMPARE(actualDateStyle, QList({14, 15, 16, 17, 22}));
 }
@@ -48,7 +48,7 @@ void ImportXlsxTest::testGetAllStyles()
 {
     QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualAllStyle] = importXlsx.getAllStyles();
+    auto [success, actualAllStyle]{importXlsx.getAllStyles()};
     QCOMPARE(success, true);
     QCOMPARE(actualAllStyle, allStyles_);
 }
@@ -57,7 +57,7 @@ void ImportXlsxTest::testGetAllStylesNoContent()
 {
     QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualAllStyle] = importXlsx.getAllStyles();
+    auto [success, actualAllStyle]{importXlsx.getAllStyles()};
     QCOMPARE(success, true);
     QCOMPARE(actualAllStyle, QList({0, 164, 10, 14, 4, 0, 0, 3}));
 }
@@ -66,7 +66,7 @@ void ImportXlsxTest::testGetSharedStrings()
 {
     QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualSharedStrings] = importXlsx.getSharedStrings();
+    auto [success, actualSharedStrings]{importXlsx.getSharedStrings()};
     QCOMPARE(success, true);
     QCOMPARE(actualSharedStrings, sharedStrings_);
 }
@@ -75,7 +75,7 @@ void ImportXlsxTest::testGetSharedStringsNoContent()
 {
     QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
-    auto [success, actualSharedStrings] = importXlsx.getSharedStrings();
+    auto [success, actualSharedStrings]{importXlsx.getSharedStrings()};
     QCOMPARE(success, true);
     QCOMPARE(actualSharedStrings, {});
 }
@@ -215,7 +215,7 @@ void ImportXlsxTest::testGetDataLimitRows_data()
     QVector<QVector<QVariant>> expectedValues;
     expectedValues.reserve(static_cast<int>(rowLimit));
     sheetData = ImportCommon::getDataForSheet(sheetName);
-    for (unsigned int i = 0; i < rowLimit; ++i)
+    for (unsigned int i{0}; i < rowLimit; ++i)
         expectedValues.append(sheetData[static_cast<int>(i)]);
     expectedValues = convertDataToUseSharedStrings(expectedValues);
     testName =
@@ -284,7 +284,7 @@ void ImportXlsxTest::benchmarkGetData()
     QSKIP("Skip benchmark.");
     QBuffer testFile(&generatedXlsx_);
     ImportXlsx importXlsx(testFile);
-    auto [success, sheetNames] = importXlsx.getSheetNames();
+    auto [success, sheetNames]{importXlsx.getSheetNames()};
     QCOMPARE(success, true);
     QCOMPARE(sheetNames.size(), 1);
     QBENCHMARK { importXlsx.getData(sheetNames.front(), {}); }

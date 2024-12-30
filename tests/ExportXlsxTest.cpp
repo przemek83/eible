@@ -27,9 +27,9 @@ QByteArray ExportXlsxTest::retrieveFileFromZip(QBuffer& exportedZip,
 void ExportXlsxTest::compareWorkSheets(QBuffer& exportedZip,
                                        const QString& sheetData) const
 {
-    const QByteArray actual =
-        retrieveFileFromZip(exportedZip, zipWorkSheetPath_);
-    const QByteArray expected = Utilities::composeXlsxSheet(sheetData);
+    const QByteArray actual{
+        retrieveFileFromZip(exportedZip, zipWorkSheetPath_)};
+    const QByteArray expected{Utilities::composeXlsxSheet(sheetData)};
     QCOMPARE(actual, expected);
 }
 

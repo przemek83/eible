@@ -147,12 +147,12 @@ void ImportOdsTest::benchmarkGetData()
     QSKIP("Skip benchmark.");
     QFile testFile(QStringLiteral(":/bigFile.ods"));
     ImportOds importOds(testFile);
-    auto [success, sheetNames] = importOds.getSheetNames();
+    auto [success, sheetNames]{importOds.getSheetNames()};
     QCOMPARE(success, true);
     QCOMPARE(sheetNames.size(), 1);
     QBENCHMARK
     {
-        for (int i = 0; i < 10; ++i)
+        for (int i{0}; i < 10; ++i)
             importOds.getData(sheetNames.front(), {});
     }
 }
