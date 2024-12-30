@@ -58,7 +58,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
         return {false, {}};
 
     const auto it{columnNames_.constFind(sheetName)};
-    if (it == columnNames_.constEnd() && !analyzeSheet(sheetName))
+    if ((it == columnNames_.constEnd()) && (!analyzeSheet(sheetName)))
         return {false, {}};
 
     return {true, columnNames_.value(sheetName)};
@@ -100,7 +100,7 @@ QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes)
     for (int i{0}; i < sheetNodes.size(); ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
-        if (!sheet.isNull() && sheet.hasAttribute(searchedAttribute))
+        if ((!sheet.isNull()) && sheet.hasAttribute(searchedAttribute))
             allStyles.push_back(sheet.attribute(searchedAttribute).toInt());
     }
     return allStyles;
@@ -256,24 +256,26 @@ std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
 
 bool ImportXlsx::isRowStart(const QXmlStreamReader& xmlStreamReader) const
 {
-    return xmlStreamReader.name() == ROW_TAG &&
+    return (xmlStreamReader.name() == ROW_TAG) &&
            xmlStreamReader.isStartElement();
 }
 
 bool ImportXlsx::isCellStart(const QXmlStreamReader& xmlStreamReader) const
 {
-    return xmlStreamReader.name() == CELL_TAG &&
+    return (xmlStreamReader.name() == CELL_TAG) &&
            xmlStreamReader.isStartElement();
 }
 
 bool ImportXlsx::isCellEnd(const QXmlStreamReader& xmlStreamReader) const
 {
-    return xmlStreamReader.name() == CELL_TAG && xmlStreamReader.isEndElement();
+    return (xmlStreamReader.name() == CELL_TAG) &&
+           xmlStreamReader.isEndElement();
 }
 
 bool ImportXlsx::isVTagStart(const QXmlStreamReader& xmlStreamReader) const
 {
-    return xmlStreamReader.name() == V_TAG && xmlStreamReader.isStartElement();
+    return (xmlStreamReader.name() == V_TAG) &&
+           xmlStreamReader.isStartElement();
 }
 
 std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(

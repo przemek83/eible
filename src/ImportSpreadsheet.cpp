@@ -64,7 +64,7 @@ void ImportSpreadsheet::updateProgress(unsigned int currentRow,
 
 bool ImportSpreadsheet::openZip()
 {
-    if (!zip_.isOpen() && !zip_.open(QuaZip::mdUnzip))
+    if ((!zip_.isOpen()) && (!zip_.open(QuaZip::mdUnzip)))
     {
         setError("Can not open zip file " + zip_.getZipName() + ".");
         return false;

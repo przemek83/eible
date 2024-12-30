@@ -32,7 +32,7 @@ QHash<QByteArray, int> generateExcelColumnNames(int columnsNumber)
         columnNamesWithIndexes[currentPrefix +
                                templateNames[i % templateNames.count()]] = i;
 
-        if (i != 0 && (i + 1) % templateNames.count() == 0)
+        if ((i != 0) && ((i + 1) % templateNames.count() == 0))
             currentPrefix = templateNames[i / (templateNames.count() - 1) - 1];
     }
     return columnNamesWithIndexes;
