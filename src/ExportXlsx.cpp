@@ -111,8 +111,8 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
         rowContent.append(ROW_NUMBER_CLOSE);
         rowContent.append(getCellTypeTag(cell));
         rowContent.append(VALUE_START);
-        if (cell.typeId() == QMetaType::QDate ||
-            cell.typeId() == QMetaType::QDateTime)
+        if ((cell.typeId() == QMetaType::QDate) ||
+            (cell.typeId() == QMetaType::QDateTime))
             rowContent.append(QByteArray::number(
                 -1 * cell.toDate().daysTo(utilities::getStartOfExcelWorld())));
         else

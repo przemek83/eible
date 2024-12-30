@@ -219,20 +219,22 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
     xmlStreamReader.setDevice(&zipFile);
     skipToSheet(xmlStreamReader, sheetName);
 
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != TABLE_ROW_TAG)
+    while ((!xmlStreamReader.atEnd()) &&
+           (xmlStreamReader.name() != TABLE_ROW_TAG))
         xmlStreamReader.readNext();
     xmlStreamReader.readNext();
 
     QXmlStreamReader::TokenType lastToken{xmlStreamReader.tokenType()};
     QStringList columnNames;
 
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != TABLE_ROW_TAG)
+    while (!xmlStreamReader.atEnd() &&
+           (xmlStreamReader.name() != TABLE_ROW_TAG))
     {
         if (isCellStart(xmlStreamReader) &&
-            getColumnRepeatCount(xmlStreamReader.attributes()) > 1)
+            (getColumnRepeatCount(xmlStreamReader.attributes()) > 1))
             break;
 
-        if (xmlStreamReader.name().toString() == P_TAG &&
+        if ((xmlStreamReader.name().toString() == P_TAG) &&
             xmlStreamReader.isStartElement())
         {
             while (xmlStreamReader.tokenType() != QXmlStreamReader::Characters)
@@ -241,7 +243,7 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
         }
 
         if (isCellEnd(xmlStreamReader) &&
-            lastToken == QXmlStreamReader::StartElement)
+            (lastToken == QXmlStreamReader::StartElement))
             columnNames << emptyColName_;
 
         lastToken = xmlStreamReader.tokenType();
@@ -355,12 +357,12 @@ bool ImportOds::isRecognizedColumnType(
     const QString columnType{
         attributes.value(OFFICE_VALUE_TYPE_TAG).toString()};
 
-    return 0 == columnType.compare(STRING_TAG) ||
-           0 == columnType.compare(DATE_TAG) ||
-           0 == columnType.compare(FLOAT_TAG) ||
-           0 == columnType.compare(PERCENTAGE_TAG) ||
-           0 == columnType.compare(CURRENCY_TAG) ||
-           0 == columnType.compare(TIME_TAG);
+    return (0 == columnType.compare(STRING_TAG)) ||
+           (0 == columnType.compare(DATE_TAG)) ||
+           (0 == columnType.compare(FLOAT_TAG)) ||
+           (0 == columnType.compare(PERCENTAGE_TAG)) ||
+           (0 == columnType.compare(CURRENCY_TAG)) ||
+           (0 == columnType.compare(TIME_TAG));
 }
 
 unsigned int ImportOds::getColumnRepeatCount(
@@ -372,25 +374,25 @@ unsigned int ImportOds::getColumnRepeatCount(
 
 bool ImportOds::isRowStart(const QXmlStreamReader& xmlStreamReader) const
 {
-    return 0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
+    return (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG)) &&
            xmlStreamReader.isStartElement();
 }
 
 bool ImportOds::isRowEnd(const QXmlStreamReader& xmlStreamReader) const
 {
-    return 0 == xmlStreamReader.name().compare(TABLE_ROW_TAG) &&
+    return (0 == xmlStreamReader.name().compare(TABLE_ROW_TAG)) &&
            xmlStreamReader.isEndElement();
 }
 
 bool ImportOds::isCellStart(const QXmlStreamReader& xmlStreamReader) const
 {
-    return 0 == xmlStreamReader.name().compare(TABLE_CELL_TAG) &&
+    return (0 == xmlStreamReader.name().compare(TABLE_CELL_TAG)) &&
            xmlStreamReader.isStartElement();
 }
 
 bool ImportOds::isCellEnd(const QXmlStreamReader& xmlStreamReader) const
 {
-    return xmlStreamReader.name().toString() == TABLE_CELL_TAG &&
+    return (xmlStreamReader.name().toString() == TABLE_CELL_TAG) &&
            xmlStreamReader.isEndElement();
 }
 
@@ -413,10 +415,10 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
             return ColumnType::STRING;
     }
 
-    if (0 == xmlColTypeValue.compare(FLOAT_TAG) ||
-        0 == xmlColTypeValue.compare(PERCENTAGE_TAG) ||
-        0 == xmlColTypeValue.compare(CURRENCY_TAG) ||
-        0 == xmlColTypeValue.compare(TIME_TAG))
+    if ((0 == xmlColTypeValue.compare(FLOAT_TAG)) ||
+        (0 == xmlColTypeValue.compare(PERCENTAGE_TAG)) ||
+        (0 == xmlColTypeValue.compare(CURRENCY_TAG)) ||
+        (0 == xmlColTypeValue.compare(TIME_TAG)))
     {
         if (currentType == ColumnType::UNKNOWN)
             return ColumnType::NUMBER;

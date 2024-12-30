@@ -39,7 +39,8 @@ bool ExportData::rowShouldBeSkipped(const QAbstractItemView& view, int row)
         (QAbstractItemView::MultiSelection == view.selectionMode())};
     const QItemSelectionModel* selectionModel{view.selectionModel()};
 
-    return multiSelection && !selectionModel->isSelected(model->index(row, 0));
+    return multiSelection &&
+           (!selectionModel->isSelected(model->index(row, 0)));
 }
 
 QByteArray ExportData::getContentEnding() { return {}; }
