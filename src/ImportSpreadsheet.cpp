@@ -109,7 +109,7 @@ QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
         if (!excludedColumns.contains(i))
         {
             activeColumnsMapping[i] = columnToFill;
-            columnToFill++;
+            ++columnToFill;
         }
     }
     return activeColumnsMapping;
@@ -130,7 +130,7 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
             templateDataRow[columnToFill] =
                 utilities::getDefaultVariantForFormat(
                     columnTypes[static_cast<int>(i)]);
-            columnToFill++;
+            ++columnToFill;
         }
     }
     return templateDataRow;

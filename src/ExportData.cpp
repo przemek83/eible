@@ -20,7 +20,7 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
     {
         if (rowShouldBeSkipped(view, row))
         {
-            skippedRows++;
+            ++skippedRows;
             continue;
         }
         content.append(generateRowContent(*model, row, skippedRows));

@@ -299,13 +299,13 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
     {
         if (isCellStart(xmlStreamReader))
         {
-            columnIndex++;
+            ++columnIndex;
             const int currentColumnNumber{
                 getCurrentColumnNumber(xmlStreamReader, 1)};
             while (currentColumnNumber > columnIndex)
             {
                 columnNames << emptyColName_;
-                columnIndex++;
+                ++columnIndex;
             }
             currentColType =
                 xmlStreamReader.attributes().value(T_TAG).toString();
@@ -350,7 +350,7 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
         {
             rowCountDigitsInXlsx =
                 xmlStreamReader.attributes().value(R_TAG).size();
-            rowCounter++;
+            ++rowCounter;
         }
 
         if (isCellStart(xmlStreamReader))
@@ -625,7 +625,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
             }
             rowCountDigitsInXlsx =
                 xmlStreamReader.attributes().value(R_TAG).size();
-            rowCounter++;
+            ++rowCounter;
             updateProgress(rowCounter, rowLimit, lastEmittedPercent);
         }
 

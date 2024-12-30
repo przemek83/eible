@@ -39,7 +39,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
     const QDomElement root = xmlDocument.documentElement();
     const int elementsCount = root.elementsByTagName(configMapNamed).size();
     QStringList sheetNames{};
-    for (int i = 0; i < elementsCount; i++)
+    for (int i = 0; i < elementsCount; ++i)
     {
         const QDomElement currentElement =
             root.elementsByTagName(configMapNamed).at(i).toElement();
@@ -48,7 +48,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
         {
             const int innerElementsCount =
                 currentElement.elementsByTagName(configMapEntry).size();
-            for (int j = 0; j < innerElementsCount; j++)
+            for (int j = 0; j < innerElementsCount; ++j)
             {
                 const QDomElement element =
                     currentElement.elementsByTagName(configMapEntry)
@@ -152,7 +152,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             {
                 dataContainer[static_cast<int>(rowCounter)] = currentDataRow;
                 currentDataRow = templateDataRow;
-                rowCounter++;
+                ++rowCounter;
                 updateProgress(rowCounter, rowLimit, lastEmittedPercent);
             }
             rowEmpty = true;
@@ -160,7 +160,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 
         if (isCellStart(xmlStreamReader))
         {
-            column++;
+            ++column;
             const unsigned int repeats{
                 getColumnRepeatCount(xmlStreamReader.attributes())};
             if (!isOfficeValueTagEmpty(xmlStreamReader))
@@ -274,7 +274,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
 
         if (isCellStart(xmlStreamReader))
         {
-            column++;
+            ++column;
             const QXmlStreamAttributes attributes{xmlStreamReader.attributes()};
             const QString xmlColTypeValue =
                 attributes.value(OFFICE_VALUE_TYPE_TAG).toString();
@@ -299,7 +299,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
         if (isRowEnd(xmlStreamReader))
         {
             if (!rowEmpty)
-                rowCounter++;
+                ++rowCounter;
             rowEmpty = true;
         }
     }
