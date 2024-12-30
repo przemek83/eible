@@ -7,7 +7,6 @@
 #include <QtXml/QDomDocument>
 
 #include "ImportSpreadsheet.h"
-
 #include "eible_global.h"
 
 class QuaZip;

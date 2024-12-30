@@ -1,10 +1,9 @@
 #pragma once
 
-#include "ExportData.h"
-
-#include "eible_global.h"
-
 #include <QLocale>
+
+#include "ExportData.h"
+#include "eible_global.h"
 
 class QAbstractItemView;
 class QIODevice;

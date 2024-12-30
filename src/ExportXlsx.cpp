@@ -1,7 +1,6 @@
 #include <eible/ExportXlsx.h>
 
 #include <quazip/quazipfile.h>
-
 #include <QAbstractItemView>
 #include <QCoreApplication>
 #include <QFile>

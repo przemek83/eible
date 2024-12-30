@@ -3,7 +3,6 @@
 #include <eible/ExportXlsx.h>
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
-
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QTableView>
