@@ -67,12 +67,14 @@ QByteArray ExportXlsx::getEmptyContent()
 
 QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
 {
-    if (columnNames_.size() != model.columnCount())
-        initColumnNames(model.columnCount());
+    const int columnCount{model.columnCount()};
+    if (columnNames_.size() != columnCount)
+        initColumnNames(columnCount);
 
     QByteArray headersContent{QByteArrayLiteral("<sheetData>")};
     headersContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
-    for (int j{0}; j < model.columnCount(); ++j)
+
+    for (int j{0}; j < columnCount; ++j)
     {
         QString header{model.headerData(j, Qt::Horizontal).toString()};
         const QString clearedHeader(
@@ -91,8 +93,9 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
 QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
                                           int row, int skippedRowsCount)
 {
-    if (columnNames_.size() != model.columnCount())
-        initColumnNames(model.columnCount());
+    const int columnCount{model.columnCount()};
+    if (columnNames_.size() != columnCount)
+        initColumnNames(columnCount);
 
     QByteArray rowContent;
     const QByteArray rowNumber{
@@ -100,7 +103,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
     rowContent.append(QByteArrayLiteral("<row r=\""));
     rowContent.append(rowNumber);
     rowContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
-    for (int column{0}; column < model.columnCount(); ++column)
+    for (int column{0}; column < columnCount; ++column)
     {
         const QVariant& cell{model.index(row, column).data()};
         if (cell.isNull())
@@ -152,6 +155,8 @@ void ExportXlsx::initColumnNames(int modelColumnCount)
     QHash<QByteArray, int> nameToIndexMap{
         utilities::generateExcelColumnNames(modelColumnCount)};
     columnNames_.resize(nameToIndexMap.size());
-    for (auto it{nameToIndexMap.begin()}; it != nameToIndexMap.end(); ++it)
+
+    const auto mapEnd{nameToIndexMap.end()};
+    for (auto it{nameToIndexMap.begin()}; it != mapEnd; ++it)
         columnNames_[it.value()] = it.key();
 }

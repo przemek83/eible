@@ -15,11 +15,12 @@ QByteArray ExportDsv::getEmptyContent() { return {}; }
 QByteArray ExportDsv::generateHeaderContent(const QAbstractItemModel& model)
 {
     QByteArray headersContent;
-    for (int j{0}; j < model.columnCount(); ++j)
+    const int columnCount{model.columnCount()};
+    for (int j{0}; j < columnCount; ++j)
     {
         headersContent.append(
             model.headerData(j, Qt::Horizontal).toString().toUtf8());
-        if (j != (model.columnCount() - 1))
+        if (j != (columnCount - 1))
             headersContent.append(separator_);
     }
     return headersContent;
@@ -31,12 +32,13 @@ QByteArray ExportDsv::generateRowContent(const QAbstractItemModel& model,
 {
     QByteArray rowContent;
     rowContent.append("\n");
-    for (int j{0}; j < model.columnCount(); ++j)
+    const int columnCount{model.columnCount()};
+    for (int j{0}; j < columnCount; ++j)
     {
         const QVariant actualField{model.index(row, j).data()};
         if (!actualField.isNull())
             variantToString(actualField, rowContent, separator_);
-        if (j != (model.columnCount() - 1))
+        if (j != (columnCount - 1))
             rowContent.append(separator_);
     }
 

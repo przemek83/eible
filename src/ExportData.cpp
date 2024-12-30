@@ -16,7 +16,8 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
     QByteArray content{generateHeaderContent(*model)};
     int skippedRows{0};
     unsigned int lastEmittedPercent{0};
-    for (int row{0}; row < model->rowCount(); ++row)
+    const int rowCount{model->rowCount()};
+    for (int row{0}; row < rowCount; ++row)
     {
         if (rowShouldBeSkipped(view, row))
         {
@@ -25,8 +26,7 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
         }
         content.append(generateRowContent(*model, row, skippedRows));
         updateProgress(static_cast<unsigned int>(row),
-                       static_cast<unsigned int>(model->rowCount()),
-                       lastEmittedPercent);
+                       static_cast<unsigned int>(rowCount), lastEmittedPercent);
     }
     content.append(getContentEnding());
     return writeContent(content, ioDevice);
