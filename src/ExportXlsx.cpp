@@ -95,7 +95,8 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
         initColumnNames(model.columnCount());
 
     QByteArray rowContent;
-    const QByteArray rowNumber{QByteArray::number(row - skippedRowsCount + 2)};
+    const QByteArray rowNumber{
+        QByteArray::number((row - skippedRowsCount) + 2)};
     rowContent.append(QByteArrayLiteral("<row r=\""));
     rowContent.append(rowNumber);
     rowContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");

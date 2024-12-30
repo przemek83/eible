@@ -19,7 +19,7 @@ QByteArray ExportDsv::generateHeaderContent(const QAbstractItemModel& model)
     {
         headersContent.append(
             model.headerData(j, Qt::Horizontal).toString().toUtf8());
-        if (j != model.columnCount() - 1)
+        if (j != (model.columnCount() - 1))
             headersContent.append(separator_);
     }
     return headersContent;
@@ -36,7 +36,7 @@ QByteArray ExportDsv::generateRowContent(const QAbstractItemModel& model,
         const QVariant actualField{model.index(row, j).data()};
         if (!actualField.isNull())
             variantToString(actualField, rowContent, separator_);
-        if (j != model.columnCount() - 1)
+        if (j != (model.columnCount() - 1))
             rowContent.append(separator_);
     }
 

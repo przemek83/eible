@@ -285,7 +285,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
             {
                 rowEmpty = false;
                 for (int i{static_cast<int>(columnTypes.size())};
-                     i < column + static_cast<int>(repeats); ++i)
+                     i < (column + static_cast<int>(repeats)); ++i)
                     columnTypes.push_back(ColumnType::UNKNOWN);
 
                 for (unsigned int i{0}; i < repeats; ++i)
