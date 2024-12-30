@@ -6,7 +6,7 @@
 #include <QVariant>
 
 ExportDsv::ExportDsv(char separator, QObject* parent)
-    : ExportData(parent), separator_(separator)
+    : ExportData(parent), separator_{separator}
 {
 }
 
@@ -15,7 +15,7 @@ QByteArray ExportDsv::getEmptyContent() { return {}; }
 QByteArray ExportDsv::generateHeaderContent(const QAbstractItemModel& model)
 {
     QByteArray headersContent;
-    for (int j = 0; j < model.columnCount(); ++j)
+    for (int j{0}; j < model.columnCount(); ++j)
     {
         headersContent.append(
             model.headerData(j, Qt::Horizontal).toString().toUtf8());
@@ -31,9 +31,9 @@ QByteArray ExportDsv::generateRowContent(const QAbstractItemModel& model,
 {
     QByteArray rowContent;
     rowContent.append("\n");
-    for (int j = 0; j < model.columnCount(); ++j)
+    for (int j{0}; j < model.columnCount(); ++j)
     {
-        const QVariant actualField = model.index(row, j).data();
+        const QVariant actualField{model.index(row, j).data()};
         if (!actualField.isNull())
             variantToString(actualField, rowContent, separator_);
         if (j != model.columnCount() - 1)

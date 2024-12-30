@@ -18,7 +18,7 @@ bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
     inZip.open(QuaZip::mdUnzip);
 
     // Files list in template.
-    const QStringList fileList = inZip.getFileNameList();
+    const QStringList fileList{inZip.getFileNameList()};
 
     // Create out xlsx.
     QuaZip outZip(&ioDevice);
@@ -41,7 +41,7 @@ bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
         if (file.endsWith(QLatin1String("sheet1.xml")))
         {
             // Replace empty tag by gathered data.
-            QByteArray contentFile = inZipFile.readAll();
+            QByteArray contentFile{inZipFile.readAll()};
             contentFile.replace("<sheetData/>", content);
 
             outZipFile.write(contentFile);
@@ -72,9 +72,9 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
 
     QByteArray headersContent{QByteArrayLiteral("<sheetData>")};
     headersContent.append(R"(<row r="1" spans="1:1" x14ac:dyDescent="0.25">)");
-    for (int j = 0; j < model.columnCount(); ++j)
+    for (int j{0}; j < model.columnCount(); ++j)
     {
-        QString header = model.headerData(j, Qt::Horizontal).toString();
+        QString header{model.headerData(j, Qt::Horizontal).toString()};
         const QString clearedHeader(
             header
                 .replace(QRegularExpression(QStringLiteral("[<>&\"']")),
@@ -99,7 +99,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
     rowContent.append(QByteArrayLiteral("<row r=\""));
     rowContent.append(rowNumber);
     rowContent.append(R"(" spans="1:1" x14ac:dyDescent="0.25">)");
-    for (int column = 0; column < model.columnCount(); ++column)
+    for (int column{0}; column < model.columnCount(); ++column)
     {
         const QVariant& cell{model.index(row, column).data()};
         if (cell.isNull())
@@ -151,6 +151,6 @@ void ExportXlsx::initColumnNames(int modelColumnCount)
     QHash<QByteArray, int> nameToIndexMap{
         utilities::generateExcelColumnNames(modelColumnCount)};
     columnNames_.resize(nameToIndexMap.size());
-    for (auto it = nameToIndexMap.begin(); it != nameToIndexMap.end(); ++it)
+    for (auto it{nameToIndexMap.begin()}; it != nameToIndexMap.end(); ++it)
         columnNames_[it.value()] = it.key();
 }

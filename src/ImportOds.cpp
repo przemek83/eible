@@ -29,31 +29,31 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
         return {false, {}};
     }
 
-    const QString configMapNamed(
-        QStringLiteral("config:config-item-map-named"));
-    const QString configName(QStringLiteral("config:name"));
-    const QString configMapEntry(
-        QStringLiteral("config:config-item-map-entry"));
-    const QString tables(QStringLiteral("Tables"));
+    const QString configMapNamed{
+        QStringLiteral("config:config-item-map-named")};
+    const QString configName{QStringLiteral("config:name")};
+    const QString configMapEntry{
+        QStringLiteral("config:config-item-map-entry")};
+    const QString tables{QStringLiteral("Tables")};
 
-    const QDomElement root = xmlDocument.documentElement();
-    const int elementsCount = root.elementsByTagName(configMapNamed).size();
+    const QDomElement root{xmlDocument.documentElement()};
+    const int elementsCount{root.elementsByTagName(configMapNamed).size()};
     QStringList sheetNames{};
-    for (int i = 0; i < elementsCount; ++i)
+    for (int i{0}; i < elementsCount; ++i)
     {
-        const QDomElement currentElement =
-            root.elementsByTagName(configMapNamed).at(i).toElement();
+        const QDomElement currentElement{
+            root.elementsByTagName(configMapNamed).at(i).toElement()};
         if (currentElement.hasAttribute(configName) &&
             currentElement.attribute(configName) == tables)
         {
-            const int innerElementsCount =
-                currentElement.elementsByTagName(configMapEntry).size();
-            for (int j = 0; j < innerElementsCount; ++j)
+            const int innerElementsCount{
+                currentElement.elementsByTagName(configMapEntry).size()};
+            for (int j{0}; j < innerElementsCount; ++j)
             {
-                const QDomElement element =
+                const QDomElement element{
                     currentElement.elementsByTagName(configMapEntry)
                         .at(j)
-                        .toElement();
+                        .toElement()};
                 sheetNames.push_back(element.attribute(configName));
             }
         }
@@ -66,7 +66,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
 std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     const QString& sheetName)
 {
-    if (const auto it = columnTypes_.constFind(sheetName);
+    if (const auto it{columnTypes_.constFind(sheetName)};
         it != columnTypes_.constEnd())
         return {true, *it};
 
@@ -98,7 +98,7 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
     if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
-    const auto it = columnNames_.constFind(sheetName);
+    const auto it{columnNames_.constFind(sheetName)};
     if (it == columnNames_.constEnd() && !analyzeSheet(sheetName))
         return {false, {}};
 
@@ -109,7 +109,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
 {
-    const auto [success, columnTypes] = getColumnTypes(sheetName);
+    const auto [success, columnTypes]{getColumnTypes(sheetName)};
     if (!success)
         return {false, {}};
 
@@ -136,10 +136,10 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 
     QVector<QVariant> currentDataRow(templateDataRow);
 
-    int column = NOT_SET_COLUMN;
+    int column{NOT_SET_COLUMN};
 
-    unsigned int rowCounter = 0;
-    bool rowEmpty = true;
+    unsigned int rowCounter{0};
+    bool rowEmpty{true};
     unsigned int lastEmittedPercent{0};
     while (!xmlStreamReader.atEnd() &&
            0 != xmlStreamReader.name().compare(TABLE_TAG) &&
@@ -166,9 +166,9 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             if (!isOfficeValueTagEmpty(xmlStreamReader))
             {
                 rowEmpty = false;
-                const QVariant value = retrieveValueFromField(
-                    xmlStreamReader, columnTypes.at(column));
-                for (unsigned int i = 0; i < repeats; ++i)
+                const QVariant value{retrieveValueFromField(
+                    xmlStreamReader, columnTypes.at(column))};
+                for (unsigned int i{0}; i < repeats; ++i)
                 {
                     const unsigned int currentColumn{
                         static_cast<unsigned int>(column) + i};
@@ -199,7 +199,7 @@ std::pair<bool, unsigned int> ImportOds::getCount(
     if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
-    if (const auto it = countMap.find(sheetName); it != countMap.end())
+    if (const auto it{countMap.find(sheetName)}; it != countMap.end())
         return {true, it.value()};
 
     if (!analyzeSheet(sheetName))
@@ -223,7 +223,7 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
         xmlStreamReader.readNext();
     xmlStreamReader.readNext();
 
-    QXmlStreamReader::TokenType lastToken = xmlStreamReader.tokenType();
+    QXmlStreamReader::TokenType lastToken{xmlStreamReader.tokenType()};
     QStringList columnNames;
 
     while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != TABLE_ROW_TAG)
@@ -276,8 +276,8 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
         {
             ++column;
             const QXmlStreamAttributes attributes{xmlStreamReader.attributes()};
-            const QString xmlColTypeValue =
-                attributes.value(OFFICE_VALUE_TYPE_TAG).toString();
+            const QString xmlColTypeValue{
+                attributes.value(OFFICE_VALUE_TYPE_TAG).toString()};
             const unsigned int repeats{getColumnRepeatCount(attributes)};
             if (isRecognizedColumnType(attributes))
             {
@@ -286,7 +286,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
                      i < column + static_cast<int>(repeats); ++i)
                     columnTypes.push_back(ColumnType::UNKNOWN);
 
-                for (unsigned int i = 0; i < repeats; ++i)
+                for (unsigned int i{0}; i < repeats; ++i)
                 {
                     const int currentColumn{column + static_cast<int>(i)};
                     columnTypes[currentColumn] = recognizeColumnType(
@@ -352,8 +352,8 @@ void ImportOds::skipToSheet(QXmlStreamReader& xmlStreamReader,
 bool ImportOds::isRecognizedColumnType(
     const QXmlStreamAttributes& attributes) const
 {
-    const QString columnType =
-        attributes.value(OFFICE_VALUE_TYPE_TAG).toString();
+    const QString columnType{
+        attributes.value(OFFICE_VALUE_TYPE_TAG).toString()};
 
     return 0 == columnType.compare(STRING_TAG) ||
            0 == columnType.compare(DATE_TAG) ||
@@ -439,9 +439,9 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
     {
         case ColumnType::STRING:
         {
-            const QString currentDateValue = xmlStreamReader.attributes()
-                                                 .value(OFFICE_DATE_VALUE_TAG)
-                                                 .toString();
+            const QString currentDateValue{xmlStreamReader.attributes()
+                                               .value(OFFICE_DATE_VALUE_TAG)
+                                               .toString()};
 
             while (!xmlStreamReader.atEnd() &&
                    0 != xmlStreamReader.name().compare(P_TAG))
@@ -455,7 +455,7 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
                 value = QVariant(currentDateValue);
             else
             {
-                const QStringView stringView = xmlStreamReader.text();
+                const QStringView stringView{xmlStreamReader.text()};
                 if (stringView.isNull())
                     value = QVariant(emptyString);
                 else

@@ -7,16 +7,16 @@ ExportData::ExportData(QObject* parent) : QObject(parent) {}
 
 bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {
-    const auto* model = view.model();
+    const QAbstractItemModel* model{view.model()};
     Q_ASSERT(model != nullptr);
 
     if (model->columnCount() == 0)
         return writeContent(getEmptyContent(), ioDevice);
 
     QByteArray content{generateHeaderContent(*model)};
-    int skippedRows = 0;
+    int skippedRows{0};
     unsigned int lastEmittedPercent{0};
-    for (int row = 0; row < model->rowCount(); ++row)
+    for (int row{0}; row < model->rowCount(); ++row)
     {
         if (rowShouldBeSkipped(view, row))
         {
@@ -34,10 +34,10 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 
 bool ExportData::rowShouldBeSkipped(const QAbstractItemView& view, int row)
 {
-    const auto* model = view.model();
-    const bool multiSelection =
-        (QAbstractItemView::MultiSelection == view.selectionMode());
-    const QItemSelectionModel* selectionModel = view.selectionModel();
+    const QAbstractItemModel* model{view.model()};
+    const bool multiSelection{
+        (QAbstractItemView::MultiSelection == view.selectionMode())};
+    const QItemSelectionModel* selectionModel{view.selectionModel()};
 
     return multiSelection && !selectionModel->isSelected(model->index(row, 0));
 }
