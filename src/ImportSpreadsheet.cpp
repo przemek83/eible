@@ -37,7 +37,7 @@ std::pair<bool, unsigned int> ImportSpreadsheet::getRowCount(
 std::pair<bool, QVector<QVector<QVariant> > > ImportSpreadsheet::getData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns)
 {
-    auto [success, rowCount] = getRowCount(sheetName);
+    auto [success, rowCount]{getRowCount(sheetName)};
     if (!success)
         return {false, {}};
     return getLimitedData(sheetName, excludedColumns, rowCount);
@@ -104,7 +104,7 @@ QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
 {
     QMap<unsigned int, unsigned int> activeColumnsMapping;
     unsigned int columnToFill{0};
-    for (unsigned int i = 0; i < columnCount; ++i)
+    for (unsigned int i{0}; i < columnCount; ++i)
     {
         if (!excludedColumns.contains(i))
         {
@@ -120,9 +120,9 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
     const QVector<ColumnType>& columnTypes)
 {
     QVector<QVariant> templateDataRow;
-    int columnToFill = 0;
+    int columnToFill{0};
     templateDataRow.resize(columnTypes.size() - excludedColumns.size());
-    for (unsigned int i = 0; i < static_cast<unsigned int>(columnTypes.size());
+    for (unsigned int i{0}; i < static_cast<unsigned int>(columnTypes.size());
          ++i)
     {
         if (!excludedColumns.contains(i))
@@ -139,9 +139,9 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
 bool ImportSpreadsheet::columnsToExcludeAreValid(
     const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
 {
-    const auto it = std::find_if(excludedColumns.begin(), excludedColumns.end(),
-                                 [count = columnCount](unsigned int column)
-                                 { return column >= count; });
+    const auto it{std::find_if(excludedColumns.begin(), excludedColumns.end(),
+                               [count = columnCount](unsigned int column)
+                               { return column >= count; })};
     if (it != excludedColumns.end())
     {
         setError("Column to exclude " + QString::number(*it) +
@@ -154,12 +154,12 @@ bool ImportSpreadsheet::columnsToExcludeAreValid(
 
 bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
 {
-    auto [namesRetrieved, columnNames] = retrieveColumnNames(sheetName);
+    auto [namesRetrieved, columnNames]{retrieveColumnNames(sheetName)};
     if (!namesRetrieved)
         return false;
 
-    auto [success, rowCount, columnTypes] =
-        retrieveRowCountAndColumnTypes(sheetName);
+    auto [success, rowCount,
+          columnTypes]{retrieveRowCountAndColumnTypes(sheetName)};
     if (!success)
         return false;
 
@@ -168,11 +168,11 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
     columnNames.reserve(static_cast<int>(actualColumnCount));
     columnTypes.reserve(static_cast<int>(actualColumnCount));
 
-    for (auto i = static_cast<unsigned int>(columnNames.size());
+    for (auto i{static_cast<unsigned int>(columnNames.size())};
          i < actualColumnCount; ++i)
         columnNames << emptyColName_;
 
-    for (auto i = static_cast<unsigned int>(columnTypes.size());
+    for (auto i{static_cast<unsigned int>(columnTypes.size())};
          i < actualColumnCount; ++i)
         columnTypes.append(ColumnType::STRING);
 

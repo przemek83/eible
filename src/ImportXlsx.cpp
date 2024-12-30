@@ -32,8 +32,8 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
         return {true, sheets};
     }
 
-    auto [success, sheetIdToUserFriendlyNameMap] =
-        getSheetIdToUserFriendlyNameMap();
+    auto [success,
+          sheetIdToUserFriendlyNameMap]{getSheetIdToUserFriendlyNameMap()};
     if (!success)
         return {false, {}};
 
@@ -57,7 +57,7 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!isSheetNameValid(getSheetNames().second, sheetName))
         return {false, {}};
 
-    const auto it = columnNames_.constFind(sheetName);
+    const auto it{columnNames_.constFind(sheetName)};
     if (it == columnNames_.constEnd() && !analyzeSheet(sheetName))
         return {false, {}};
 
@@ -69,20 +69,20 @@ QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes)
     QList<int> dateStyles;
     const QList predefinedExcelStylesForDates{14, 15, 16, 17, 22};
     dateStyles.append(predefinedExcelStylesForDates);
-    for (int i = 0; i < sheetNodes.size(); ++i)
+    for (int i{0}; i < sheetNodes.size(); ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (sheet.hasAttribute(QStringLiteral("numFmtId")) &&
             sheet.hasAttribute(QStringLiteral("formatCode")))
         {
-            const QString formatCode =
-                sheet.attribute(QStringLiteral("formatCode"));
-            const bool gotD =
-                formatCode.contains(QStringLiteral("d"), Qt::CaseInsensitive);
-            const bool gotM =
-                formatCode.contains(QStringLiteral("m"), Qt::CaseInsensitive);
-            const bool gotY =
-                formatCode.contains(QStringLiteral("y"), Qt::CaseInsensitive);
+            const QString formatCode{
+                sheet.attribute(QStringLiteral("formatCode"))};
+            const bool gotD{
+                formatCode.contains(QStringLiteral("d"), Qt::CaseInsensitive)};
+            const bool gotM{
+                formatCode.contains(QStringLiteral("m"), Qt::CaseInsensitive)};
+            const bool gotY{
+                formatCode.contains(QStringLiteral("y"), Qt::CaseInsensitive)};
 
             if ((gotD && gotY) || (gotD && gotM) || (gotM && gotY))
                 dateStyles.push_back(
@@ -97,7 +97,7 @@ QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes)
     QList<int> allStyles;
     allStyles.reserve(sheetNodes.size());
     const QString searchedAttribute{QStringLiteral("numFmtId")};
-    for (int i = 0; i < sheetNodes.size(); ++i)
+    for (int i{0}; i < sheetNodes.size(); ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (!sheet.isNull() && sheet.hasAttribute(searchedAttribute))
@@ -180,7 +180,7 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     const QString& sheetName)
 {
-    if (const auto it = columnTypes_.constFind(sheetName);
+    if (const auto it{columnTypes_.constFind(sheetName)};
         it != columnTypes_.constEnd())
         return {true, *it};
 
@@ -217,7 +217,7 @@ bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
 std::pair<bool, unsigned int> ImportXlsx::getCount(
     const QString& sheetName, const QHash<QString, unsigned int>& countMap)
 {
-    const auto it = countMap.find(sheetName);
+    const auto it{countMap.find(sheetName)};
     if (it != countMap.end())
         return {true, it.value()};
 
@@ -279,7 +279,7 @@ bool ImportXlsx::isVTagStart(const QXmlStreamReader& xmlStreamReader) const
 std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
     const QString& sheetName)
 {
-    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    auto [sheetFound, sheetPath]{getSheetPath(sheetName)};
     if (!sheetFound)
         return {false, {}};
 
@@ -359,7 +359,8 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
                 getCurrentColumnNumber(xmlStreamReader, rowCountDigitsInXlsx);
             maxColumnIndex = std::max(maxColumnIndex, column);
             if (column >= columnTypes.size())
-                for (int i = columnTypes.size(); i <= column; ++i)
+                for (int i{static_cast<int>(columnTypes.size())}; i <= column;
+                     ++i)
                     columnTypes.push_back(ColumnType::UNKNOWN);
             columnTypes[column] =
                 recognizeColumnType(columnTypes.at(column), xmlStreamReader);
@@ -448,12 +449,12 @@ ImportXlsx::getSheetIdToUserFriendlyNameMap()
     auto nodesRetriever{[](const QDomElement& root) {
         return root.firstChildElement(QStringLiteral("sheets")).childNodes();
     }};
-    auto [sucess, sheetNodes] = getSheetNodes(zipFile, nodesRetriever);
+    auto [sucess, sheetNodes]{getSheetNodes(zipFile, nodesRetriever)};
     if (!sucess)
         return {false, {}};
 
     QMap<QString, QString> sheetIdToUserFriendlyNameMap;
-    for (int i = 0; i < sheetNodes.size(); ++i)
+    for (int i{0}; i < sheetNodes.size(); ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (!sheet.isNull())
@@ -471,19 +472,19 @@ ImportXlsx::retrieveSheets(
     if (!initZipFile(zipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
         return {false, {}};
 
-    auto [sucess, sheetNodes] = getSheetNodes(
-        zipFile, [](const QDomElement& root) { return root.childNodes(); });
+    auto [sucess, sheetNodes]{getSheetNodes(
+        zipFile, [](const QDomElement& root) { return root.childNodes(); })};
     if (!sucess)
         return {false, {}};
 
     QVector<std::pair<QString, QString>> sheets;
-    for (int i = 0; i < sheetNodes.size(); ++i)
+    for (int i{0}; i < sheetNodes.size(); ++i)
     {
         const QDomElement sheet{sheetNodes.at(i).toElement()};
         if (!sheet.isNull())
         {
-            const auto it = sheetIdToUserFriendlyNameMap.constFind(
-                sheet.attribute(QStringLiteral("Id")));
+            const auto it{sheetIdToUserFriendlyNameMap.constFind(
+                sheet.attribute(QStringLiteral("Id")))};
             if (sheetIdToUserFriendlyNameMap.constEnd() != it)
                 sheets.append(
                     {*it, "xl/" + sheet.attribute(QStringLiteral("Target"))});
@@ -576,7 +577,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const QString& sheetName, const QVector<unsigned int>& excludedColumns,
     unsigned int rowLimit)
 {
-    const auto [success, columnTypes] = getColumnTypes(sheetName);
+    const auto [success, columnTypes]{getColumnTypes(sheetName)};
     if (!success)
         return {false, {}};
 
@@ -584,7 +585,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     if (!columnsToExcludeAreValid(excludedColumns, columnCount))
         return {false, {}};
 
-    auto [sheetFound, sheetPath] = getSheetPath(sheetName);
+    auto [sheetFound, sheetPath]{getSheetPath(sheetName)};
     if (!sheetFound)
         return {false, {}};
 

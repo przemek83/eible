@@ -25,9 +25,9 @@ QHash<QByteArray, int> generateExcelColumnNames(int columnsNumber)
                   << QByteArrayLiteral("W") << QByteArrayLiteral("X")
                   << QByteArrayLiteral("Y") << QByteArrayLiteral("Z");
 
-    QByteArray currentPrefix(QByteArrayLiteral(""));
+    QByteArray currentPrefix{QByteArrayLiteral("")};
     QHash<QByteArray, int> columnNamesWithIndexes;
-    for (int i = 0; i < columnsNumber; ++i)
+    for (int i{0}; i < columnsNumber; ++i)
     {
         columnNamesWithIndexes[currentPrefix +
                                templateNames[i % templateNames.count()]] = i;
