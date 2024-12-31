@@ -423,15 +423,14 @@ ColumnType ImportXlsx::recognizeColumnType(
     if (ColumnType::STRING == currentType)
         return currentType;
 
-    const QXmlStreamAttributes xmlStreamAtrributes{
-        xmlStreamReader.attributes()};
-    const QString value{xmlStreamAtrributes.value(T_TAG).toString()};
-    if (value == S_TAG || value == STR_TAG)
+    const QXmlStreamAttributes attributes{xmlStreamReader.attributes()};
+    if (const QString value{attributes.value(T_TAG).toString()};
+        value == S_TAG || value == STR_TAG)
         return ColumnType::STRING;
 
     ColumnType detectedType{currentType};
-    const QString sTagValue{xmlStreamAtrributes.value(S_TAG).toString()};
-    if (isDateStyle(sTagValue))
+    if (const QString sTagValue{attributes.value(S_TAG).toString()};
+        isDateStyle(sTagValue))
     {
         if (currentType == ColumnType::UNKNOWN)
             detectedType = ColumnType::DATE;
