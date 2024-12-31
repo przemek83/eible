@@ -321,8 +321,8 @@ bool ImportOds::moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
 
     bool secondRow{false};
     while ((!xmlStreamReader.atEnd()) &&
-           !((xmlStreamReader.qualifiedName() == TABLE_QUALIFIED_NAME) &&
-             xmlStreamReader.isEndElement()))
+           (!((xmlStreamReader.qualifiedName() == TABLE_QUALIFIED_NAME) &&
+              xmlStreamReader.isEndElement())))
     {
         if (isRowStart(xmlStreamReader))
         {
