@@ -57,8 +57,8 @@ std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     if (!isSheetNameValid(getSheetNames().second, sheetName))
         return {false, {}};
 
-    const auto it{columnNames_.constFind(sheetName)};
-    if ((it == columnNames_.constEnd()) && (!analyzeSheet(sheetName)))
+    if (const auto it{columnNames_.constFind(sheetName)};
+        (it == columnNames_.constEnd()) && (!analyzeSheet(sheetName)))
         return {false, {}};
 
     return {true, columnNames_.value(sheetName)};
@@ -225,8 +225,7 @@ bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
 std::pair<bool, unsigned int> ImportXlsx::getCount(
     const QString& sheetName, const QHash<QString, unsigned int>& countMap)
 {
-    const auto it{countMap.find(sheetName)};
-    if (it != countMap.end())
+    if (const auto it{countMap.find(sheetName)}; it != countMap.end())
         return {true, it.value()};
 
     if (!isCommonDataOk())
