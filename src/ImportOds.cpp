@@ -70,7 +70,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
         it != columnTypes_.constEnd())
         return {true, *it};
 
-    if (!sheetNames_ && (!getSheetNames().first))
+    if ((!sheetNames_) && (!getSheetNames().first))
         return {false, {}};
 
     if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
@@ -92,14 +92,14 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
 {
-    if (!sheetNames_ && (!getSheetNames().first))
+    if ((!sheetNames_) && (!getSheetNames().first))
         return {false, {}};
 
     if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
         return {false, {}};
 
     if (const auto it{columnNames_.constFind(sheetName)};
-        it == columnNames_.constEnd() && (!analyzeSheet(sheetName)))
+        (it == columnNames_.constEnd()) && (!analyzeSheet(sheetName)))
         return {false, {}};
 
     return {true, columnNames_.value(sheetName)};
@@ -193,10 +193,10 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 std::pair<bool, unsigned int> ImportOds::getCount(
     const QString& sheetName, const QHash<QString, unsigned int>& countMap)
 {
-    if (!sheetNames_ && !getSheetNames().first)
+    if ((!sheetNames_) && (!getSheetNames().first))
         return {false, {}};
 
-    if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
+    if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
         return {false, {}};
 
     if (const auto it{countMap.find(sheetName)}; it != countMap.end())
@@ -227,7 +227,7 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
     QXmlStreamReader::TokenType lastToken{xmlStreamReader.tokenType()};
     QStringList columnNames;
 
-    while (!xmlStreamReader.atEnd() &&
+    while ((!xmlStreamReader.atEnd()) &&
            (xmlStreamReader.name() != TABLE_ROW_TAG))
     {
         if (isCellStart(xmlStreamReader) &&
@@ -268,8 +268,8 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
     int rowCounter{0};
     bool rowEmpty{true};
 
-    while (!xmlStreamReader.atEnd() &&
-           xmlStreamReader.name().compare(TABLE_TAG) != 0)
+    while ((!xmlStreamReader.atEnd()) &&
+           (xmlStreamReader.name().compare(TABLE_TAG) != 0))
     {
         if (isRowStart(xmlStreamReader))
             column = NOT_SET_COLUMN;
@@ -320,8 +320,8 @@ bool ImportOds::moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
     skipToSheet(xmlStreamReader, sheetName);
 
     bool secondRow{false};
-    while (!xmlStreamReader.atEnd() &&
-           !(xmlStreamReader.qualifiedName() == TABLE_QUALIFIED_NAME &&
+    while ((!xmlStreamReader.atEnd()) &&
+           !((xmlStreamReader.qualifiedName() == TABLE_QUALIFIED_NAME) &&
              xmlStreamReader.isEndElement()))
     {
         if (isRowStart(xmlStreamReader))
@@ -439,13 +439,13 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
                                                .value(OFFICE_DATE_VALUE_TAG)
                                                .toString()};
 
-            while (!xmlStreamReader.atEnd() &&
-                   0 != xmlStreamReader.name().compare(P_TAG))
+            while ((!xmlStreamReader.atEnd()) &&
+                   (0 != xmlStreamReader.name().compare(P_TAG)))
                 xmlStreamReader.readNext();
 
-            while (xmlStreamReader.tokenType() !=
-                       QXmlStreamReader::Characters &&
-                   0 != xmlStreamReader.name().compare(TABLE_CELL_TAG))
+            while (
+                (xmlStreamReader.tokenType() != QXmlStreamReader::Characters) &&
+                (0 != xmlStreamReader.name().compare(TABLE_CELL_TAG)))
                 xmlStreamReader.readNext();
             if (xmlColTypeValue.compare(DATE_TAG) == 0)
                 value = QVariant(currentDateValue);
