@@ -480,7 +480,7 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
             break;
         }
 
-        case ColumnType::UNKNOWN:
+        default:
         {
             Q_ASSERT(false);
             break;

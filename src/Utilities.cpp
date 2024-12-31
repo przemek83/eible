@@ -64,7 +64,7 @@ QVariant getDefaultVariantForFormat(ColumnType format)
         case ColumnType::DATE:
             return QVariant(QMetaType(QMetaType::QDate));
 
-        case ColumnType::UNKNOWN:
+        default:
             Q_ASSERT(false);
     }
     return QVariant(QMetaType(QMetaType::QString));
