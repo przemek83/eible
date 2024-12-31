@@ -80,8 +80,8 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     if (!initZipFile(zipFile, QStringLiteral("content.xml")))
         return {false, {}};
 
-    QXmlStreamReader xmlStreamReader;
-    if (!moveToSecondRow(sheetName, zipFile, xmlStreamReader))
+    if (QXmlStreamReader xmlStreamReader;
+        !moveToSecondRow(sheetName, zipFile, xmlStreamReader))
         return {false, {}};
 
     if (!analyzeSheet(sheetName))
@@ -98,8 +98,8 @@ std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
     if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
         return {false, {}};
 
-    const auto it{columnNames_.constFind(sheetName)};
-    if (it == columnNames_.constEnd() && !analyzeSheet(sheetName))
+    if (const auto it{columnNames_.constFind(sheetName)};
+        it == columnNames_.constEnd() && !analyzeSheet(sheetName))
         return {false, {}};
 
     return {true, columnNames_.value(sheetName)};
