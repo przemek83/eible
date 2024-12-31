@@ -86,7 +86,11 @@ QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes)
             const bool gotY{
                 formatCode.contains(QStringLiteral("y"), Qt::CaseInsensitive)};
 
-            if ((gotD && gotY) || (gotD && gotM) || (gotM && gotY))
+            const bool dayAndYearFormat{gotD && gotY};
+            const bool dayAndMonthFormat{gotD && gotM};
+            const bool monthAndYearFormat{gotM && gotY};
+
+            if (dayAndYearFormat || dayAndMonthFormat || monthAndYearFormat)
                 dateStyles.push_back(
                     sheet.attribute(QStringLiteral("numFmtId")).toInt());
         }
