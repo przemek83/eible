@@ -354,8 +354,8 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     {
         if (isRowStart(xmlStreamReader))
         {
-            rowCountDigitsInXlsx =
-                xmlStreamReader.attributes().value(R_TAG).size();
+            rowCountDigitsInXlsx = static_cast<int>(
+                xmlStreamReader.attributes().value(R_TAG).size());
             ++rowCounter;
         }
 
@@ -632,8 +632,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                     currentDataRow;
                 currentDataRow = QVector<QVariant>(templateDataRow);
             }
-            rowCountDigitsInXlsx =
-                xmlStreamReader.attributes().value(R_TAG).size();
+            rowCountDigitsInXlsx = static_cast<int>(
+                xmlStreamReader.attributes().value(R_TAG).size());
             ++rowCounter;
             updateProgress(rowCounter, rowLimit, lastEmittedPercent);
         }
