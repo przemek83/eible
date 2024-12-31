@@ -35,8 +35,8 @@ QByteArray ExportDsv::generateRowContent(const QAbstractItemModel& model,
     const int columnCount{model.columnCount()};
     for (int j{0}; j < columnCount; ++j)
     {
-        const QVariant actualField{model.index(row, j).data()};
-        if (!actualField.isNull())
+        if (const QVariant actualField{model.index(row, j).data()};
+            !actualField.isNull())
             variantToString(actualField, rowContent, separator_);
         if (j != (columnCount - 1))
             rowContent.append(separator_);
@@ -85,8 +85,8 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QMetaType::QString:
         {
             // Following https://tools.ietf.org/html/rfc4180
-            QByteArray value{variant.toByteArray()};
-            if (value.contains(separator) || value.contains('\"') ||
+            if (QByteArray value{variant.toByteArray()};
+                value.contains(separator) || value.contains('\"') ||
                 value.contains('\n'))
             {
                 value.replace('"', QByteArrayLiteral("\"\""));
