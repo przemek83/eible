@@ -92,4 +92,8 @@ private:
     const QString DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
     const QString TABLE_QUALIFIED_NAME{QStringLiteral("table:table")};
     const QString TABLE_NAME_TAG{QStringLiteral("table:name")};
+
+    const QStringList RECOCNIZED_COLUMN_TYPES{STRING_TAG,   DATE_TAG,
+                                              FLOAT_TAG,    PERCENTAGE_TAG,
+                                              CURRENCY_TAG, TIME_TAG};
 };

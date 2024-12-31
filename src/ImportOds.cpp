@@ -356,13 +356,7 @@ bool ImportOds::isRecognizedColumnType(
 {
     const QString columnType{
         attributes.value(OFFICE_VALUE_TYPE_TAG).toString()};
-
-    return (0 == columnType.compare(STRING_TAG)) ||
-           (0 == columnType.compare(DATE_TAG)) ||
-           (0 == columnType.compare(FLOAT_TAG)) ||
-           (0 == columnType.compare(PERCENTAGE_TAG)) ||
-           (0 == columnType.compare(CURRENCY_TAG)) ||
-           (0 == columnType.compare(TIME_TAG));
+    return RECOCNIZED_COLUMN_TYPES.contains(columnType);
 }
 
 unsigned int ImportOds::getColumnRepeatCount(
