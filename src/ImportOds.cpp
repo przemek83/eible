@@ -44,7 +44,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
         const QDomElement currentElement{
             root.elementsByTagName(configMapNamed).at(i).toElement()};
         if (currentElement.hasAttribute(configName) &&
-            currentElement.attribute(configName) == tables)
+            (currentElement.attribute(configName) == tables))
         {
             const int innerElementsCount{
                 currentElement.elementsByTagName(configMapEntry).size()};
@@ -70,10 +70,10 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
         it != columnTypes_.constEnd())
         return {true, *it};
 
-    if (!sheetNames_ && !getSheetNames().first)
+    if (!sheetNames_ && (!getSheetNames().first))
         return {false, {}};
 
-    if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
+    if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
         return {false, {}};
 
     QuaZipFile zipFile;
@@ -92,14 +92,14 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
 {
-    if (!sheetNames_ && !getSheetNames().first)
+    if (!sheetNames_ && (!getSheetNames().first))
         return {false, {}};
 
-    if (sheetNames_.has_value() && !isSheetNameValid(*sheetNames_, sheetName))
+    if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
         return {false, {}};
 
     if (const auto it{columnNames_.constFind(sheetName)};
-        it == columnNames_.constEnd() && !analyzeSheet(sheetName))
+        it == columnNames_.constEnd() && (!analyzeSheet(sheetName)))
         return {false, {}};
 
     return {true, columnNames_.value(sheetName)};
@@ -141,9 +141,9 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     unsigned int rowCounter{0};
     bool rowEmpty{true};
     unsigned int lastEmittedPercent{0};
-    while (!xmlStreamReader.atEnd() &&
-           0 != xmlStreamReader.name().compare(TABLE_TAG) &&
-           rowCounter < rowLimit)
+    while ((!xmlStreamReader.atEnd()) &&
+           (0 != xmlStreamReader.name().compare(TABLE_TAG)) &&
+           (rowCounter < rowLimit))
     {
         if (isRowStart(xmlStreamReader))
         {
