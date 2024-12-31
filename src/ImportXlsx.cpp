@@ -304,7 +304,7 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
     QXmlStreamReader::TokenType lastToken{xmlStreamReader.tokenType()};
     QStringList columnNames;
     QString currentColType;
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != ROW_TAG)
+    while ((!xmlStreamReader.atEnd()) && (xmlStreamReader.name() != ROW_TAG))
     {
         if (isCellStart(xmlStreamReader))
         {
@@ -320,12 +320,12 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
                 xmlStreamReader.attributes().value(T_TAG).toString();
         }
 
-        if (!xmlStreamReader.atEnd() && isVTagStart(xmlStreamReader))
+        if ((!xmlStreamReader.atEnd()) && isVTagStart(xmlStreamReader))
             columnNames.append(getColumnName(xmlStreamReader, currentColType));
 
         // If we encounter empty cell than add it to list.
         if (isCellEnd(xmlStreamReader) &&
-            lastToken == QXmlStreamReader::StartElement)
+            (lastToken == QXmlStreamReader::StartElement))
             columnNames << emptyColName_;
         lastToken = xmlStreamReader.tokenType();
         xmlStreamReader.readNext();
@@ -353,7 +353,8 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     int maxColumnIndex{NOT_SET_COLUMN};
     int rowCounter{0};
     int rowCountDigitsInXlsx{0};
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
+    while ((!xmlStreamReader.atEnd()) &&
+           (xmlStreamReader.name() != SHEET_DATA_TAG))
     {
         if (isRowStart(xmlStreamReader))
         {
@@ -402,7 +403,8 @@ QString ImportXlsx::getColumnName(QXmlStreamReader& xmlStreamReader,
 
 void ImportXlsx::skipToFirstRow(QXmlStreamReader& xmlStreamReader) const
 {
-    while (!xmlStreamReader.atEnd() && xmlStreamReader.name() != SHEET_DATA_TAG)
+    while ((!xmlStreamReader.atEnd()) &&
+           (xmlStreamReader.name() != SHEET_DATA_TAG))
         xmlStreamReader.readNext();
     xmlStreamReader.readNext();
     xmlStreamReader.readNext();
@@ -424,7 +426,7 @@ ColumnType ImportXlsx::recognizeColumnType(
 
     const QXmlStreamAttributes attributes{xmlStreamReader.attributes()};
     if (const QString value{attributes.value(T_TAG).toString()};
-        value == S_TAG || value == STR_TAG)
+        (value == S_TAG) || (value == STR_TAG))
         return ColumnType::STRING;
 
     ColumnType detectedType{currentType};
@@ -565,19 +567,19 @@ QDate ImportXlsx::getDateFromString(const QString& dateAsString)
 
 bool ImportXlsx::isDateStyle(const QString& sTagValue) const
 {
-    return !sTagValue.isEmpty() &&
+    return (!sTagValue.isEmpty()) &&
            dateStyles_->contains(allStyles_->at(sTagValue.toInt()));
 }
 
 bool ImportXlsx::isCommonDataOk()
 {
-    if (!sheets_ && !getSheetNames().first)
+    if ((!sheets_) && (!getSheetNames().first))
         return false;
 
-    if (!sharedStrings_ && !getSharedStrings().first)
+    if ((!sharedStrings_) && (!getSharedStrings().first))
         return false;
 
-    if (!getDateStyles().first && !getAllStyles().first)
+    if ((!getDateStyles().first) && (!getAllStyles().first))
         return false;
 
     return true;
@@ -622,8 +624,9 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     unsigned int rowCounter{0};
     unsigned int lastEmittedPercent{0};
     int rowCountDigitsInXlsx{0};
-    while (!xmlStreamReader.atEnd() &&
-           xmlStreamReader.name() != SHEET_DATA_TAG && rowCounter <= rowLimit)
+    while ((!xmlStreamReader.atEnd()) &&
+           (xmlStreamReader.name() != SHEET_DATA_TAG) &&
+           (rowCounter <= rowLimit))
     {
         if (isRowStart(xmlStreamReader))
         {
@@ -650,7 +653,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                 xmlStreamReader.attributes().value(S_TAG).toString();
         }
 
-        if (!xmlStreamReader.atEnd() && isVTagStart(xmlStreamReader) &&
+        if ((!xmlStreamReader.atEnd()) && isVTagStart(xmlStreamReader) &&
             (!excludedColumns.contains(static_cast<unsigned int>(column))))
         {
             const ColumnType format{columnTypes.at(column)};
