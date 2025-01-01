@@ -18,7 +18,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
     if (sheetNames_)
         return {true, *sheetNames_};
 
-    const auto [success, sheetNames]{getSheetNamesFromZipFile()};
+    auto [success, sheetNames]{getSheetNamesFromZipFile()};
     if (!success)
         return {false, {}};
 
