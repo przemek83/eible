@@ -63,7 +63,8 @@ private:
 
     std::pair<bool, QString> getSheetPath(const QString& sheetName);
 
-    bool moveToSecondRow(QuaZipFile& zipFile, QXmlStreamReader& reader) const;
+    bool moveToSecondRow(QuaZipFile& quaZipFile,
+                         QXmlStreamReader& reader) const;
 
     std::pair<bool, unsigned int> getCount(
         const QString& sheetName,
@@ -75,7 +76,7 @@ private:
         const QMap<QString, QString>& sheetIdToUserFriendlyNameMap);
 
     std::pair<bool, QDomNodeList> getSheetNodes(
-        QuaZipFile& zipFile,
+        QuaZipFile& quaZipFile,
         const std::function<QDomNodeList(const QDomElement&)>& nodesRetriever);
 
     bool isRowStart(const QXmlStreamReader& reader) const;

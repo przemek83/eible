@@ -50,7 +50,7 @@ private:
     std::tuple<bool, unsigned int, QVector<ColumnType>>
     retrieveRowCountAndColumnTypes(const QString& sheetName) override;
 
-    bool moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
+    bool moveToSecondRow(const QString& sheetName, QuaZipFile& quaZipFile,
                          QXmlStreamReader& reader) const;
 
     void skipToSheet(QXmlStreamReader& reader, const QString& sheetName) const;

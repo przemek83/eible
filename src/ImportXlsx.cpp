@@ -117,12 +117,12 @@ QList<int> ImportXlsx::retrieveAllStyles(const QDomNodeList& sheetNodes)
 std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
 ImportXlsx::getStyles()
 {
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("xl/styles.xml")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("xl/styles.xml")))
         return {false, {}, {}};
 
     QDomDocument xmlDocument;
-    if (!xmlDocument.setContent(zipFile.readAll()))
+    if (!xmlDocument.setContent(quaZipFile.readAll()))
     {
         setError(QStringLiteral("Xml file is corrupted."));
         return {false, std::nullopt, std::nullopt};
@@ -166,12 +166,12 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
     if (!setCurrentZipFile(QStringLiteral("xl/sharedStrings.xml")))
         return {true, {}};
 
-    QuaZipFile zipFile;
-    if (!openZipFile(zipFile))
+    QuaZipFile quaZipFile;
+    if (!openZipFile(quaZipFile))
         return {false, {}};
 
     QXmlStreamReader reader;
-    reader.setDevice(&zipFile);
+    reader.setDevice(&quaZipFile);
 
     QStringList sharedStrings;
     while (!reader.atEnd())
@@ -204,10 +204,10 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     return {true, columnTypes_.value(sheetName)};
 }
 
-bool ImportXlsx::moveToSecondRow(QuaZipFile& zipFile,
+bool ImportXlsx::moveToSecondRow(QuaZipFile& quaZipFile,
                                  QXmlStreamReader& reader) const
 {
-    reader.setDevice(&zipFile);
+    reader.setDevice(&quaZipFile);
     bool secondRow{false};
     while (!reader.atEnd())
     {
@@ -241,11 +241,11 @@ std::pair<bool, unsigned int> ImportXlsx::getCount(
 }
 
 std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
-    QuaZipFile& zipFile,
+    QuaZipFile& quaZipFile,
     const std::function<QDomNodeList(const QDomElement&)>& nodesRetriever)
 {
     QDomDocument xmlDocument;
-    if (!xmlDocument.setContent(zipFile.readAll()))
+    if (!xmlDocument.setContent(quaZipFile.readAll()))
     {
         setError(QStringLiteral("File is corrupted."));
         return {false, {}};
@@ -288,12 +288,12 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
     if (!sheetFound)
         return {false, {}};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, sheetPath))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, sheetPath))
         return {false, {}};
 
     QXmlStreamReader reader;
-    reader.setDevice(&zipFile);
+    reader.setDevice(&quaZipFile);
     skipToFirstRow(reader);
 
     int columnIndex{NOT_SET_COLUMN};
@@ -333,12 +333,12 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     if (!sheetFound)
         return {false, {}, {}};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, sheetPath))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, sheetPath))
         return {false, {}, {}};
 
     QXmlStreamReader reader;
-    if (!moveToSecondRow(zipFile, reader))
+    if (!moveToSecondRow(quaZipFile, reader))
         return {false, {}, {}};
 
     QVector<ColumnType> columnTypes;
@@ -442,14 +442,14 @@ ColumnType ImportXlsx::recognizeColumnType(ColumnType currentType,
 std::pair<bool, QMap<QString, QString>>
 ImportXlsx::getSheetIdToUserFriendlyNameMap()
 {
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("xl/workbook.xml")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("xl/workbook.xml")))
         return {false, {}};
 
     auto nodesRetriever{[](const QDomElement& root) {
         return root.firstChildElement(QStringLiteral("sheets")).childNodes();
     }};
-    auto [sucess, sheetNodes]{getSheetNodes(zipFile, nodesRetriever)};
+    auto [sucess, sheetNodes]{getSheetNodes(quaZipFile, nodesRetriever)};
     if (!sucess)
         return {false, {}};
 
@@ -469,12 +469,12 @@ std::pair<bool, QVector<std::pair<QString, QString>>>
 ImportXlsx::retrieveSheets(
     const QMap<QString, QString>& sheetIdToUserFriendlyNameMap)
 {
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("xl/_rels/workbook.xml.rels")))
         return {false, {}};
 
     auto [sucess, sheetNodes]{getSheetNodes(
-        zipFile, [](const QDomElement& root) { return root.childNodes(); })};
+        quaZipFile, [](const QDomElement& root) { return root.childNodes(); })};
     if (!sucess)
         return {false, {}};
 
@@ -596,12 +596,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     if (!sheetFound)
         return {false, {}};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, sheetPath))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, sheetPath))
         return {false, {}};
 
     QXmlStreamReader reader;
-    moveToSecondRow(zipFile, reader);
+    moveToSecondRow(quaZipFile, reader);
 
     const QVector<QVariant> templateDataRow(
         createTemplateDataRow(excludedColumns, columnTypes));

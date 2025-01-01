@@ -82,21 +82,22 @@ bool ImportSpreadsheet::setCurrentZipFile(const QString& zipFileName)
     return true;
 }
 
-bool ImportSpreadsheet::openZipFile(QuaZipFile& zipFile)
+bool ImportSpreadsheet::openZipFile(QuaZipFile& quaZipFile)
 {
-    zipFile.setZip(&zip_);
-    if (!zipFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    quaZipFile.setZip(&zip_);
+    if (!quaZipFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        setError("Can not open file " + zipFile.getFileName() + ".");
+        setError("Can not open file " + quaZipFile.getFileName() + ".");
         return false;
     }
     return true;
 }
 
-bool ImportSpreadsheet::initZipFile(QuaZipFile& zipFile,
+bool ImportSpreadsheet::initZipFile(QuaZipFile& quaZipFile,
                                     const QString& zipFileName)
 {
-    return openZip() && setCurrentZipFile(zipFileName) && openZipFile(zipFile);
+    return openZip() && setCurrentZipFile(zipFileName) &&
+           openZipFile(quaZipFile);
 }
 
 QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(

@@ -39,11 +39,12 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
     if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
         return {false, {}};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("content.xml")))
         return {false, {}};
 
-    if (QXmlStreamReader reader; !moveToSecondRow(sheetName, zipFile, reader))
+    if (QXmlStreamReader reader;
+        !moveToSecondRow(sheetName, quaZipFile, reader))
         return {false, {}};
 
     if (!analyzeSheet(sheetName))
@@ -79,12 +80,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     if (!columnsToExcludeAreValid(excludedColumns, columnCount))
         return {false, {}};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("content.xml")))
         return {false, {}};
 
     QXmlStreamReader reader;
-    if (!moveToSecondRow(sheetName, zipFile, reader))
+    if (!moveToSecondRow(sheetName, quaZipFile, reader))
         return {false, {}};
 
     const QVector<QVariant> templateDataRow(
@@ -153,12 +154,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
 
 std::pair<bool, QStringList> ImportOds::getSheetNamesFromZipFile()
 {
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("settings.xml")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("settings.xml")))
         return {false, {}};
 
     QDomDocument xmlDocument;
-    if (!xmlDocument.setContent(zipFile.readAll()))
+    if (!xmlDocument.setContent(quaZipFile.readAll()))
     {
         setError(QStringLiteral("Xml file is damaged."));
         return {false, {}};
@@ -218,12 +219,12 @@ std::pair<bool, unsigned int> ImportOds::getCount(
 std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
     const QString& sheetName)
 {
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("content.xml")))
         return {false, {}};
 
     QXmlStreamReader reader;
-    reader.setDevice(&zipFile);
+    reader.setDevice(&quaZipFile);
     skipToSheet(reader, sheetName);
 
     while ((!reader.atEnd()) && (reader.name() != TABLE_ROW_TAG))
@@ -258,12 +259,12 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
 std::tuple<bool, unsigned int, QVector<ColumnType>>
 ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
 {
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("content.xml")))
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("content.xml")))
         return {false, {}, {}};
 
     QXmlStreamReader reader;
-    if (!moveToSecondRow(sheetName, zipFile, reader))
+    if (!moveToSecondRow(sheetName, quaZipFile, reader))
         return {false, {}, {}};
 
     QVector<ColumnType> columnTypes;
@@ -315,10 +316,11 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
     return {true, rowCounter, columnTypes};
 }
 
-bool ImportOds::moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
+bool ImportOds::moveToSecondRow(const QString& sheetName,
+                                QuaZipFile& quaZipFile,
                                 QXmlStreamReader& reader) const
 {
-    reader.setDevice(&zipFile);
+    reader.setDevice(&quaZipFile);
     skipToSheet(reader, sheetName);
 
     bool secondRow{false};

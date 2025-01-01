@@ -102,9 +102,9 @@ protected:
 
     bool setCurrentZipFile(const QString& zipFileName);
 
-    bool openZipFile(QuaZipFile& zipFile);
+    bool openZipFile(QuaZipFile& quaZipFile);
 
-    bool initZipFile(QuaZipFile& zipFile, const QString& zipFileName);
+    bool initZipFile(QuaZipFile& quaZipFile, const QString& zipFileName);
 
     static QVector<QVariant> createTemplateDataRow(
         const QVector<unsigned int>& excludedColumns,
