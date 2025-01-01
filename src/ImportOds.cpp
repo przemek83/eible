@@ -415,7 +415,7 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
     return currentType;
 }
 
-QVariant ImportOds::retrieveValueFromStringColumnType(
+QVariant ImportOds::retrieveValueFromStringColumn(
     QXmlStreamReader& reader) const
 {
     const QString xmlColTypeValue{
@@ -446,7 +446,7 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& reader,
     Q_ASSERT(columnType == ColumnType::UNKNOWN);
 
     if (columnType == ColumnType::STRING)
-        return retrieveValueFromStringColumnType(reader);
+        return retrieveValueFromStringColumn(reader);
 
     if (columnType == ColumnType::NUMBER)
         return QVariant(reader.attributes().value(OFFICE_VALUE_TAG).toDouble());

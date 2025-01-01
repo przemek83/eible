@@ -66,7 +66,7 @@ private:
     ColumnType recognizeColumnType(ColumnType currentType,
                                    const QString& xmlColTypeValue) const;
 
-    QVariant retrieveValueFromStringColumnType(QXmlStreamReader& reader) const;
+    QVariant retrieveValueFromStringColumn(QXmlStreamReader& reader) const;
 
     QVariant retrieveValueFromField(QXmlStreamReader& reader,
                                     ColumnType columnType) const;
