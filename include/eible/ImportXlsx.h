@@ -104,6 +104,10 @@ private:
     ColumnType recognizeColumnType(
         ColumnType currentType, const QXmlStreamReader& xmlStreamReader) const;
 
+    QVariant getCurrentValueForStringColumn(const QString& currentColType,
+                                            const QString& actualSTagValue,
+                                            const QString& valueAsString) const;
+
     QVariant getCurrentValue(QXmlStreamReader& xmlStreamReader,
                              ColumnType currentColumnFormat,
                              const QString& currentColType,

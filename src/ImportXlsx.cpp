@@ -514,6 +514,19 @@ std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
     return {success, *allStyles_};
 }
 
+QVariant ImportXlsx::getCurrentValueForStringColumn(
+    const QString& currentColType, const QString& actualSTagValue,
+    const QString& valueAsString) const
+{
+    if (currentColType == S_TAG)
+        return valueAsString.toInt();
+
+    if (isDateStyle(actualSTagValue))
+        return getDateFromString(valueAsString).toString(Qt::ISODate);
+
+    return valueAsString;
+}
+
 QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
                                      ColumnType currentColumnFormat,
                                      const QString& currentColType,
@@ -525,16 +538,8 @@ QVariant ImportXlsx::getCurrentValue(QXmlStreamReader& xmlStreamReader,
     {
         case ColumnType::STRING:
         {
-            if (currentColType == S_TAG)
-                currentValue = valueAsString.toInt();
-            else
-            {
-                if (isDateStyle(actualSTagValue))
-                    currentValue =
-                        getDateFromString(valueAsString).toString(Qt::ISODate);
-                else
-                    currentValue = valueAsString;
-            }
+            currentValue = getCurrentValueForStringColumn(
+                currentColType, actualSTagValue, valueAsString);
             break;
         }
 
