@@ -18,46 +18,9 @@ std::pair<bool, QStringList> ImportOds::getSheetNames()
     if (sheetNames_)
         return {true, *sheetNames_};
 
-    QuaZipFile zipFile;
-    if (!initZipFile(zipFile, QStringLiteral("settings.xml")))
+    const auto [success, sheetNames]{getSheetNamesFromZipFile()};
+    if (!success)
         return {false, {}};
-
-    QDomDocument xmlDocument;
-    if (!xmlDocument.setContent(zipFile.readAll()))
-    {
-        setError(QStringLiteral("Xml file is damaged."));
-        return {false, {}};
-    }
-
-    const QString configMapNamed{
-        QStringLiteral("config:config-item-map-named")};
-    const QString configName{QStringLiteral("config:name")};
-    const QString configMapEntry{
-        QStringLiteral("config:config-item-map-entry")};
-    const QString tables{QStringLiteral("Tables")};
-
-    const QDomElement root{xmlDocument.documentElement()};
-    const int elementsCount{root.elementsByTagName(configMapNamed).size()};
-    QStringList sheetNames{};
-    for (int i{0}; i < elementsCount; ++i)
-    {
-        const QDomElement currentElement{
-            root.elementsByTagName(configMapNamed).at(i).toElement()};
-        if (currentElement.hasAttribute(configName) &&
-            (currentElement.attribute(configName) == tables))
-        {
-            const int innerElementsCount{
-                currentElement.elementsByTagName(configMapEntry).size()};
-            for (int j{0}; j < innerElementsCount; ++j)
-            {
-                const QDomElement element{
-                    currentElement.elementsByTagName(configMapEntry)
-                        .at(j)
-                        .toElement()};
-                sheetNames.push_back(element.attribute(configName));
-            }
-        }
-    }
 
     sheetNames_ = std::move(sheetNames);
     return {true, *sheetNames_};
@@ -186,6 +149,52 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         dataContainer[dataContainer.size() - 1] = currentDataRow;
 
     return {true, dataContainer};
+}
+
+std::pair<bool, QStringList> ImportOds::getSheetNamesFromZipFile()
+{
+    QuaZipFile zipFile;
+    if (!initZipFile(zipFile, QStringLiteral("settings.xml")))
+        return {false, {}};
+
+    QDomDocument xmlDocument;
+    if (!xmlDocument.setContent(zipFile.readAll()))
+    {
+        setError(QStringLiteral("Xml file is damaged."));
+        return {false, {}};
+    }
+
+    const QString configMapNamed{
+        QStringLiteral("config:config-item-map-named")};
+    const QString configName{QStringLiteral("config:name")};
+    const QString configMapEntry{
+        QStringLiteral("config:config-item-map-entry")};
+    const QString tables{QStringLiteral("Tables")};
+
+    const QDomElement root{xmlDocument.documentElement()};
+    const int elementsCount{root.elementsByTagName(configMapNamed).size()};
+    QStringList sheetNames{};
+    for (int i{0}; i < elementsCount; ++i)
+    {
+        const QDomElement currentElement{
+            root.elementsByTagName(configMapNamed).at(i).toElement()};
+        if (currentElement.hasAttribute(configName) &&
+            (currentElement.attribute(configName) == tables))
+        {
+            const int innerElementsCount{
+                currentElement.elementsByTagName(configMapEntry).size()};
+            for (int j{0}; j < innerElementsCount; ++j)
+            {
+                const QDomElement element{
+                    currentElement.elementsByTagName(configMapEntry)
+                        .at(j)
+                        .toElement()};
+                sheetNames.push_back(element.attribute(configName));
+            }
+        }
+    }
+
+    return {true, sheetNames};
 }
 
 std::pair<bool, unsigned int> ImportOds::getCount(

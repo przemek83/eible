@@ -38,6 +38,8 @@ public:
         unsigned int rowLimit) override;
 
 private:
+    std::pair<bool, QStringList> getSheetNamesFromZipFile();
+
     std::pair<bool, unsigned int> getCount(
         const QString& sheetName,
         const QHash<QString, unsigned int>& countMap) override;
