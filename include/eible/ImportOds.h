@@ -49,28 +49,27 @@ private:
     retrieveRowCountAndColumnTypes(const QString& sheetName) override;
 
     bool moveToSecondRow(const QString& sheetName, QuaZipFile& zipFile,
-                         QXmlStreamReader& xmlStreamReader) const;
+                         QXmlStreamReader& reader) const;
 
-    void skipToSheet(QXmlStreamReader& xmlStreamReader,
-                     const QString& sheetName) const;
+    void skipToSheet(QXmlStreamReader& reader, const QString& sheetName) const;
 
     bool isRecognizedColumnType(const QXmlStreamAttributes& attributes) const;
 
     unsigned int getColumnRepeatCount(
         const QXmlStreamAttributes& attributes) const;
 
-    bool isRowStart(const QXmlStreamReader& xmlStreamReader) const;
-    bool isRowEnd(const QXmlStreamReader& xmlStreamReader) const;
-    bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
-    bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
+    bool isRowStart(const QXmlStreamReader& reader) const;
+    bool isRowEnd(const QXmlStreamReader& reader) const;
+    bool isCellStart(const QXmlStreamReader& reader) const;
+    bool isCellEnd(const QXmlStreamReader& reader) const;
 
     ColumnType recognizeColumnType(ColumnType currentType,
                                    const QString& xmlColTypeValue) const;
 
-    QVariant retrieveValueFromField(QXmlStreamReader& xmlStreamReader,
+    QVariant retrieveValueFromField(QXmlStreamReader& reader,
                                     ColumnType columnType) const;
 
-    bool isOfficeValueTagEmpty(const QXmlStreamReader& xmlStreamReader) const;
+    bool isOfficeValueTagEmpty(const QXmlStreamReader& reader) const;
 
     std::optional<QStringList> sheetNames_{std::nullopt};
 

@@ -63,8 +63,7 @@ private:
 
     std::pair<bool, QString> getSheetPath(const QString& sheetName);
 
-    bool moveToSecondRow(QuaZipFile& zipFile,
-                         QXmlStreamReader& xmlStreamReader) const;
+    bool moveToSecondRow(QuaZipFile& zipFile, QXmlStreamReader& reader) const;
 
     std::pair<bool, unsigned int> getCount(
         const QString& sheetName,
@@ -79,10 +78,10 @@ private:
         QuaZipFile& zipFile,
         const std::function<QDomNodeList(const QDomElement&)>& nodesRetriever);
 
-    bool isRowStart(const QXmlStreamReader& xmlStreamReader) const;
-    bool isCellStart(const QXmlStreamReader& xmlStreamReader) const;
-    bool isCellEnd(const QXmlStreamReader& xmlStreamReader) const;
-    bool isVTagStart(const QXmlStreamReader& xmlStreamReader) const;
+    bool isRowStart(const QXmlStreamReader& reader) const;
+    bool isCellStart(const QXmlStreamReader& reader) const;
+    bool isCellEnd(const QXmlStreamReader& reader) const;
+    bool isVTagStart(const QXmlStreamReader& reader) const;
 
     std::pair<bool, QStringList> retrieveColumnNames(
         const QString& sheetName) override;
@@ -93,22 +92,22 @@ private:
     static QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes);
     static QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes);
 
-    QString getColumnName(QXmlStreamReader& xmlStreamReader,
+    QString getColumnName(QXmlStreamReader& reader,
                           const QString& currentColType) const;
 
-    void skipToFirstRow(QXmlStreamReader& xmlStreamReader) const;
+    void skipToFirstRow(QXmlStreamReader& reader) const;
 
-    int getCurrentColumnNumber(const QXmlStreamReader& xmlStreamReader,
+    int getCurrentColumnNumber(const QXmlStreamReader& reader,
                                int rowCountDigitsInXlsx) const;
 
-    ColumnType recognizeColumnType(
-        ColumnType currentType, const QXmlStreamReader& xmlStreamReader) const;
+    ColumnType recognizeColumnType(ColumnType currentType,
+                                   const QXmlStreamReader& reader) const;
 
     QVariant getCurrentValueForStringColumn(const QString& currentColType,
                                             const QString& actualSTagValue,
                                             const QString& valueAsString) const;
 
-    QVariant getCurrentValue(QXmlStreamReader& xmlStreamReader,
+    QVariant getCurrentValue(QXmlStreamReader& reader,
                              ColumnType currentColumnFormat,
                              const QString& currentColType,
                              const QString& actualSTagValue) const;
