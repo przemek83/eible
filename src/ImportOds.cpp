@@ -33,10 +33,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
         it != columnTypes_.constEnd())
         return {true, *it};
 
-    if ((!sheetNames_) && (!getSheetNames().first))
-        return {false, {}};
-
-    if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
+    if (!isSheetAvailable(sheetName))
         return {false, {}};
 
     QuaZipFile quaZipFile;
@@ -55,10 +52,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
 {
-    if ((!sheetNames_) && (!getSheetNames().first))
-        return {false, {}};
-
-    if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
+    if (!isSheetAvailable(sheetName))
         return {false, {}};
 
     if (const auto it{columnNames_.constFind(sheetName)};
@@ -201,10 +195,7 @@ std::pair<bool, QStringList> ImportOds::getSheetNamesFromZipFile()
 std::pair<bool, unsigned int> ImportOds::getCount(
     const QString& sheetName, const QHash<QString, unsigned int>& countMap)
 {
-    if ((!sheetNames_) && (!getSheetNames().first))
-        return {false, {}};
-
-    if (sheetNames_.has_value() && (!isSheetNameValid(*sheetNames_, sheetName)))
+    if (!isSheetAvailable(sheetName))
         return {false, {}};
 
     if (const auto it{countMap.find(sheetName)}; it != countMap.end())
@@ -473,4 +464,12 @@ bool ImportOds::isOfficeValueTagEmpty(const QXmlStreamReader& reader) const
     const QString xmlColTypeValue{
         reader.attributes().value(OFFICE_VALUE_TYPE_TAG).toString()};
     return xmlColTypeValue.isEmpty();
+}
+
+bool ImportOds::isSheetAvailable(const QString& sheetName)
+{
+    if ((!sheetNames_) && (!getSheetNames().first))
+        return false;
+
+    return isSheetNameValid(*sheetNames_, sheetName);
 }

@@ -75,6 +75,8 @@ private:
 
     bool isOfficeValueTagEmpty(const QXmlStreamReader& reader) const;
 
+    bool isSheetAvailable(const QString& sheetName);
+
     std::optional<QStringList> sheetNames_{std::nullopt};
 
     const QString TABLE_TAG{QStringLiteral("table")};
