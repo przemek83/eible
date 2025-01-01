@@ -51,7 +51,10 @@ protected:
                                   int skippedRowsCount) override;
 
 private:
-    void variantToString(const QVariant& variant, QByteArray& destinationArray,
+    QByteArray convertToByteArray(const QVariant& variant,
+                                  char separator) const;
+
+    void variantToString(const QVariant& variant, QByteArray& array,
                          char separator) const;
 
     QString dateFormat_{};

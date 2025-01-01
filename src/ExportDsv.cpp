@@ -56,8 +56,22 @@ bool ExportDsv::writeContent(const QByteArray& content, QIODevice& ioDevice)
     return ioDevice.write(content) != -1;
 }
 
-void ExportDsv::variantToString(const QVariant& variant,
-                                QByteArray& destinationArray,
+QByteArray ExportDsv::convertToByteArray(const QVariant& variant,
+                                         char separator) const
+{
+    // Following https://tools.ietf.org/html/rfc4180
+    if (QByteArray value{variant.toByteArray()}; value.contains(separator) ||
+                                                 value.contains('\"') ||
+                                                 value.contains('\n'))
+    {
+        value.replace('"', QByteArrayLiteral("\"\""));
+        return "\"" + value + "\"";
+    }
+    else
+        return value;
+}
+
+void ExportDsv::variantToString(const QVariant& variant, QByteArray& array,
                                 char separator) const
 {
     switch (variant.typeId())
@@ -65,7 +79,7 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QMetaType::Double:
         case QMetaType::Int:
         {
-            destinationArray.append(
+            array.append(
                 locale_.toString(variant.toDouble(), 'f', precision_).toUtf8());
             break;
         }
@@ -74,26 +88,16 @@ void ExportDsv::variantToString(const QVariant& variant,
         case QMetaType::QDateTime:
         {
             if (dateFormat_.isEmpty())
-                destinationArray.append(
-                    variant.toDate().toString(qtDateFormat_).toUtf8());
+                array.append(variant.toDate().toString(qtDateFormat_).toUtf8());
             else
-                destinationArray.append(
-                    variant.toDate().toString(dateFormat_).toUtf8());
+                array.append(variant.toDate().toString(dateFormat_).toUtf8());
             break;
         }
 
         case QMetaType::QString:
         {
-            // Following https://tools.ietf.org/html/rfc4180
-            if (QByteArray value{variant.toByteArray()};
-                value.contains(separator) || value.contains('\"') ||
-                value.contains('\n'))
-            {
-                value.replace('"', QByteArrayLiteral("\"\""));
-                destinationArray.append("\"" + value + "\"");
-            }
-            else
-                destinationArray.append(value);
+            QByteArray byteArray{convertToByteArray(variant, separator)};
+            array.append(byteArray);
             break;
         }
 
