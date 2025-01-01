@@ -415,65 +415,46 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
     return currentType;
 }
 
-QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& reader,
-                                           ColumnType columnType) const
+QVariant ImportOds::retrieveValueFromStringColumnType(
+    QXmlStreamReader& reader) const
 {
     const QString xmlColTypeValue{
         reader.attributes().value(OFFICE_VALUE_TYPE_TAG).toString()};
-    QVariant value{};
     const QString emptyString(QLatin1String(""));
+    const QString currentDateValue{
+        reader.attributes().value(OFFICE_DATE_VALUE_TAG).toString()};
 
-    switch (columnType)
-    {
-        case ColumnType::STRING:
-        {
-            const QString currentDateValue{
-                reader.attributes().value(OFFICE_DATE_VALUE_TAG).toString()};
+    while ((!reader.atEnd()) && (0 != reader.name().compare(P_TAG)))
+        reader.readNext();
 
-            while ((!reader.atEnd()) && (0 != reader.name().compare(P_TAG)))
-                reader.readNext();
+    while ((reader.tokenType() != QXmlStreamReader::Characters) &&
+           (0 != reader.name().compare(TABLE_CELL_TAG)))
+        reader.readNext();
 
-            while ((reader.tokenType() != QXmlStreamReader::Characters) &&
-                   (0 != reader.name().compare(TABLE_CELL_TAG)))
-                reader.readNext();
-            if (xmlColTypeValue.compare(DATE_TAG) == 0)
-                value = QVariant(currentDateValue);
-            else
-            {
-                const QStringView stringView{reader.text()};
-                if (stringView.isNull())
-                    value = QVariant(emptyString);
-                else
-                    value = stringView.toString();
-            }
-            break;
-        }
+    if (xmlColTypeValue.compare(DATE_TAG) == 0)
+        return QVariant(currentDateValue);
 
-        case ColumnType::DATE:
-        {
-            static const int odsStringDateLength{10};
-            QString dateValue{
-                reader.attributes().value(OFFICE_DATE_VALUE_TAG).toString()};
-            dateValue.chop(dateValue.size() - odsStringDateLength);
-            value = QDate::fromString(dateValue, DATE_FORMAT);
+    const QStringView stringView{reader.text()};
+    if (stringView.isNull())
+        return QVariant(emptyString);
 
-            break;
-        }
+    return stringView.toString();
+}
+QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& reader,
+                                           ColumnType columnType) const
+{
+    Q_ASSERT(columnType == ColumnType::UNKNOWN);
 
-        case ColumnType::NUMBER:
-        {
-            value = QVariant(
-                reader.attributes().value(OFFICE_VALUE_TAG).toDouble());
-            break;
-        }
+    if (columnType == ColumnType::STRING)
+        return retrieveValueFromStringColumnType(reader);
 
-        default:
-        {
-            Q_ASSERT(false);
-            break;
-        }
-    }
-    return value;
+    if (columnType == ColumnType::NUMBER)
+        return QVariant(reader.attributes().value(OFFICE_VALUE_TAG).toDouble());
+
+    QString dateValue{
+        reader.attributes().value(OFFICE_DATE_VALUE_TAG).toString()};
+    dateValue.chop(dateValue.size() - ODS_STRING_DATE_LENGTH);
+    return QDate::fromString(dateValue, DATE_FORMAT);
 }
 
 bool ImportOds::isOfficeValueTagEmpty(const QXmlStreamReader& reader) const

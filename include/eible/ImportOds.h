@@ -66,6 +66,8 @@ private:
     ColumnType recognizeColumnType(ColumnType currentType,
                                    const QString& xmlColTypeValue) const;
 
+    QVariant retrieveValueFromStringColumnType(QXmlStreamReader& reader) const;
+
     QVariant retrieveValueFromField(QXmlStreamReader& reader,
                                     ColumnType columnType) const;
 
@@ -95,4 +97,6 @@ private:
     const QStringList RECOCNIZED_COLUMN_TYPES{STRING_TAG,   DATE_TAG,
                                               FLOAT_TAG,    PERCENTAGE_TAG,
                                               CURRENCY_TAG, TIME_TAG};
+
+    const int ODS_STRING_DATE_LENGTH{10};
 };
