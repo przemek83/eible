@@ -41,14 +41,14 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
 {
-    if (!isSheetAvailable(sheetName))
-        return {false, {}};
-
     if (const auto it{columnNames_.constFind(sheetName)};
-        (it == columnNames_.constEnd()) && (!analyzeSheet(sheetName)))
-        return {false, {}};
+        it != columnNames_.constEnd())
+        return {true, *it};
 
-    return {true, columnNames_.value(sheetName)};
+    if (isSheetAvailable(sheetName) && analyzeSheet(sheetName))
+        return {true, columnNames_.value(sheetName)};
+
+    return {false, {}};
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
