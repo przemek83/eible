@@ -33,10 +33,10 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
         it != columnTypes_.constEnd())
         return {true, *it};
 
-    if (!isSheetAvailable(sheetName) || !initializeColumnTypes(sheetName))
-        return {false, {}};
+    if (isSheetAvailable(sheetName) && initializeColumnTypes(sheetName))
+        return {true, columnTypes_.value(sheetName)};
 
-    return {true, columnTypes_.value(sheetName)};
+    return {false, {}};
 }
 
 std::pair<bool, QStringList> ImportOds::getColumnNames(const QString& sheetName)
