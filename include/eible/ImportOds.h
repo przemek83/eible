@@ -77,6 +77,8 @@ private:
 
     bool isSheetAvailable(const QString& sheetName);
 
+    bool initializeColumnTypes(const QString& sheetName);
+
     std::optional<QStringList> sheetNames_{std::nullopt};
 
     const QString TABLE_TAG{QStringLiteral("table")};

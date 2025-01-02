@@ -33,18 +33,7 @@ std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
         it != columnTypes_.constEnd())
         return {true, *it};
 
-    if (!isSheetAvailable(sheetName))
-        return {false, {}};
-
-    QuaZipFile quaZipFile;
-    if (!initZipFile(quaZipFile, QStringLiteral("content.xml")))
-        return {false, {}};
-
-    if (QXmlStreamReader reader;
-        !moveToSecondRow(sheetName, quaZipFile, reader))
-        return {false, {}};
-
-    if (!analyzeSheet(sheetName))
+    if (!isSheetAvailable(sheetName) || !initializeColumnTypes(sheetName))
         return {false, {}};
 
     return {true, columnTypes_.value(sheetName)};
@@ -472,4 +461,17 @@ bool ImportOds::isSheetAvailable(const QString& sheetName)
         return false;
 
     return isSheetNameValid(*sheetNames_, sheetName);
+}
+
+bool ImportOds::initializeColumnTypes(const QString& sheetName)
+{
+    QuaZipFile quaZipFile;
+    if (!initZipFile(quaZipFile, QStringLiteral("content.xml")))
+        return false;
+
+    if (QXmlStreamReader reader;
+        !moveToSecondRow(sheetName, quaZipFile, reader))
+        return false;
+
+    return analyzeSheet(sheetName);
 }
