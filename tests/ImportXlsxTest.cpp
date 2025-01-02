@@ -192,31 +192,31 @@ void ImportXlsxTest::testGetData()
 void ImportXlsxTest::testGetDataLimitRows_data()
 {
     QTest::addColumn<QString>("sheetName");
-    QTest::addColumn<unsigned int>("rowLimit");
+    QTest::addColumn<int>("rowLimit");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
 
     QString sheetName{sheets_[0].first};
     QVector<QVector<QVariant>> sheetData{convertDataToUseSharedStrings(
         ImportCommon::getDataForSheet(sheetName))};
-    unsigned int rowLimit{10};
+    int rowLimit{10};
     QString testName{"Limited data to " + QString::number(rowLimit) + " in " +
                      sheetName};
     QTest::newRow(testName.toStdString().c_str())
         << sheetName << rowLimit << sheetData;
 
-    rowLimit = 2U;
+    rowLimit = 2;
     testName =
         "Limited data to " + QString::number(rowLimit) + " in " + sheetName;
     QTest::newRow(testName.toStdString().c_str())
         << sheetName << rowLimit << sheetData;
 
     sheetName = sheets_[5].first;
-    rowLimit = 12U;
+    rowLimit = 12;
     QVector<QVector<QVariant>> expectedValues;
-    expectedValues.reserve(static_cast<int>(rowLimit));
+    expectedValues.reserve(rowLimit);
     sheetData = ImportCommon::getDataForSheet(sheetName);
-    for (unsigned int i{0}; i < rowLimit; ++i)
-        expectedValues.append(sheetData[static_cast<int>(i)]);
+    for (int i{0}; i < rowLimit; ++i)
+        expectedValues.append(sheetData[i]);
     expectedValues = convertDataToUseSharedStrings(expectedValues);
     testName =
         "Limited data to " + QString::number(rowLimit) + " in " + sheetName;
@@ -234,7 +234,7 @@ void ImportXlsxTest::testGetDataLimitRows()
 void ImportXlsxTest::testGetDataExcludeColumns_data()
 {
     QTest::addColumn<QString>("sheetName");
-    QTest::addColumn<QVector<unsigned int>>("excludedColumns");
+    QTest::addColumn<QVector<int>>("excludedColumns");
     QTest::addColumn<QVector<QVector<QVariant>>>("expectedData");
 
     const QString sheetName{sheets_[0].first};
@@ -242,12 +242,12 @@ void ImportXlsxTest::testGetDataExcludeColumns_data()
     const QVector<QVector<QVariant>> sheetData{convertDataToUseSharedStrings(
         ImportCommon::getDataForSheet(sheetName))};
     QTest::newRow(qUtf8Printable(testName))
-        << sheetName << QVector<unsigned int>{1}
+        << sheetName << QVector<int>{1}
         << ImportCommon::getDataWithoutColumns(sheetData, {1});
 
     testName = "Get data with excluded column 0 and 2 in " + sheetName;
     QTest::newRow(qUtf8Printable(testName))
-        << sheetName << QVector<unsigned int>{0, 2}
+        << sheetName << QVector<int>{0, 2}
         << ImportCommon::getDataWithoutColumns(sheetData, {2, 0});
 }
 

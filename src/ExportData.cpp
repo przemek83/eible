@@ -15,7 +15,7 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 
     QByteArray content{generateHeaderContent(*model)};
     int skippedRows{0};
-    unsigned int lastEmittedPercent{0};
+    int lastEmittedPercent{0};
     const int rowCount{model->rowCount()};
     for (int row{0}; row < rowCount; ++row)
     {
@@ -25,8 +25,7 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
             continue;
         }
         content.append(generateRowContent(*model, row, skippedRows));
-        updateProgress(static_cast<unsigned int>(row),
-                       static_cast<unsigned int>(rowCount), lastEmittedPercent);
+        updateProgress(row, rowCount, lastEmittedPercent);
     }
     content.append(getContentEnding());
     return writeContent(content, ioDevice);
@@ -45,11 +44,11 @@ bool ExportData::rowShouldBeSkipped(const QAbstractItemView& view, int row)
 
 QByteArray ExportData::getContentEnding() { return {}; }
 
-void ExportData::updateProgress(unsigned int currentRow, unsigned int rowCount,
-                                unsigned int& lastEmittedPercent)
+void ExportData::updateProgress(int currentRow, int rowCount,
+                                int& lastEmittedPercent)
 {
-    const unsigned int currentPercent{
-        static_cast<unsigned int>((100. * (currentRow + 1)) / rowCount)};
+    const int currentPercent{
+        static_cast<int>((100. * (currentRow + 1)) / rowCount)};
     if (currentPercent > lastEmittedPercent)
     {
         Q_EMIT progressPercentChanged(currentPercent);

@@ -63,14 +63,14 @@ public:
      * @param sheetName Sheet name.
      * @return First value indicating success, second is column count.
      */
-    std::pair<bool, unsigned int> getColumnCount(const QString& sheetName);
+    std::pair<bool, int> getColumnCount(const QString& sheetName);
 
     /**
      * @brief Get number of rows in given sheet.
      * @param sheetName Sheet name.
      * @return First value indicating success, second is row count.
      */
-    std::pair<bool, unsigned int> getRowCount(const QString& sheetName);
+    std::pair<bool, int> getRowCount(const QString& sheetName);
 
     /**
      * @brief Get data from sheet.
@@ -79,7 +79,7 @@ public:
      * @return First value indicating success, second is vector of data rows.
      */
     std::pair<bool, QVector<QVector<QVariant>>> getData(
-        const QString& sheetName, const QVector<unsigned int>& excludedColumns);
+        const QString& sheetName, const QVector<int>& excludedColumns);
 
     /**
      * @brief Get limited data from sheet.
@@ -89,14 +89,14 @@ public:
      * @return First value indicating success, second is vector of data rows.
      */
     virtual std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
-        const QString& sheetName, const QVector<unsigned int>& excludedColumns,
-        unsigned int rowLimit) = 0;
+        const QString& sheetName, const QVector<int>& excludedColumns,
+        int rowLimit) = 0;
 
 protected:
     void setError(const QString& errorContent);
 
-    virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
-                                unsigned int& lastEmittedPercent);
+    virtual void updateProgress(int currentRow, int rowCount,
+                                int& lastEmittedPercent);
 
     bool openZip();
 
@@ -107,19 +107,19 @@ protected:
     bool initZipFile(QuaZipFile& quaZipFile, const QString& zipFileName);
 
     static QVector<QVariant> createTemplateDataRow(
-        const QVector<unsigned int>& excludedColumns,
+        const QVector<int>& excludedColumns,
         const QVector<ColumnType>& columnTypes);
 
-    static QMap<unsigned int, unsigned int> createActiveColumnMapping(
-        const QVector<unsigned int>& excludedColumns, unsigned int columnCount);
+    static QMap<int, int> createActiveColumnMapping(
+        const QVector<int>& excludedColumns, int columnCount);
 
-    bool columnsToExcludeAreValid(const QVector<unsigned int>& excludedColumns,
-                                  unsigned int columnCount);
+    bool columnsToExcludeAreValid(const QVector<int>& excludedColumns,
+                                  int columnCount);
 
     virtual std::pair<bool, QStringList> retrieveColumnNames(
         const QString& sheetName) = 0;
 
-    virtual std::tuple<bool, unsigned int, QVector<ColumnType>>
+    virtual std::tuple<bool, int, QVector<ColumnType>>
     retrieveRowCountAndColumnTypes(const QString& sheetName) = 0;
 
     bool analyzeSheet(const QString& sheetName);
@@ -127,12 +127,11 @@ protected:
     bool isSheetNameValid(const QStringList& sheetNames,
                           const QString& sheetName);
 
-    virtual std::pair<bool, unsigned int> getCount(
-        const QString& sheetName,
-        const QHash<QString, unsigned int>& countMap) = 0;
+    virtual std::pair<bool, int> getCount(
+        const QString& sheetName, const QHash<QString, int>& countMap) = 0;
 
-    QHash<QString, unsigned int> rowCounts_{};
-    QHash<QString, unsigned int> columnCounts_{};
+    QHash<QString, int> rowCounts_{};
+    QHash<QString, int> columnCounts_{};
     QHash<QString, QVector<ColumnType>> columnTypes_{};
     QHash<QString, QStringList> columnNames_{};
 
@@ -153,5 +152,5 @@ Q_SIGNALS:
      * Triggered on change of progress percentage.
      * @param progressPercent New progress percent.
      */
-    void progressPercentChanged(unsigned int progressPercent);
+    void progressPercentChanged(int progressPercent);
 };

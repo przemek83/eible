@@ -34,21 +34,20 @@ public:
         const QString& sheetName) override;
 
     std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
-        const QString& sheetName, const QVector<unsigned int>& excludedColumns,
-        unsigned int rowLimit) override;
+        const QString& sheetName, const QVector<int>& excludedColumns,
+        int rowLimit) override;
 
 private:
     std::pair<bool, QStringList> getSheetNamesFromZipFile();
 
-    std::pair<bool, unsigned int> getCount(
-        const QString& sheetName,
-        const QHash<QString, unsigned int>& countMap) override;
+    std::pair<bool, int> getCount(const QString& sheetName,
+                                  const QHash<QString, int>& countMap) override;
 
     std::pair<bool, QStringList> retrieveColumnNames(
         const QString& sheetName) override;
 
-    std::tuple<bool, unsigned int, QVector<ColumnType>>
-    retrieveRowCountAndColumnTypes(const QString& sheetName) override;
+    std::tuple<bool, int, QVector<ColumnType>> retrieveRowCountAndColumnTypes(
+        const QString& sheetName) override;
 
     bool moveToSecondRow(const QString& sheetName, QuaZipFile& quaZipFile,
                          QXmlStreamReader& reader) const;
@@ -57,8 +56,7 @@ private:
 
     bool isRecognizedColumnType(const QXmlStreamAttributes& attributes) const;
 
-    unsigned int getColumnRepeatCount(
-        const QXmlStreamAttributes& attributes) const;
+    int getColumnRepeatCount(const QXmlStreamAttributes& attributes) const;
 
     bool isRowStart(const QXmlStreamReader& reader) const;
     bool isRowEnd(const QXmlStreamReader& reader) const;

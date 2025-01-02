@@ -54,8 +54,8 @@ public:
     std::pair<bool, QList<int>> getAllStyles();
 
     std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
-        const QString& sheetName, const QVector<unsigned int>& excludedColumns,
-        unsigned int rowLimit) override;
+        const QString& sheetName, const QVector<int>& excludedColumns,
+        int rowLimit) override;
 
 private:
     std::tuple<bool, std::optional<QList<int>>, std::optional<QList<int>>>
@@ -66,9 +66,8 @@ private:
     bool moveToSecondRow(QuaZipFile& quaZipFile,
                          QXmlStreamReader& reader) const;
 
-    std::pair<bool, unsigned int> getCount(
-        const QString& sheetName,
-        const QHash<QString, unsigned int>& countMap) override;
+    std::pair<bool, int> getCount(const QString& sheetName,
+                                  const QHash<QString, int>& countMap) override;
 
     std::pair<bool, QMap<QString, QString>> getSheetIdToUserFriendlyNameMap();
 
@@ -87,8 +86,8 @@ private:
     std::pair<bool, QStringList> retrieveColumnNames(
         const QString& sheetName) override;
 
-    std::tuple<bool, unsigned int, QVector<ColumnType>>
-    retrieveRowCountAndColumnTypes(const QString& sheetName) override;
+    std::tuple<bool, int, QVector<ColumnType>> retrieveRowCountAndColumnTypes(
+        const QString& sheetName) override;
 
     static QList<int> retrieveDateStyles(const QDomNodeList& sheetNodes);
     static QList<int> retrieveAllStyles(const QDomNodeList& sheetNodes);

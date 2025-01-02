@@ -40,8 +40,8 @@ protected:
 
     virtual QByteArray getContentEnding();
 
-    virtual void updateProgress(unsigned int currentRow, unsigned int rowCount,
-                                unsigned int& lastEmittedPercent);
+    virtual void updateProgress(int currentRow, int rowCount,
+                                int& lastEmittedPercent);
 
 private:
     static bool rowShouldBeSkipped(const QAbstractItemView& view, int row);
@@ -51,5 +51,5 @@ Q_SIGNALS:
      * Triggered on change of progress percentage.
      * @param currentPercent New progress percent.
      */
-    void progressPercentChanged(unsigned int currentPercent);
+    void progressPercentChanged(int currentPercent);
 };

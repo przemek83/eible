@@ -222,8 +222,8 @@ bool ImportXlsx::moveToSecondRow(QuaZipFile& quaZipFile,
     return true;
 }
 
-std::pair<bool, unsigned int> ImportXlsx::getCount(
-    const QString& sheetName, const QHash<QString, unsigned int>& countMap)
+std::pair<bool, int> ImportXlsx::getCount(const QString& sheetName,
+                                          const QHash<QString, int>& countMap)
 {
     if (const auto it{countMap.find(sheetName)}; it != countMap.end())
         return {true, it.value()};
@@ -326,7 +326,7 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
     return {true, columnNames};
 }
 
-std::tuple<bool, unsigned int, QVector<ColumnType>>
+std::tuple<bool, int, QVector<ColumnType>>
 ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
 {
     auto [sheetFound, sheetPath] = getSheetPath(sheetName);
@@ -581,14 +581,13 @@ bool ImportXlsx::isCommonDataOk()
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
-    const QString& sheetName, const QVector<unsigned int>& excludedColumns,
-    unsigned int rowLimit)
+    const QString& sheetName, const QVector<int>& excludedColumns, int rowLimit)
 {
     const auto [success, columnTypes]{getColumnTypes(sheetName)};
     if (!success)
         return {false, {}};
 
-    const unsigned int columnCount{columnCounts_.value(sheetName)};
+    const int columnCount{columnCounts_.value(sheetName)};
     if (!columnsToExcludeAreValid(excludedColumns, columnCount))
         return {false, {}};
 
@@ -606,18 +605,18 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
     const QVector<QVariant> templateDataRow(
         createTemplateDataRow(excludedColumns, columnTypes));
 
-    QMap<unsigned int, unsigned int> activeColumnsMapping{
+    QMap<int, int> activeColumnsMapping{
         createActiveColumnMapping(excludedColumns, columnCount)};
 
     QVector<QVector<QVariant>> dataContainer(
-        static_cast<int>(std::min(getRowCount(sheetName).second, rowLimit)));
+        std::min(getRowCount(sheetName).second, rowLimit));
 
     QVector<QVariant> currentDataRow(templateDataRow);
     int column{NOT_SET_COLUMN};
     QString currentColType{S_TAG};
     QString actualSTagValue;
-    unsigned int rowCounter{0};
-    unsigned int lastEmittedPercent{0};
+    int rowCounter{0};
+    int lastEmittedPercent{0};
     int rowCountDigitsInXlsx{0};
     while ((!reader.atEnd()) && (reader.name() != SHEET_DATA_TAG) &&
            (rowCounter <= rowLimit))
@@ -645,14 +644,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         }
 
         if ((!reader.atEnd()) && isVTagStart(reader) &&
-            (!excludedColumns.contains(static_cast<unsigned int>(column))))
+            (!excludedColumns.contains(column)))
         {
             const ColumnType format{columnTypes.at(column)};
-            const unsigned int mappedColumnIndex{
-                activeColumnsMapping[static_cast<unsigned int>(column)]};
-            currentDataRow[static_cast<int>(mappedColumnIndex)] =
-                getCurrentValue(reader, format, currentColType,
-                                actualSTagValue);
+            const int mappedColumnIndex{activeColumnsMapping[column]};
+            currentDataRow[mappedColumnIndex] = getCurrentValue(
+                reader, format, currentColType, actualSTagValue);
         }
         reader.readNextStartElement();
     }

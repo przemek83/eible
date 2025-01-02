@@ -22,20 +22,18 @@ void ImportSpreadsheet::setNameForEmptyColumn(const QString& name)
     emptyColName_ = name;
 }
 
-std::pair<bool, unsigned int> ImportSpreadsheet::getColumnCount(
-    const QString& sheetName)
+std::pair<bool, int> ImportSpreadsheet::getColumnCount(const QString& sheetName)
 {
     return getCount(sheetName, columnCounts_);
 }
 
-std::pair<bool, unsigned int> ImportSpreadsheet::getRowCount(
-    const QString& sheetName)
+std::pair<bool, int> ImportSpreadsheet::getRowCount(const QString& sheetName)
 {
     return getCount(sheetName, rowCounts_);
 }
 
 std::pair<bool, QVector<QVector<QVariant> > > ImportSpreadsheet::getData(
-    const QString& sheetName, const QVector<unsigned int>& excludedColumns)
+    const QString& sheetName, const QVector<int>& excludedColumns)
 {
     auto [success, rowCount]{getRowCount(sheetName)};
     if (!success)
@@ -48,12 +46,11 @@ void ImportSpreadsheet::setError(const QString& errorContent)
     lastError_ = errorContent;
 }
 
-void ImportSpreadsheet::updateProgress(unsigned int currentRow,
-                                       unsigned int rowCount,
-                                       unsigned int& lastEmittedPercent)
+void ImportSpreadsheet::updateProgress(int currentRow, int rowCount,
+                                       int& lastEmittedPercent)
 {
-    const unsigned int currentPercent{
-        static_cast<unsigned int>((100. * (currentRow + 1)) / rowCount)};
+    const int currentPercent{
+        static_cast<int>((100. * (currentRow + 1)) / rowCount)};
     if (currentPercent > lastEmittedPercent)
     {
         Q_EMIT progressPercentChanged(currentPercent);
@@ -100,12 +97,12 @@ bool ImportSpreadsheet::initZipFile(QuaZipFile& quaZipFile,
            openZipFile(quaZipFile);
 }
 
-QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
-    const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
+QMap<int, int> ImportSpreadsheet::createActiveColumnMapping(
+    const QVector<int>& excludedColumns, int columnCount)
 {
-    QMap<unsigned int, unsigned int> activeColumnsMapping;
-    unsigned int columnToFill{0};
-    for (unsigned int i{0}; i < columnCount; ++i)
+    QMap<int, int> activeColumnsMapping;
+    int columnToFill{0};
+    for (int i{0}; i < columnCount; ++i)
     {
         if (!excludedColumns.contains(i))
         {
@@ -117,8 +114,7 @@ QMap<unsigned int, unsigned int> ImportSpreadsheet::createActiveColumnMapping(
 }
 
 QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
-    const QVector<unsigned int>& excludedColumns,
-    const QVector<ColumnType>& columnTypes)
+    const QVector<int>& excludedColumns, const QVector<ColumnType>& columnTypes)
 {
     QVector<QVariant> templateDataRow;
     int columnToFill{0};
@@ -138,12 +134,11 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
 }
 
 bool ImportSpreadsheet::columnsToExcludeAreValid(
-    const QVector<unsigned int>& excludedColumns, unsigned int columnCount)
+    const QVector<int>& excludedColumns, int columnCount)
 {
-    if (const auto it{std::find_if(excludedColumns.begin(),
-                                   excludedColumns.end(),
-                                   [count = columnCount](unsigned int column)
-                                   { return column >= count; })};
+    if (const auto it{std::find_if(
+            excludedColumns.begin(), excludedColumns.end(),
+            [count = columnCount](int column) { return column >= count; })};
         it != excludedColumns.end())
     {
         setError("Column to exclude " + QString::number(*it) +
@@ -165,17 +160,15 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
     if (!success)
         return false;
 
-    const unsigned int actualColumnCount{static_cast<unsigned int>(
-        std::max(columnNames.size(), columnTypes.size()))};
-    columnNames.reserve(static_cast<int>(actualColumnCount));
-    columnTypes.reserve(static_cast<int>(actualColumnCount));
+    const int actualColumnCount{
+        static_cast<int>(std::max(columnNames.size(), columnTypes.size()))};
+    columnNames.reserve(actualColumnCount);
+    columnTypes.reserve(actualColumnCount);
 
-    for (auto i{static_cast<unsigned int>(columnNames.size())};
-         i < actualColumnCount; ++i)
+    for (auto i{columnNames.size()}; i < actualColumnCount; ++i)
         columnNames << emptyColName_;
 
-    for (auto i{static_cast<unsigned int>(columnTypes.size())};
-         i < actualColumnCount; ++i)
+    for (auto i{columnTypes.size()}; i < actualColumnCount; ++i)
         columnTypes.append(ColumnType::STRING);
 
     rowCounts_[sheetName] = rowCount;
