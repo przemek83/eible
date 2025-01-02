@@ -120,8 +120,8 @@ QVector<QVariant> ImportSpreadsheet::createTemplateDataRow(
     int columnToFill{0};
     templateDataRow.resize(columnTypes.size() - excludedColumns.size());
 
-    const int columnCount{static_cast<int>(columnTypes.size())};
-    for (int i{0}; i < columnCount; ++i)
+    const qsizetype columnCount{columnTypes.size()};
+    for (qsizetype i{0}; i < columnCount; ++i)
     {
         if (!excludedColumns.contains(i))
         {
@@ -160,19 +160,19 @@ bool ImportSpreadsheet::analyzeSheet(const QString& sheetName)
     if (!success)
         return false;
 
-    const int actualColumnCount{
-        static_cast<int>(std::max(columnNames.size(), columnTypes.size()))};
+    const qsizetype actualColumnCount{
+        std::max(columnNames.size(), columnTypes.size())};
     columnNames.reserve(actualColumnCount);
     columnTypes.reserve(actualColumnCount);
 
-    for (auto i{columnNames.size()}; i < actualColumnCount; ++i)
+    for (qsizetype i{columnNames.size()}; i < actualColumnCount; ++i)
         columnNames << emptyColName_;
 
-    for (auto i{columnTypes.size()}; i < actualColumnCount; ++i)
+    for (qsizetype i{columnTypes.size()}; i < actualColumnCount; ++i)
         columnTypes.append(ColumnType::STRING);
 
     rowCounts_[sheetName] = rowCount;
-    columnCounts_[sheetName] = actualColumnCount;
+    columnCounts_[sheetName] = static_cast<int>(actualColumnCount);
     columnTypes_[sheetName] = columnTypes;
     columnNames_[sheetName] = columnNames;
 

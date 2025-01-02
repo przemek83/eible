@@ -77,7 +77,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         createActiveColumnMapping(excludedColumns, columnCount)};
 
     QVector<QVector<QVariant>> dataContainer(
-        static_cast<int>(std::min(getRowCount(sheetName).second, rowLimit)));
+        std::min(getRowCount(sheetName).second, rowLimit));
 
     QVector<QVariant> currentDataRow(templateDataRow);
 
@@ -94,7 +94,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
             column = NOT_SET_COLUMN;
             if (!rowEmpty)
             {
-                dataContainer[static_cast<int>(rowCounter)] = currentDataRow;
+                dataContainer[rowCounter] = currentDataRow;
                 currentDataRow = templateDataRow;
                 ++rowCounter;
                 updateProgress(rowCounter, rowLimit, lastEmittedPercent);
@@ -264,8 +264,8 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
             if (isRecognizedColumnType(attributes))
             {
                 rowEmpty = false;
-                for (int i{static_cast<int>(columnTypes.size())};
-                     i < (column + repeats); ++i)
+                for (qsizetype i{columnTypes.size()}; i < (column + repeats);
+                     ++i)
                     columnTypes.push_back(ColumnType::UNKNOWN);
 
                 for (int i{0}; i < repeats; ++i)
