@@ -16,14 +16,14 @@ ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 std::pair<bool, QStringList> ImportOds::getSheetNames()
 {
     if (sheetNames_)
-        return {true, *sheetNames_};
+        return {true, sheetNames_.value()};
 
     auto [success, sheetNames]{getSheetNamesFromZipFile()};
     if (!success)
         return {false, {}};
 
     sheetNames_ = std::move(sheetNames);
-    return {true, *sheetNames_};
+    return {true, sheetNames_.value()};
 }
 
 std::pair<bool, QVector<ColumnType>> ImportOds::getColumnTypes(
