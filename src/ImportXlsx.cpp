@@ -24,13 +24,7 @@ ImportXlsx::ImportXlsx(QIODevice& ioDevice)
 std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 {
     if (sheets_)
-    {
-        QStringList sheets;
-        sheets.reserve(sheets_->size());
-        for (const auto& [sheetName, sheetPath] : *sheets_)
-            sheets << sheetName;
-        return {true, sheets};
-    }
+        return {true, createSheetNames()};
 
     auto [success,
           sheetIdToUserFriendlyNameMap]{getSheetIdToUserFriendlyNameMap()};
@@ -41,11 +35,7 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
     if (!success)
         return {false, {}};
 
-    QStringList sheetsToReturn;
-    sheetsToReturn.reserve(sheets_->size());
-    for (const auto& [sheetName, sheetPath] : *sheets_)
-        sheetsToReturn << sheetName;
-    return {true, sheetsToReturn};
+    return {true, createSheetNames()};
 }
 
 std::pair<bool, QStringList> ImportXlsx::getColumnNames(
@@ -144,10 +134,7 @@ std::pair<bool, QString> ImportXlsx::getSheetPath(const QString& sheetName)
         if (currentSheetName == sheetName)
             return {true, sheetPath};
 
-    QStringList sheetNames;
-    sheetNames.reserve(sheets_->size());
-    for (const auto& [currenSheetName, sheetPath] : *sheets_)
-        sheetNames << currenSheetName;
+    QStringList sheetNames{createSheetNames()};
     setError("Can not find sheet path for sheet name " + sheetName +
              ". Available sheet names:" + sheetNames.join(','));
     return {false, {}};
@@ -651,4 +638,13 @@ std::pair<bool, QList<int>> ImportXlsx::getDateStyles()
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
     return {success, *dateStyles_};
+}
+
+QStringList ImportXlsx::createSheetNames() const
+{
+    QStringList sheetNames;
+    sheetNames.reserve(sheets_->size());
+    for (const auto& [sheetName, sheetPath] : *sheets_)
+        sheetNames << sheetName;
+    return sheetNames;
 }

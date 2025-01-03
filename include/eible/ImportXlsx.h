@@ -118,6 +118,8 @@ private:
 
     bool isCommonDataOk();
 
+    QStringList createSheetNames() const;
+
     std::optional<QVector<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
