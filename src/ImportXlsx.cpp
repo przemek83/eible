@@ -23,17 +23,18 @@ ImportXlsx::ImportXlsx(QIODevice& ioDevice)
 
 std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 {
-    if (sheets_)
-        return {true, createSheetNames()};
+    if (!sheets_)
+    {
+        auto [success,
+              sheetIdToUserFriendlyNameMap]{getSheetIdToUserFriendlyNameMap()};
+        if (!success)
+            return {false, {}};
 
-    auto [success,
-          sheetIdToUserFriendlyNameMap]{getSheetIdToUserFriendlyNameMap()};
-    if (!success)
-        return {false, {}};
-
-    std::tie(success, sheets_) = retrieveSheets(sheetIdToUserFriendlyNameMap);
-    if (!success)
-        return {false, {}};
+        std::tie(success, sheets_) =
+            retrieveSheets(sheetIdToUserFriendlyNameMap);
+        if (!success)
+            return {false, {}};
+    }
 
     return {true, createSheetNames()};
 }
