@@ -219,9 +219,9 @@ std::pair<bool, int> ImportXlsx::getCount(const QString& sheetName,
     return {false, {}};
 }
 
+template <typename NodesRetriever>
 std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
-    QuaZipFile& quaZipFile,
-    const std::function<QDomNodeList(const QDomElement&)>& nodesRetriever)
+    QuaZipFile& quaZipFile, const NodesRetriever& nodesRetriever)
 {
     QDomDocument xmlDocument;
     if (!xmlDocument.setContent(quaZipFile.readAll()))

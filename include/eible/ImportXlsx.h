@@ -74,9 +74,9 @@ private:
     std::pair<bool, QVector<std::pair<QString, QString>>> retrieveSheets(
         const QMap<QString, QString>& sheetIdToUserFriendlyNameMap);
 
+    template <typename NodesRetriever>
     std::pair<bool, QDomNodeList> getSheetNodes(
-        QuaZipFile& quaZipFile,
-        const std::function<QDomNodeList(const QDomElement&)>& nodesRetriever);
+        QuaZipFile& quaZipFile, const NodesRetriever& nodesRetriever);
 
     bool isRowStart(const QXmlStreamReader& reader) const;
     bool isCellStart(const QXmlStreamReader& reader) const;
