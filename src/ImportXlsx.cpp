@@ -337,12 +337,7 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
         {
             column = getCurrentColumnNumber(reader, rowCountDigitsInXlsx);
             maxColumnIndex = std::max(maxColumnIndex, column);
-            if (column >= columnTypes.size())
-            {
-                for (qsizetype i{columnTypes.size()}; i <= column; ++i)
-                    columnTypes.push_back(ColumnType::UNKNOWN);
-            }
-
+            adjustColumnTypeSize(columnTypes, column);
             columnTypes[column] =
                 recognizeColumnType(columnTypes.at(column), reader);
         }
@@ -648,4 +643,14 @@ QStringList ImportXlsx::createSheetNames() const
     for (const auto& [sheetName, sheetPath] : *sheets_)
         sheetNames << sheetName;
     return sheetNames;
+}
+
+void ImportXlsx::adjustColumnTypeSize(QVector<ColumnType>& columnTypes,
+                                      int& column) const
+{
+    if (column >= columnTypes.size())
+    {
+        for (qsizetype i{columnTypes.size()}; i <= column; ++i)
+            columnTypes.push_back(ColumnType::UNKNOWN);
+    }
 }

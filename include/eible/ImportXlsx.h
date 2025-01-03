@@ -120,6 +120,9 @@ private:
 
     QStringList createSheetNames() const;
 
+    void adjustColumnTypeSize(QVector<ColumnType>& columnTypes,
+                              int& column) const;
+
     std::optional<QVector<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};
     std::optional<QList<int>> dateStyles_{std::nullopt};
