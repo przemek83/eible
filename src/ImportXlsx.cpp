@@ -487,6 +487,7 @@ std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
 {
     if (allStyles_)
         return {true, *allStyles_};
+
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
     return {success, *allStyles_};
@@ -651,6 +652,7 @@ std::pair<bool, QList<int>> ImportXlsx::getDateStyles()
 {
     if (dateStyles_)
         return {true, *dateStyles_};
+
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
     return {success, *dateStyles_};
