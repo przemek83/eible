@@ -13,7 +13,9 @@
 #include <eible/ImportOds.h>
 #include <eible/ImportXlsx.h>
 
-static void initTable(QTableWidget& tableWidget)
+namespace
+{
+void initTable(QTableWidget& tableWidget)
 {
     const int columnCount{3};
     const int rowCount{3};
@@ -46,7 +48,7 @@ static void initTable(QTableWidget& tableWidget)
         }
 }
 
-static bool exportXlsx(const QTableWidget& tableWidget)
+bool exportXlsx(const QTableWidget& tableWidget)
 {
     const QString file{QCoreApplication::applicationDirPath() +
                        "/ExportedFile.xlsx"};
@@ -68,7 +70,7 @@ static bool exportXlsx(const QTableWidget& tableWidget)
     return success;
 }
 
-static bool exportCsv(const QTableWidget& tableWidget)
+bool exportCsv(const QTableWidget& tableWidget)
 {
     const QString file{QCoreApplication::applicationDirPath() +
                        "/ExportedFile.csv"};
@@ -90,7 +92,7 @@ static bool exportCsv(const QTableWidget& tableWidget)
     return success;
 }
 
-static bool exportFiles()
+bool exportFiles()
 {
     QTableWidget tableWidget;
     initTable(tableWidget);
@@ -99,8 +101,8 @@ static bool exportFiles()
     return success;
 }
 
-static void printSpreadsheetContent(const QStringList& columnNames,
-                                    const QVector<QVector<QVariant>>& data)
+void printSpreadsheetContent(const QStringList& columnNames,
+                             const QVector<QVector<QVariant>>& data)
 {
     std::cout << columnNames.join('\t').toStdString() << std::endl;
     for (const auto& row : data)
@@ -111,7 +113,7 @@ static void printSpreadsheetContent(const QStringList& columnNames,
     }
 }
 
-static bool importFile(ImportSpreadsheet& importer, const QString& fileName)
+bool importFile(ImportSpreadsheet& importer, const QString& fileName)
 {
     const QString sheetName(QStringLiteral("Sheet1"));
     auto [sucess, columnNames] = importer.getColumnNames(sheetName);
@@ -128,7 +130,7 @@ static bool importFile(ImportSpreadsheet& importer, const QString& fileName)
     return true;
 }
 
-static bool importFiles()
+bool importFiles()
 {
     QFile odsFile(QStringLiteral(":/example.ods"));
     ImportOds importOds(odsFile);
@@ -147,7 +149,8 @@ static bool importFiles()
     return true;
 }
 
-static bool performOperations() { return importFiles() && exportFiles(); }
+bool performOperations() { return importFiles() && exportFiles(); }
+}  // namespace
 
 int main(int argc, char* argv[])
 {
