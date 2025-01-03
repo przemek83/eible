@@ -646,7 +646,7 @@ QStringList ImportXlsx::createSheetNames() const
 }
 
 void ImportXlsx::adjustColumnTypeSize(QVector<ColumnType>& columnTypes,
-                                      int& column) const
+                                      int column) const
 {
     if (column >= columnTypes.size())
     {
