@@ -38,7 +38,7 @@ bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
             return false;
 
         // Modify sheet1 by inserting data from view, copy rest of files.
-        if (file.endsWith(QLatin1String("sheet1.xml")))
+        if (file.endsWith(QString::fromLatin1("sheet1.xml")))
         {
             // Replace empty tag by gathered data.
             QByteArray contentFile{inZipFile.readAll()};

@@ -408,7 +408,7 @@ QVariant ImportOds::retrieveValueFromStringColumn(
 {
     const QString xmlColTypeValue{
         reader.attributes().value(OFFICE_VALUE_TYPE_TAG).toString()};
-    const QString emptyString(QLatin1String(""));
+    const QString emptyString(QString::fromLatin1(""));
     const QString currentDateValue{
         reader.attributes().value(OFFICE_DATE_VALUE_TAG).toString()};
 

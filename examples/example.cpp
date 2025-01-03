@@ -155,7 +155,7 @@ bool performOperations() { return importFiles() && exportFiles(); }
 int main(int argc, char* argv[])
 {
     const QApplication a(argc, argv);
-    QTimer::singleShot(0,
+    QTimer::singleShot(0, &a,
                        []() {
                            QApplication::exit(performOperations()
                                                   ? EXIT_SUCCESS
