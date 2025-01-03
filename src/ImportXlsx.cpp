@@ -214,7 +214,8 @@ bool ImportXlsx::moveToSecondRow(QuaZipFile& quaZipFile,
         if (isRowStart(reader))
         {
             if (secondRow)
-                break;
+                return true;
+
             secondRow = true;
         }
         reader.readNextStartElement();
