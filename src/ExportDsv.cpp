@@ -60,15 +60,15 @@ QByteArray ExportDsv::convertToByteArray(const QVariant& variant,
                                          char separator) const
 {
     // Following https://tools.ietf.org/html/rfc4180
-    if (QByteArray value{variant.toByteArray()}; value.contains(separator) ||
-                                                 value.contains('\"') ||
-                                                 value.contains('\n'))
+    QByteArray value{variant.toByteArray()};
+    if (value.contains(separator) || value.contains('\"') ||
+        value.contains('\n'))
     {
         value.replace('"', QByteArrayLiteral("\"\""));
         return "\"" + value + "\"";
     }
-    else
-        return value;
+
+    return value;
 }
 
 void ExportDsv::variantToString(const QVariant& variant, QByteArray& array,
@@ -96,7 +96,7 @@ void ExportDsv::variantToString(const QVariant& variant, QByteArray& array,
 
         case QMetaType::QString:
         {
-            QByteArray byteArray{convertToByteArray(variant, separator)};
+            const QByteArray byteArray{convertToByteArray(variant, separator)};
             array.append(byteArray);
             break;
         }

@@ -420,11 +420,11 @@ QVariant ImportOds::retrieveValueFromStringColumn(
         reader.readNext();
 
     if (xmlColTypeValue == DATE_TAG)
-        return QVariant(currentDateValue);
+        return {currentDateValue};
 
     const QStringView stringView{reader.text()};
     if (stringView.isNull())
-        return QVariant(emptyString);
+        return {emptyString};
 
     return stringView.toString();
 }
@@ -437,7 +437,7 @@ QVariant ImportOds::retrieveValueFromField(QXmlStreamReader& reader,
         return retrieveValueFromStringColumn(reader);
 
     if (columnType == ColumnType::NUMBER)
-        return QVariant(reader.attributes().value(OFFICE_VALUE_TAG).toDouble());
+        return {reader.attributes().value(OFFICE_VALUE_TAG).toDouble()};
 
     QString dateValue{
         reader.attributes().value(OFFICE_DATE_VALUE_TAG).toString()};

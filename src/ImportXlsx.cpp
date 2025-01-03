@@ -135,7 +135,7 @@ std::pair<bool, QString> ImportXlsx::getSheetPath(const QString& sheetName)
         if (currentSheetName == sheetName)
             return {true, sheetPath};
 
-    QStringList sheetNames{createSheetNames()};
+    const QStringList sheetNames{createSheetNames()};
     setError("Can not find sheet path for sheet name " + sheetName +
              ". Available sheet names:" + sheetNames.join(','));
     return {false, {}};
