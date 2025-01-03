@@ -230,6 +230,21 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
     return {true, columnNames};
 }
 
+void ImportOds::updateColumnTypes(QVector<ColumnType>& columnTypes, int column,
+                                  const QString& xmlColTypeValue,
+                                  int repeats) const
+{
+    for (qsizetype i{columnTypes.size()}; i < (column + repeats); ++i)
+        columnTypes.push_back(ColumnType::UNKNOWN);
+
+    for (int i{0}; i < repeats; ++i)
+    {
+        const int currentColumn{column + i};
+        columnTypes[currentColumn] =
+            recognizeColumnType(columnTypes.at(currentColumn), xmlColTypeValue);
+    }
+}
+
 std::tuple<bool, int, QVector<ColumnType>>
 ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
 {
@@ -260,16 +275,8 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
             if (isRecognizedColumnType(attributes))
             {
                 rowEmpty = false;
-                for (qsizetype i{columnTypes.size()}; i < (column + repeats);
-                     ++i)
-                    columnTypes.push_back(ColumnType::UNKNOWN);
-
-                for (int i{0}; i < repeats; ++i)
-                {
-                    const int currentColumn{column + i};
-                    columnTypes[currentColumn] = recognizeColumnType(
-                        columnTypes.at(currentColumn), xmlColTypeValue);
-                }
+                updateColumnTypes(columnTypes, column, xmlColTypeValue,
+                                  repeats);
             }
             column += repeats - 1;
         }

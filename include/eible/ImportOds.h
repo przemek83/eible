@@ -46,6 +46,9 @@ private:
     std::pair<bool, QStringList> retrieveColumnNames(
         const QString& sheetName) override;
 
+    void updateColumnTypes(QVector<ColumnType>& columnTypes, int column,
+                           const QString& xmlColTypeValue, int repeats) const;
+
     std::tuple<bool, int, QVector<ColumnType>> retrieveRowCountAndColumnTypes(
         const QString& sheetName) override;
 
