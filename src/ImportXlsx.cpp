@@ -222,18 +222,14 @@ std::pair<bool, int> ImportXlsx::getCount(const QString& sheetName,
                                           const QHash<QString, int>& countMap)
 {
     if (const auto it{countMap.find(sheetName)}; it != countMap.end())
-        return {true, it.value()};
+        return {true, *it};
 
-    if (!isCommonDataOk())
-        return {false, {}};
+    if (isCommonDataOk() &&
+        isSheetNameValid(getSheetNames().second, sheetName) &&
+        analyzeSheet(sheetName))
+        return {true, countMap.find(sheetName).value()};
 
-    if (!isSheetNameValid(getSheetNames().second, sheetName))
-        return {false, {}};
-
-    if (!analyzeSheet(sheetName))
-        return {false, 0};
-
-    return {true, countMap.find(sheetName).value()};
+    return {false, {}};
 }
 
 std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
