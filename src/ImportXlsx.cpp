@@ -199,7 +199,7 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
     return {false, {}};
 }
 
-bool ImportXlsx::moveToSecondRow(QuaZipFile& quaZipFile,
+void ImportXlsx::moveToSecondRow(QuaZipFile& quaZipFile,
                                  QXmlStreamReader& reader) const
 {
     reader.setDevice(&quaZipFile);
@@ -209,13 +209,12 @@ bool ImportXlsx::moveToSecondRow(QuaZipFile& quaZipFile,
         if (isRowStart(reader))
         {
             if (secondRow)
-                return true;
+                return;
 
             secondRow = true;
         }
         reader.readNextStartElement();
     }
-    return true;
 }
 
 std::pair<bool, int> ImportXlsx::getCount(const QString& sheetName,
@@ -330,8 +329,7 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
         return {false, {}, {}};
 
     QXmlStreamReader reader;
-    if (!moveToSecondRow(quaZipFile, reader))
-        return {false, {}, {}};
+    moveToSecondRow(quaZipFile, reader);
 
     QVector<ColumnType> columnTypes;
     int column{NOT_SET_COLUMN};

@@ -63,7 +63,7 @@ private:
 
     std::pair<bool, QString> getSheetPath(const QString& sheetName);
 
-    bool moveToSecondRow(QuaZipFile& quaZipFile,
+    void moveToSecondRow(QuaZipFile& quaZipFile,
                          QXmlStreamReader& reader) const;
 
     std::pair<bool, int> getCount(const QString& sheetName,

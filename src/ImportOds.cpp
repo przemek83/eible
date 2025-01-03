@@ -67,8 +67,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
         return {false, {}};
 
     QXmlStreamReader reader;
-    if (!moveToSecondRow(sheetName, quaZipFile, reader))
-        return {false, {}};
+    moveToSecondRow(sheetName, quaZipFile, reader);
 
     const QVector<QVariant> templateDataRow(
         createTemplateDataRow(excludedColumns, columnTypes));
@@ -239,8 +238,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
         return {false, {}, {}};
 
     QXmlStreamReader reader;
-    if (!moveToSecondRow(sheetName, quaZipFile, reader))
-        return {false, {}, {}};
+    moveToSecondRow(sheetName, quaZipFile, reader);
 
     QVector<ColumnType> columnTypes;
     int column{NOT_SET_COLUMN};
@@ -291,7 +289,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
     return {true, rowCounter, columnTypes};
 }
 
-bool ImportOds::moveToSecondRow(const QString& sheetName,
+void ImportOds::moveToSecondRow(const QString& sheetName,
                                 QuaZipFile& quaZipFile,
                                 QXmlStreamReader& reader) const
 {
@@ -306,13 +304,12 @@ bool ImportOds::moveToSecondRow(const QString& sheetName,
         if (isRowStart(reader))
         {
             if (secondRow)
-                return true;
+                return;
 
             secondRow = true;
         }
         reader.readNext();
     }
-    return true;
 }
 
 void ImportOds::skipToSheet(QXmlStreamReader& reader,
@@ -462,9 +459,8 @@ bool ImportOds::initializeColumnTypes(const QString& sheetName)
     if (!initZipFile(quaZipFile, QStringLiteral("content.xml")))
         return false;
 
-    if (QXmlStreamReader reader;
-        !moveToSecondRow(sheetName, quaZipFile, reader))
-        return false;
+    QXmlStreamReader reader;
+    moveToSecondRow(sheetName, quaZipFile, reader);
 
     return analyzeSheet(sheetName);
 }
