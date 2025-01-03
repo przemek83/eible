@@ -340,8 +340,9 @@ bool ImportOds::isRecognizedColumnType(
 int ImportOds::getColumnRepeatCount(
     const QXmlStreamAttributes& attributes) const
 {
-    return std::max(1,
-                    attributes.value(COLUMNS_REPEATED_TAG).toString().toInt());
+    const int repeats{
+        attributes.value(COLUMNS_REPEATED_TAG).toString().toInt()};
+    return std::max(1, repeats);
 }
 
 bool ImportOds::isRowStart(const QXmlStreamReader& reader) const
