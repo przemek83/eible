@@ -51,8 +51,8 @@ protected:
                                   int skippedRowsCount) override;
 
 private:
-    QByteArray convertToByteArray(const QVariant& variant,
-                                  char separator) const;
+    static QByteArray convertToByteArray(const QVariant& variant,
+                                         char separator);
 
     void variantToString(const QVariant& variant, QByteArray& array,
                          char separator) const;

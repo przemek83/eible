@@ -119,8 +119,8 @@ private:
 
     QStringList createSheetNames() const;
 
-    void adjustColumnTypeSize(QVector<ColumnType>& columnTypes,
-                              int column) const;
+    static void adjustColumnTypeSize(QVector<ColumnType>& columnTypes,
+                                     int column);
 
     std::optional<QVector<std::pair<QString, QString>>> sheets_{std::nullopt};
     std::optional<QStringList> sharedStrings_{std::nullopt};

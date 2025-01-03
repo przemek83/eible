@@ -57,7 +57,7 @@ bool ExportDsv::writeContent(const QByteArray& content, QIODevice& ioDevice)
 }
 
 QByteArray ExportDsv::convertToByteArray(const QVariant& variant,
-                                         char separator) const
+                                         char separator)
 {
     // Following https://tools.ietf.org/html/rfc4180
     QByteArray value{variant.toByteArray()};
