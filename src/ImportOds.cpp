@@ -181,16 +181,13 @@ std::pair<bool, QStringList> ImportOds::getSheetNamesFromZipFile()
 std::pair<bool, int> ImportOds::getCount(const QString& sheetName,
                                          const QHash<QString, int>& countMap)
 {
-    if (!isSheetAvailable(sheetName))
-        return {false, {}};
+    if (const auto it{countMap.constFind(sheetName)}; it != countMap.constEnd())
+        return {true, *it};
 
-    if (const auto it{countMap.find(sheetName)}; it != countMap.end())
-        return {true, it.value()};
+    if (isSheetAvailable(sheetName) && analyzeSheet(sheetName))
+        return {true, countMap.value(sheetName)};
 
-    if (!analyzeSheet(sheetName))
-        return {false, 0};
-
-    return {true, countMap.find(sheetName).value()};
+    return {false, {}};
 }
 
 std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
