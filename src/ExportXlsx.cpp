@@ -106,22 +106,23 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
     for (int column{0}; column < columnCount; ++column)
     {
         const QVariant& cell{model.index(row, column).data()};
-        if (cell.isNull())
-            continue;
-
-        rowContent.append(CELL_START);
-        rowContent.append(columnNames_[column]);
-        rowContent.append(rowNumber);
-        rowContent.append(ROW_NUMBER_CLOSE);
-        rowContent.append(getCellTypeTag(cell));
-        rowContent.append(VALUE_START);
-        if ((cell.typeId() == QMetaType::QDate) ||
-            (cell.typeId() == QMetaType::QDateTime))
-            rowContent.append(QByteArray::number(
-                -1 * cell.toDate().daysTo(utilities::getStartOfExcelWorld())));
-        else
-            rowContent.append(cell.toByteArray());
-        rowContent.append(CELL_END);
+        if (!cell.isNull())
+        {
+            rowContent.append(CELL_START);
+            rowContent.append(columnNames_[column]);
+            rowContent.append(rowNumber);
+            rowContent.append(ROW_NUMBER_CLOSE);
+            rowContent.append(getCellTypeTag(cell));
+            rowContent.append(VALUE_START);
+            if ((cell.typeId() == QMetaType::QDate) ||
+                (cell.typeId() == QMetaType::QDateTime))
+                rowContent.append(QByteArray::number(
+                    -1 *
+                    cell.toDate().daysTo(utilities::getStartOfExcelWorld())));
+            else
+                rowContent.append(cell.toByteArray());
+            rowContent.append(CELL_END);
+        }
     }
     rowContent.append(QByteArrayLiteral("</row>"));
     return rowContent;

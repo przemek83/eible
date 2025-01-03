@@ -22,10 +22,12 @@ bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
         if (rowShouldBeSkipped(view, row))
         {
             ++skippedRows;
-            continue;
         }
-        content.append(generateRowContent(*model, row, skippedRows));
-        updateProgress(row, rowCount, lastEmittedPercent);
+        else
+        {
+            content.append(generateRowContent(*model, row, skippedRows));
+            updateProgress(row, rowCount, lastEmittedPercent);
+        }
     }
     content.append(getContentEnding());
     return writeContent(content, ioDevice);

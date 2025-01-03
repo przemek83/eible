@@ -114,11 +114,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
                 for (int i{0}; i < repeats; ++i)
                 {
                     const int currentColumn{column + i};
-                    if (excludedColumns.contains(currentColumn))
-                        continue;
-                    const int mappedColumnIndex{
-                        activeColumnsMapping[currentColumn]};
-                    currentDataRow[mappedColumnIndex] = value;
+                    if (!excludedColumns.contains(currentColumn))
+                    {
+                        const int mappedColumnIndex{
+                            activeColumnsMapping[currentColumn]};
+                        currentDataRow[mappedColumnIndex] = value;
+                    }
                 }
             }
             column += repeats - 1;
