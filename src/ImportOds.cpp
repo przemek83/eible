@@ -212,7 +212,7 @@ std::pair<bool, QStringList> ImportOds::retrieveColumnNames(
     {
         if (isCellStart(reader) &&
             (getColumnRepeatCount(reader.attributes()) > 1))
-            break;
+            return {true, columnNames};
 
         if ((reader.name().toString() == P_TAG) && reader.isStartElement())
         {
@@ -305,7 +305,8 @@ bool ImportOds::moveToSecondRow(const QString& sheetName,
         if (isRowStart(reader))
         {
             if (secondRow)
-                break;
+                return true;
+
             secondRow = true;
         }
         reader.readNext();
@@ -323,7 +324,7 @@ void ImportOds::skipToSheet(QXmlStreamReader& reader,
             if (reader.attributes().value(TABLE_NAME_TAG) != sheetName)
                 reader.skipCurrentElement();
             else
-                break;
+                return;
         }
         reader.readNextStartElement();
     }
