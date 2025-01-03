@@ -563,10 +563,7 @@ bool ImportXlsx::isCommonDataOk()
     if ((!sharedStrings_) && (!getSharedStrings().first))
         return false;
 
-    if ((!getDateStyles().first) && (!getAllStyles().first))
-        return false;
-
-    return true;
+    return getDateStyles().first && getAllStyles().first;
 }
 
 std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
