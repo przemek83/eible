@@ -86,7 +86,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportOds::getLimitedData(
     int rowCounter{0};
     bool rowEmpty{true};
     int lastEmittedPercent{0};
-    while ((!reader.atEnd()) && (0 != reader.name().compare(TABLE_TAG)) &&
+    while ((!reader.atEnd()) && (reader.name() != TABLE_TAG) &&
            (rowCounter < rowLimit))
     {
         if (isRowStart(reader))
@@ -246,7 +246,7 @@ ImportOds::retrieveRowCountAndColumnTypes(const QString& sheetName)
     int rowCounter{0};
     bool rowEmpty{true};
 
-    while ((!reader.atEnd()) && (reader.name().compare(TABLE_TAG) != 0))
+    while ((!reader.atEnd()) && (reader.name() != TABLE_TAG))
     {
         if (isRowStart(reader))
             column = NOT_SET_COLUMN;
@@ -346,19 +346,17 @@ int ImportOds::getColumnRepeatCount(
 
 bool ImportOds::isRowStart(const QXmlStreamReader& reader) const
 {
-    return (0 == reader.name().compare(TABLE_ROW_TAG)) &&
-           reader.isStartElement();
+    return (reader.name() == TABLE_ROW_TAG) && reader.isStartElement();
 }
 
 bool ImportOds::isRowEnd(const QXmlStreamReader& reader) const
 {
-    return (0 == reader.name().compare(TABLE_ROW_TAG)) && reader.isEndElement();
+    return (reader.name() == TABLE_ROW_TAG) && reader.isEndElement();
 }
 
 bool ImportOds::isCellStart(const QXmlStreamReader& reader) const
 {
-    return (0 == reader.name().compare(TABLE_CELL_TAG)) &&
-           reader.isStartElement();
+    return (reader.name() == TABLE_CELL_TAG) && reader.isStartElement();
 }
 
 bool ImportOds::isCellEnd(const QXmlStreamReader& reader) const
@@ -370,7 +368,7 @@ bool ImportOds::isCellEnd(const QXmlStreamReader& reader) const
 ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
                                           const QString& xmlColTypeValue) const
 {
-    if (0 == xmlColTypeValue.compare(STRING_TAG))
+    if (xmlColTypeValue == STRING_TAG)
     {
         if (currentType == ColumnType::UNKNOWN)
             return ColumnType::STRING;
@@ -378,7 +376,7 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
             return ColumnType::STRING;
     }
 
-    if (0 == xmlColTypeValue.compare(DATE_TAG))
+    if (xmlColTypeValue == DATE_TAG)
     {
         if (currentType == ColumnType::UNKNOWN)
             return ColumnType::DATE;
@@ -386,10 +384,8 @@ ColumnType ImportOds::recognizeColumnType(ColumnType currentType,
             return ColumnType::STRING;
     }
 
-    if ((0 == xmlColTypeValue.compare(FLOAT_TAG)) ||
-        (0 == xmlColTypeValue.compare(PERCENTAGE_TAG)) ||
-        (0 == xmlColTypeValue.compare(CURRENCY_TAG)) ||
-        (0 == xmlColTypeValue.compare(TIME_TAG)))
+    if ((xmlColTypeValue == FLOAT_TAG) || (xmlColTypeValue == PERCENTAGE_TAG) ||
+        (xmlColTypeValue == CURRENCY_TAG) || (xmlColTypeValue == TIME_TAG))
     {
         if (currentType == ColumnType::UNKNOWN)
             return ColumnType::NUMBER;
@@ -409,14 +405,14 @@ QVariant ImportOds::retrieveValueFromStringColumn(
     const QString currentDateValue{
         reader.attributes().value(OFFICE_DATE_VALUE_TAG).toString()};
 
-    while ((!reader.atEnd()) && (0 != reader.name().compare(P_TAG)))
+    while ((!reader.atEnd()) && (reader.name() != P_TAG))
         reader.readNext();
 
     while ((reader.tokenType() != QXmlStreamReader::Characters) &&
-           (0 != reader.name().compare(TABLE_CELL_TAG)))
+           (reader.name() != TABLE_CELL_TAG))
         reader.readNext();
 
-    if (xmlColTypeValue.compare(DATE_TAG) == 0)
+    if (xmlColTypeValue == DATE_TAG)
         return QVariant(currentDateValue);
 
     const QStringView stringView{reader.text()};
