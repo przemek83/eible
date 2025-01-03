@@ -373,17 +373,13 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
 QString ImportXlsx::getColumnName(QXmlStreamReader& reader,
                                   const QString& currentColType) const
 {
-    QString columnName;
     if (currentColType == S_TAG)
     {
         const int value{reader.readElementText().toInt()};
-        columnName = (*sharedStrings_)[value];
+        return sharedStrings_.value()[value];
     }
-    else
-    {
-        columnName = reader.readElementText();
-    }
-    return columnName;
+
+    return reader.readElementText();
 }
 
 void ImportXlsx::skipToFirstRow(QXmlStreamReader& reader) const
