@@ -191,16 +191,12 @@ std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
         it != columnTypes_.constEnd())
         return {true, *it};
 
-    if (!isCommonDataOk())
-        return {false, {}};
+    if (isCommonDataOk() &&
+        isSheetNameValid(getSheetNames().second, sheetName) &&
+        analyzeSheet(sheetName))
+        return {true, columnTypes_.value(sheetName)};
 
-    if (!isSheetNameValid(getSheetNames().second, sheetName))
-        return {false, {}};
-
-    if (!analyzeSheet(sheetName))
-        return {false, {}};
-
-    return {true, columnTypes_.value(sheetName)};
+    return {false, {}};
 }
 
 bool ImportXlsx::moveToSecondRow(QuaZipFile& quaZipFile,
