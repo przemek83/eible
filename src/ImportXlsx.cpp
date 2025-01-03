@@ -51,17 +51,16 @@ std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 std::pair<bool, QStringList> ImportXlsx::getColumnNames(
     const QString& sheetName)
 {
-    if (!isCommonDataOk())
-        return {false, {}};
-
-    if (!isSheetNameValid(getSheetNames().second, sheetName))
-        return {false, {}};
-
     if (const auto it{columnNames_.constFind(sheetName)};
-        (it == columnNames_.constEnd()) && (!analyzeSheet(sheetName)))
-        return {false, {}};
+        it != columnNames_.constEnd())
+        return {true, *it};
 
-    return {true, columnNames_.value(sheetName)};
+    if (isCommonDataOk() &&
+        isSheetNameValid(getSheetNames().second, sheetName) &&
+        analyzeSheet(sheetName))
+        return {true, columnNames_.value(sheetName)};
+
+    return {false, {}};
 }
 
 QList<int> ImportXlsx::retrieveDateStyles(const QDomNodeList& sheetNodes)
