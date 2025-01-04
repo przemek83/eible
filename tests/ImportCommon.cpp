@@ -30,25 +30,29 @@ QList<QStringList> getTestColumnNames()
 
 const QVector<int> expectedRowCounts_{2, 19, 0, 4, 30, 25, 20, 3, 3};
 
-const QVector<QVector<ColumnType>> columnTypes_{
-    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE},
-    {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
-     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-     ColumnType::STRING},
-    {},
-    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-     ColumnType::DATE, ColumnType::STRING},
-    {ColumnType::STRING, ColumnType::DATE, ColumnType::NUMBER,
-     ColumnType::NUMBER, ColumnType::DATE, ColumnType::NUMBER,
-     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
-     ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
-    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
-    {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
-     ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER},
-    {ColumnType::DATE, ColumnType::STRING, ColumnType::NUMBER,
-     ColumnType::STRING},
-    {ColumnType::STRING, ColumnType::STRING, ColumnType::STRING,
-     ColumnType::STRING}};
+QVector<QVector<ColumnType>> getColumnTypes()
+{
+    QVector<QVector<ColumnType>> columnTypes{
+        {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE},
+        {ColumnType::STRING, ColumnType::NUMBER, ColumnType::DATE,
+         ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+         ColumnType::STRING},
+        {},
+        {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+         ColumnType::DATE, ColumnType::STRING},
+        {ColumnType::STRING, ColumnType::DATE, ColumnType::NUMBER,
+         ColumnType::NUMBER, ColumnType::DATE, ColumnType::NUMBER,
+         ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER,
+         ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
+        {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER},
+        {ColumnType::NUMBER, ColumnType::NUMBER, ColumnType::NUMBER,
+         ColumnType::STRING, ColumnType::STRING, ColumnType::NUMBER},
+        {ColumnType::DATE, ColumnType::STRING, ColumnType::NUMBER,
+         ColumnType::STRING},
+        {ColumnType::STRING, ColumnType::STRING, ColumnType::STRING,
+         ColumnType::STRING}};
+    return columnTypes;
+}
 
 const QVector<QVector<QVector<QVariant>>> sheetData_{
     {{"Item 0, 0", 1., QDate(2020, 1, 3)},
@@ -316,11 +320,12 @@ void prepareDataForGetColumnTypes()
     QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
 
     const qsizetype testColumnNamesSize{getTestColumnNames().size()};
+    const QVector<QVector<ColumnType>> columnTypes{getColumnTypes()};
     for (qsizetype i{0}; i < testColumnNamesSize; ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns types in " + sheetName).toStdString().c_str())
-            << sheetName << columnTypes_[i];
+            << sheetName << columnTypes[i];
     }
 }
 
