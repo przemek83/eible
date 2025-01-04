@@ -77,10 +77,9 @@ QByteArray ExportXlsx::generateHeaderContent(const QAbstractItemModel& model)
     for (int j{0}; j < columnCount; ++j)
     {
         QString header{model.headerData(j, Qt::Horizontal).toString()};
+        static const QRegularExpression regExp{QStringLiteral("[<>&\"']")};
         const QString clearedHeader(
-            header
-                .replace(QRegularExpression(QStringLiteral("[<>&\"']")),
-                         QStringLiteral(" "))
+            header.replace(regExp, QStringLiteral(" "))
                 .replace(QStringLiteral("\r\n"), QStringLiteral(" ")));
         headersContent.append("<c r=\"" + columnNames_[j]);
         headersContent.append(R"(1" t="str" s="6"><v>)" +
