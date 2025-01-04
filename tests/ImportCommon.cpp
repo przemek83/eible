@@ -10,18 +10,23 @@
 
 namespace
 {
-const QList<QStringList> testColumnNames_{
-    {"Text", "Numeric", "Date"},
-    {"Trait #1", "Value #1", "Transaction date", "Units", "Price",
-     "Price per unit", "Another trait"},
-    {},
-    {"cena nier", "pow", "cena metra", "data transakcji", "text"},
-    {"name", "date", "mass (kg)", "height", "---", "---", "---", "---", "---",
-     "---", "---", "---"},
-    {"modificator", "x", "y"},
-    {"Pow", "Cena", "cena_m", "---", "---", "---"},
-    {"---", "second", "third", "fourth"},
-    {"user", "pass", "lic_exp", "uwagi"}};
+QList<QStringList> getTestColumnNames()
+{
+    QList<QStringList> testColumnNames{
+        {"Text", "Numeric", "Date"},
+        {"Trait #1", "Value #1", "Transaction date", "Units", "Price",
+         "Price per unit", "Another trait"},
+        {},
+        {"cena nier", "pow", "cena metra", "data transakcji", "text"},
+        {"name", "date", "mass (kg)", "height", "---", "---", "---", "---",
+         "---", "---", "---", "---"},
+        {"modificator", "x", "y"},
+        {"Pow", "Cena", "cena_m", "---", "---", "---"},
+        {"---", "second", "third", "fourth"},
+        {"user", "pass", "lic_exp", "uwagi"}};
+
+    return testColumnNames;
+}
 
 const QVector<int> expectedRowCounts_{2, 19, 0, 4, 30, 25, 20, 3, 3};
 
@@ -287,11 +292,12 @@ void prepareDataForGetColumnListTest()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QStringList>("expectedColumnList");
-    for (int i{0}; i < testColumnNames_.size(); ++i)
+    const QList<QStringList> testColumnNames{getTestColumnNames()};
+    for (int i{0}; i < testColumnNames.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
-            << sheetName << testColumnNames_[i];
+            << sheetName << testColumnNames[i];
     }
 }
 
@@ -309,7 +315,8 @@ void prepareDataForGetColumnTypes()
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<QVector<ColumnType>>("expectedColumnTypes");
 
-    for (int i{0}; i < testColumnNames_.size(); ++i)
+    const qsizetype testColumnNamesSize{getTestColumnNames().size()};
+    for (qsizetype i{0}; i < testColumnNamesSize; ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns types in " + sheetName).toStdString().c_str())
@@ -333,9 +340,10 @@ void checkSettingEmptyColumnName(ImportSpreadsheet& importer)
     auto [success,
           actualColumnList]{importer.getColumnNames(getSheetNames()[4])};
 
+    QStringList columnNames{getTestColumnNames()[4]};
     std::list<QString> expectedColumnList(
-        static_cast<size_t>(testColumnNames_[4].size()));
-    std::replace_copy(testColumnNames_[4].begin(), testColumnNames_[4].end(),
+        static_cast<std::size_t>(columnNames.size()));
+    std::replace_copy(columnNames.constBegin(), columnNames.constEnd(),
                       expectedColumnList.begin(), QStringLiteral("---"),
                       newEmptyColumnName);
 
@@ -349,23 +357,26 @@ void checkGetColumnListTwoSheets(ImportSpreadsheet& importer)
     auto [success,
           actualColumnList]{importer.getColumnNames(getSheetNames()[4])};
     QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, testColumnNames_[4]);
+    QList<QStringList> columnNames{getTestColumnNames()};
+    QCOMPARE(actualColumnList, columnNames[4]);
 
     std::tie(success, actualColumnList) =
         importer.getColumnNames(getSheetNames()[0]);
     QCOMPARE(success, true);
-    QCOMPARE(actualColumnList, testColumnNames_[0]);
+    QCOMPARE(actualColumnList, columnNames[0]);
 }
 
 void prepareDataForGetColumnCountTest()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<int>("expectedColumnCount");
-    for (int i{0}; i < testColumnNames_.size(); ++i)
+
+    const QList<QStringList> testColumnNames{getTestColumnNames()};
+    for (int i{0}; i < testColumnNames.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
-            << sheetName << testColumnNames_[i].size();
+            << sheetName << testColumnNames[i].size();
     }
 }
 
@@ -382,7 +393,9 @@ void prepareDataForGetRowCountTest()
 {
     QTest::addColumn<QString>("sheetName");
     QTest::addColumn<int>("expectedRowCount");
-    for (int i{0}; i < testColumnNames_.size(); ++i)
+
+    const qsizetype testColumnNamesSize{getTestColumnNames().size()};
+    for (qsizetype i{0}; i < testColumnNamesSize; ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Rows in " + sheetName).toStdString().c_str())
@@ -405,14 +418,15 @@ void prepareDataForGetRowAndColumnCountViaGetColumnTypes()
     QTest::addColumn<int>("expectedRowCount");
     QTest::addColumn<int>("expectedColumnCount");
 
-    for (int i{0}; i < testColumnNames_.size(); ++i)
+    const QList<QStringList> testColumnNames{getTestColumnNames()};
+    for (int i{0}; i < testColumnNames.size(); ++i)
     {
         const QString& sheetName{getSheetNames()[i]};
         QTest::newRow(("Rows and columns via GetColumnTypes() in " + sheetName)
                           .toStdString()
                           .c_str())
             << sheetName << expectedRowCounts_[i]
-            << static_cast<int>(testColumnNames_[i].size());
+            << static_cast<int>(testColumnNames[i].size());
     }
 }
 
