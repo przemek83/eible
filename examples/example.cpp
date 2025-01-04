@@ -135,8 +135,8 @@ bool importFile(ImportSpreadsheet& importer, const QString& fileName)
 bool importFiles()
 {
     QFile odsFile(QStringLiteral(":/example.ods"));
-    ImportOds importOds(odsFile);
-    if (!importFile(importOds, odsFile.fileName()))
+    if (ImportOds importOds(odsFile);
+        !importFile(importOds, odsFile.fileName()))
         return false;
 
     QFile xlsxFile(QStringLiteral(":/example.xlsx"));
