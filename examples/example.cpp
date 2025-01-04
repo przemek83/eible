@@ -24,12 +24,12 @@ void initTable(QTableWidget& tableWidget)
     tableWidget.setHorizontalHeaderLabels({QStringLiteral("Text"),
                                            QStringLiteral("Numeric"),
                                            QStringLiteral("Date")});
-    for (int column = 0; column < columnCount; ++column)
+    for (int column{0}; column < columnCount; ++column)
     {
-        for (int row = 0; row < rowCount; ++row)
+        for (int row{0}; row < rowCount; ++row)
         {
-            auto* item = new QTableWidgetItem(
-                "Item " + QString::number(column) + " " + QString::number(row));
+            auto* item{new QTableWidgetItem("Item " + QString::number(column) +
+                                            " " + QString::number(row))};
             switch (column)
             {
                 case 0:
@@ -63,7 +63,7 @@ bool exportXlsx(const QTableWidget& tableWidget)
     std::cout << "Exporting XLSX to " << file.toStdString() << "." << std::endl;
     QFile outFile(file);
     outFile.open(QIODevice::WriteOnly);
-    const bool success = exportXlsx.exportView(tableWidget, outFile);
+    const bool success{exportXlsx.exportView(tableWidget, outFile)};
     if (success)
         std::cout << "Exporting XLSX successful." << std::endl;
     else
@@ -85,7 +85,7 @@ bool exportCsv(const QTableWidget& tableWidget)
     std::cout << "Exporting CSV to " << file.toStdString() << "." << std::endl;
     QFile outFile(file);
     outFile.open(QIODevice::WriteOnly);
-    const bool success = exportDsv.exportView(tableWidget, outFile);
+    const bool success{exportDsv.exportView(tableWidget, outFile)};
     if (success)
         std::cout << "Exporting CSV successful." << std::endl;
     else
@@ -98,7 +98,7 @@ bool exportFiles()
 {
     QTableWidget tableWidget;
     initTable(tableWidget);
-    bool success = exportXlsx(tableWidget);
+    bool success{exportXlsx(tableWidget)};
     success &= exportCsv(tableWidget);
     return success;
 }
@@ -117,8 +117,8 @@ void printSpreadsheetContent(const QStringList& columnNames,
 
 bool importFile(ImportSpreadsheet& importer, const QString& fileName)
 {
-    const QString sheetName(QStringLiteral("Sheet1"));
-    auto [sucess, columnNames] = importer.getColumnNames(sheetName);
+    const QString sheetName{QStringLiteral("Sheet1")};
+    auto [sucess, columnNames]{importer.getColumnNames(sheetName)};
     if (!sucess)
         return false;
     QVector<QVector<QVariant>> xlsxData;
