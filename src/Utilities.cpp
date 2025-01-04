@@ -53,20 +53,14 @@ QString getXlsxTemplateName()
 
 QVariant getDefaultVariantForFormat(ColumnType format)
 {
-    switch (format)
-    {
-        case ColumnType::STRING:
-            return QVariant(QMetaType(QMetaType::QString));
+    Q_ASSERT(format != ColumnType::UNKNOWN);
 
-        case ColumnType::NUMBER:
-            return QVariant(QMetaType(QMetaType::Double));
+    if (format == ColumnType::NUMBER)
+        return QVariant(QMetaType(QMetaType::Double));
 
-        case ColumnType::DATE:
-            return QVariant(QMetaType(QMetaType::QDate));
+    if (format == ColumnType::DATE)
+        return QVariant(QMetaType(QMetaType::QDate));
 
-        default:
-            Q_ASSERT(false);
-    }
     return QVariant(QMetaType(QMetaType::QString));
 }
 
