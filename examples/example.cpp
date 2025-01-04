@@ -25,6 +25,7 @@ void initTable(QTableWidget& tableWidget)
                                            QStringLiteral("Numeric"),
                                            QStringLiteral("Date")});
     for (int column = 0; column < columnCount; ++column)
+    {
         for (int row = 0; row < rowCount; ++row)
         {
             auto* item = new QTableWidgetItem(
@@ -46,6 +47,7 @@ void initTable(QTableWidget& tableWidget)
             }
             tableWidget.setItem(row, column, item);
         }
+    }
 }
 
 bool exportXlsx(const QTableWidget& tableWidget)
