@@ -331,4 +331,5 @@ void ImportXlsxTest::testDamagedFile()
     QCOMPARE(importXlsx.getAllStyles().first, false);
     QCOMPARE(importXlsx.getLimitedData("mySheet", {}, 10).first, false);
     QCOMPARE(importXlsx.getData("mySheet", {}).first, false);
+    QCOMPARE(importXlsx.getRowCount("mySheet").first, false);
 }
