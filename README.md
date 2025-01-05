@@ -8,11 +8,25 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=przemek83_eible&metric=coverage)](https://sonarcloud.io/summary/new_code?id=przemek83_eible)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=przemek83_eible&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=przemek83_eible)
 
-## Table of content
+## Table of contents
 - [About project](#about-project)
-- [Building](#building)
+- [Getting Started](#getting-started)
+   * [Prerequisites](#prerequisites)
+   * [Building](#building)
+   * [CMake integration](#cmake-integration)
+- [Built with](#built-with)
 - [Usage](#usage)
 - [Classes](#classes)
+   * [Classes used for importing data](#classes-used-for-importing-data)
+      + [ImportSpreadsheet](#importspreadsheet)
+      + [ImportXlsx](#importxlsx)
+      + [ImportOds](#importods)
+   * [Classes used for exporting data](#classes-used-for-exporting-data)
+      + [ExportData](#exportdata)
+      + [ExportDsv](#exportdsv)
+      + [ExportXlsx](#exportxlsx)
+- [Testing](#testing)
+- [Licensing](#licensing)
 
 ## About project
  This is a library for importing and exporting data. Created as a result of the division of Volbx project code and moving parts of it to an independent library. The library contains classes:  
