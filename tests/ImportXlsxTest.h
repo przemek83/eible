@@ -69,7 +69,7 @@ private:
     QVector<QVector<QVariant>> convertDataToUseSharedStrings(
         const QVector<QVector<QVariant>>& inputData) const;
 
-    const QString testFileName_{QStringLiteral(":/testXlsx.xlsx")};
+    const QString testFileName_{QStringLiteral(":/res/testXlsx.xlsx")};
     const QString templateFileName_{QStringLiteral(":/template.xlsx")};
 
     const QVector<std::pair<QString, QString>> sheets_{

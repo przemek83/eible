@@ -306,7 +306,7 @@ void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile() const
 
 void ImportXlsxTest::testEmittingProgressPercentChangedBigFile()
 {
-    QFile testFile(QStringLiteral(":/mediumFile.xlsx"));
+    QFile testFile(QStringLiteral(":/res/mediumFile.xlsx"));
     ImportXlsx importXlsx(testFile);
     ImportCommon::checkEmittingProgressPercentChangedBigFile(importXlsx);
 }
@@ -321,7 +321,7 @@ void ImportXlsxTest::testInvalidSheetName() const
 void ImportXlsxTest::testDamagedFile()
 {
     const QString sheet{QString::fromLatin1("mySheet")};
-    QFile testFile(QString::fromLatin1(":/testXlsx_damaged.xlsx"));
+    QFile testFile(QString::fromLatin1(":/res/testXlsx_damaged.xlsx"));
     ImportXlsx importXlsx(testFile);
     QCOMPARE(importXlsx.getSheetNames().first, false);
     QCOMPARE(importXlsx.getColumnTypes(sheet).first, false);

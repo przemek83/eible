@@ -145,7 +145,7 @@ void ImportOdsTest::testGetDataExcludeInvalidColumn() const
 void ImportOdsTest::benchmarkGetData()
 {
     QSKIP("Skip benchmark.");
-    QFile testFile(QStringLiteral(":/bigFile.ods"));
+    QFile testFile(QStringLiteral(":/res/bigFile.ods"));
     ImportOds importOds(testFile);
     auto [success, sheetNames]{importOds.getSheetNames()};
     QCOMPARE(success, true);
@@ -173,7 +173,7 @@ void ImportOdsTest::testEmittingProgressPercentChangedSmallFile() const
 
 void ImportOdsTest::testEmittingProgressPercentChangedBigFile()
 {
-    QFile testFile(QStringLiteral(":/mediumFile.ods"));
+    QFile testFile(QStringLiteral(":/res/mediumFile.ods"));
     ImportOds importOds(testFile);
     ImportCommon::checkEmittingProgressPercentChangedBigFile(importOds);
 }
@@ -188,7 +188,7 @@ void ImportOdsTest::testInvalidSheetName() const
 void ImportOdsTest::testDamagedFile()
 {
     const QString sheet{QString::fromLatin1("mySheet")};
-    QFile testFile(QString::fromLatin1(":/testOds_damaged.xlsx"));
+    QFile testFile(QString::fromLatin1(":/res/testOds_damaged.xlsx"));
     ImportOds importOds(testFile);
     QCOMPARE(importOds.getSheetNames().first, false);
     QCOMPARE(importOds.getColumnTypes(sheet).first, false);

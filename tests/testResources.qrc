@@ -1,12 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>testXlsx.xlsx</file>
-        <file>testOds.ods</file>
-        <file>emptyOds.ods</file>
-        <file>mediumFile.ods</file>
-        <file>mediumFile.xlsx</file>
-        <file>bigFile.ods</file>
-        <file>testOds_damaged.ods</file>
-        <file>testXlsx_damaged.xlsx</file>
+        <file>res/testXlsx.xlsx</file>
+        <file>res/testOds.ods</file>
+        <file>res/emptyOds.ods</file>
+        <file>res/mediumFile.ods</file>
+        <file>res/mediumFile.xlsx</file>
+        <file>res/bigFile.ods</file>
+        <file>res/testOds_damaged.ods</file>
+        <file>res/testXlsx_damaged.xlsx</file>
     </qresource>
 </RCC>

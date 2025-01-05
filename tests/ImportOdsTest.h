@@ -50,6 +50,6 @@ private Q_SLOTS:
     static void testDamagedFile();
 
 private:
-    const QString testFileName_{QStringLiteral(":/testOds.ods")};
-    const QString templateFileName_{QStringLiteral(":/emptyOds.ods")};
+    const QString testFileName_{QStringLiteral(":/res/testOds.ods")};
+    const QString templateFileName_{QStringLiteral(":/res/emptyOds.ods")};
 };
