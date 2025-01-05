@@ -17,7 +17,7 @@ void ExportDsvTest::testEmptyTable_data()
     QTest::newRow("CSV empty table") << ',';
 }
 
-void ExportDsvTest::testEmptyTable()
+void ExportDsvTest::testEmptyTable() const
 {
     QFETCH(const char, separator);
 
@@ -35,7 +35,7 @@ void ExportDsvTest::testEmptyTable()
     QCOMPARE(exportedByteArray, emptyData_);
 }
 
-void ExportDsvTest::testHeadersOnly_data()
+void ExportDsvTest::testHeadersOnly_data() const
 {
     QTest::addColumn<char>("separator");
     QTest::addColumn<QString>("expected");
@@ -63,7 +63,7 @@ void ExportDsvTest::testHeadersOnly()
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testSimpleTable_data()
+void ExportDsvTest::testSimpleTable_data() const
 {
     QTest::addColumn<char>("separator");
     QTest::addColumn<QString>("expected");
@@ -91,7 +91,7 @@ void ExportDsvTest::testSimpleTable()
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testViewWithMultiSelection_data()
+void ExportDsvTest::testViewWithMultiSelection_data() const
 {
     QTest::addColumn<char>("separator");
     QTest::addColumn<QString>("expected");
@@ -124,7 +124,7 @@ void ExportDsvTest::testViewWithMultiSelection()
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testSpecialCharInStringField_data()
+void ExportDsvTest::testSpecialCharInStringField_data() const
 {
     QTest::addColumn<char>("separator");
     QTest::addColumn<char>("specialChar");
@@ -167,7 +167,7 @@ void ExportDsvTest::testSpecialCharInStringField()
     QCOMPARE(exportedByteArray, expected);
 }
 
-void ExportDsvTest::testCustomDateFormat()
+void ExportDsvTest::testCustomDateFormat() const
 {
     TestTableModel model(3, 1);
     QTableView view;
@@ -184,7 +184,7 @@ void ExportDsvTest::testCustomDateFormat()
     QCOMPARE(exportedByteArray, customDateFormatData_);
 }
 
-void ExportDsvTest::testIsoShortDate()
+void ExportDsvTest::testIsoShortDate() const
 {
     TestTableModel model(3, 1);
     QTableView view;
@@ -201,7 +201,7 @@ void ExportDsvTest::testIsoShortDate()
     QCOMPARE(exportedByteArray, isoShortDateData_);
 }
 
-void ExportDsvTest::testLocaleForNumbers()
+void ExportDsvTest::testLocaleForNumbers() const
 {
     TestTableModel model(3, 1);
     QTableView view;

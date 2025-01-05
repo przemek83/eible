@@ -12,24 +12,24 @@ public:
 
 private Q_SLOTS:
     static void testEmptyTable_data();
-    void testEmptyTable();
+    void testEmptyTable() const;
 
-    void testHeadersOnly_data();
+    void testHeadersOnly_data() const;
     static void testHeadersOnly();
 
-    void testSimpleTable_data();
+    void testSimpleTable_data() const;
     static void testSimpleTable();
 
-    void testViewWithMultiSelection_data();
+    void testViewWithMultiSelection_data() const;
     static void testViewWithMultiSelection();
 
-    void testSpecialCharInStringField_data();
+    void testSpecialCharInStringField_data() const;
     static void testSpecialCharInStringField();
 
-    void testCustomDateFormat();
-    void testIsoShortDate();
+    void testCustomDateFormat() const;
+    void testIsoShortDate() const;
 
-    void testLocaleForNumbers();
+    void testLocaleForNumbers() const;
 
     void benchmark_data();
     void benchmark();
