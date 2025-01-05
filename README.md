@@ -43,7 +43,7 @@ The library is based on Qt 6 and uses the Zlib and QuaZip projects for managing 
 This section describes briefly how to setup the environment and build the project.
 
 ### Prerequisites
-Qt in version 6.5 or greater, C++ compiler with C++17 support as a minimum, and CMake 3.16+. 
+Qt in version 6.5 or greater, a C++ compiler with C++17 support as a minimum, and CMake 3.16+. 
 
 ### Building
 Clone and use CMake directly or via any IDE supporting it. CMake should:
@@ -54,11 +54,11 @@ As a result of compilation, binary for simulations and binary for testing should
 
 **TIP**: Remember to set properly the `CMAKE_PREFIX_PATH` env variable. It should have a Qt installation path to let CMake `find_package` command work.  
 
-**TIP**: make sure you install the `Core5Compat` module, which is part of Qt 6 as QuaZip needs it.  
+**TIP**: Make sure you install the `Core5Compat` module, which is part of Qt 6 as QuaZip needs it.  
 
 ### CMake integration
 Use `FetchContent` CMake module in your project:
-```
+```cmake
 include(FetchContent)
 
 FetchContent_Declare(
@@ -70,7 +70,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(eible)
 ```
 From that moment, eible library can be used in the `target_link_libraries` command:
-```
+```cmake
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} shared eible)
 ```
