@@ -13,8 +13,6 @@ public:
 
     Q_OBJECT
 private Q_SLOTS:
-    void initTestCase();
-
     void testExportingEmptyTable() const;
 
     void testExportingHeadersOnly() const;

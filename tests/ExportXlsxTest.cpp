@@ -41,8 +41,6 @@ void ExportXlsxTest::exportZip(const QAbstractItemView& view,
     exportXlsx.exportView(view, exportedZip);
 }
 
-void ExportXlsxTest::initTestCase() {}
-
 void ExportXlsxTest::testExportingEmptyTable() const
 {
     TestTableModel model(0, 0);
