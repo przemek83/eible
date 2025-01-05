@@ -14,7 +14,7 @@
 - [Usage](#usage)
 - [Classes](#classes)
 
-# About project
+## About project
  This is a library for importing and exporting data. Created as a result of the division of Volbx project code and moving parts of it to an independent library. The library contains classes:  
  + ExportData (base class for exporting)
  + ExportXlsx
@@ -73,13 +73,13 @@ Check my other project `Volbx` for real world CMake integration.
 | Zlib | 1.3.1 | 1.3.1 |
 | QuaZip | 1.4 | 1.4 |
 
-# Usage
+## Usage
 The easiest way is to check the examples' subproject, where you can find how to create and interact with each class included in this library.  
 Alternatively, tests in a subproject can be checked. Usage can also be found in my other project called Volbx where classes from this library are used for exporting and importing data.
 
-# Classes
-## Classes used for importing data
-### ImportSpreadsheet
+## Classes
+### Classes used for importing data
+#### ImportSpreadsheet
 Base class for spreadsheet-related import classes. The following pure virtual methods need to be implemented when creating a new derived class:
 + `getSheetNames()`
 + `getColumnNames()`
@@ -92,7 +92,7 @@ Base class for spreadsheet-related import classes. The following pure virtual me
 Emits signal `progressPercentChanged` during loading data.
 
 Importing can be done from objects with the interface QIODevice: files on disk, files from resources, QBuffer and more.
-### ImportXlsx
+#### ImportXlsx
 Class used to import data from .xlsx files. Basic usage:
 ```cpp
 QFile xlsxFile("example.xlsx");
@@ -101,7 +101,7 @@ auto [success, xlsxData] = importXlsx.getData("SheetName", {});
 ```
 Check `example` and `test` subprojects for more advanced use cases.  
 Take note that .xlsx files store strings separately. ImportXlsx follows that convention and provides `getSharedStrings()` to retrieve those.
-### ImportOds
+#### ImportOds
 Class used to import data from .ods files. Basic usage:
 ```cpp
 QFile odsFile("example.ods");
@@ -109,8 +109,8 @@ ImportOds importOds(odsFile);
 auto [success, odsData] = importOds.getData("SheetName", {});
 ```
 Check `example` and `test` subprojects for more advanced use cases.  
-## Classes used for exporting data
-### ExportData
+### Classes used for exporting data
+#### ExportData
 Base class for export-related classes. The following pure virtual methods need to be implemented when creating a new derived class:
 + `writeContent()`
 + `getEmptyContent()`
@@ -128,7 +128,7 @@ QTableWidget tableWidget;
 ExportXlsx exportXlsx;
 exportXlsx.exportView(tableWidget, exportedZip);
 ```
-### ExportDsv
+#### ExportDsv
 Class for exporting data to DSV (Delimiter Separated Values) files. The delimiter is set in the constructor and can be any character (comma, tab, semicolon, ...). CSV or TSV files can be created using this class.   
 Three additional methods can be used to customize the output:
 + `setDateFormat(Qt::DateFormat)` - for setting the output date format to a given one,
@@ -143,7 +143,7 @@ QTableWidget tableWidget;
 ExportDsv exportDsv(',');
 exportDsv.exportView(tableWidget, outFile);
 ```
-### ExportXlsx
+#### ExportXlsx
 Class for exporting data to .xlsx files.  
 Basic usage:
 ```cpp
@@ -154,3 +154,48 @@ ExportXlsx exportXlsx;
 exportXlsx.exportView(tableWidget, outFile);
 ```
 XLSX files are created using the template file `template.xlsx` included in the project via the resource collection file `resources.qrc`.
+
+## Testing
+For testing purposes, the Qt Test framework is used. Build the project first. Make sure that the `eible-tests` target is built. Modern IDEs supporting CMake also support running tests with monitoring of failures. But in case you would like to run it manually, go to the `build/tests` directory, where the⁣ binary `eible-tests` should be available. Launching it should produce the following output on Linux:
+Example run:
+```
+$ ./eible-tests
+********* Start testing of ExportXlsxTest *********
+Config: Using QtTest library 6.5.2, Qt 6.5.2 (x86_64-little_endian-lp64 shared (dynamic) release build; by GCC 10.3.1 20210422 (Red Hat 10.3.1-1)), ubuntu 24.04
+PASS   : ExportXlsxTest::initTestCase()
+PASS   : ExportXlsxTest::testExportingEmptyTable()
+PASS   : ExportXlsxTest::testExportingHeadersOnly()
+
+(...)
+
+PASS   : ImportOdsTest::testInvalidSheetName()
+PASS   : ImportOdsTest::testDamagedFile()
+PASS   : ImportOdsTest::cleanupTestCase()
+Totals: 71 passed, 0 failed, 1 skipped, 0 blacklisted, 142ms
+********* Finished testing of ImportOdsTest *********
+
+```
+As an alternative, CTest can be used to run tests from the `build/tests` directory:
+```
+$ ctest
+Test project <path>/eible/build/tests
+    Start 1: eible-tests
+1/1 Test #1: eible-tests ......................   Passed    0.29 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.29 sec
+
+```
+
+Performance tests for importing and exporting are disabled by default. Search for `QSKIP` and comment lines with that macro to activate it.
+
+## Licensing
+Eible library is published under a LGPL license.
+
+The project uses the following software:
+| Name | License | Home | Description |
+| --- | --- | --- | --- |
+| Qt | LGPLv3 | https://www.qt.io/| cross-platform application development framework |
+| Zlib | Zlib license | https://www.zlib.net/ | compression library |
+| QuaZip | LGPLv2.1 with static linking exception | https://github.com/stachenov/quazip | C++ wrapper for Minizip using Qt library |
