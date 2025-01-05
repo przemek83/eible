@@ -11,7 +11,7 @@
 
 ImportXlsxTest::ImportXlsxTest(QObject* parent) : QObject(parent) {}
 
-void ImportXlsxTest::testRetrievingSheetNames()
+void ImportXlsxTest::testRetrievingSheetNames() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -26,7 +26,7 @@ void ImportXlsxTest::testRetrievingSheetNamesFromEmptyFile()
     ImportCommon::checkRetrievingSheetNamesFromEmptyFile(importXlsx);
 }
 
-void ImportXlsxTest::testGetDateStyles()
+void ImportXlsxTest::testGetDateStyles() const
 {
     QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
@@ -35,7 +35,7 @@ void ImportXlsxTest::testGetDateStyles()
     QCOMPARE(actualDateStyle, dateStyles_);
 }
 
-void ImportXlsxTest::testGetDateStylesNoContent()
+void ImportXlsxTest::testGetDateStylesNoContent() const
 {
     QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
@@ -44,7 +44,7 @@ void ImportXlsxTest::testGetDateStylesNoContent()
     QCOMPARE(actualDateStyle, QList({14, 15, 16, 17, 22}));
 }
 
-void ImportXlsxTest::testGetAllStyles()
+void ImportXlsxTest::testGetAllStyles() const
 {
     QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
@@ -53,7 +53,7 @@ void ImportXlsxTest::testGetAllStyles()
     QCOMPARE(actualAllStyle, allStyles_);
 }
 
-void ImportXlsxTest::testGetAllStylesNoContent()
+void ImportXlsxTest::testGetAllStylesNoContent() const
 {
     QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
@@ -62,7 +62,7 @@ void ImportXlsxTest::testGetAllStylesNoContent()
     QCOMPARE(actualAllStyle, QList({0, 164, 10, 14, 4, 0, 0, 3}));
 }
 
-void ImportXlsxTest::testGetSharedStrings()
+void ImportXlsxTest::testGetSharedStrings() const
 {
     QFile xlsxTestFile(testFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
@@ -71,7 +71,7 @@ void ImportXlsxTest::testGetSharedStrings()
     QCOMPARE(actualSharedStrings, sharedStrings_);
 }
 
-void ImportXlsxTest::testGetSharedStringsNoContent()
+void ImportXlsxTest::testGetSharedStringsNoContent() const
 {
     QFile xlsxTestFile(templateFileName_);
     ImportXlsx importXlsx(xlsxTestFile);
@@ -85,21 +85,21 @@ void ImportXlsxTest::testGetColumnList_data()
     ImportCommon::prepareDataForGetColumnListTest();
 }
 
-void ImportXlsxTest::testGetColumnList()
+void ImportXlsxTest::testGetColumnList() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
     ImportCommon::checkGetColumnList(importXlsx);
 }
 
-void ImportXlsxTest::testSettingEmptyColumnName()
+void ImportXlsxTest::testSettingEmptyColumnName() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
     ImportCommon::checkSettingEmptyColumnName(importXlsx);
 }
 
-void ImportXlsxTest::testGetColumnListTwoSheets()
+void ImportXlsxTest::testGetColumnListTwoSheets() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -111,7 +111,7 @@ void ImportXlsxTest::testGetColumnTypes_data()
     ImportCommon::prepareDataForGetColumnTypes();
 }
 
-void ImportXlsxTest::testGetColumnTypes()
+void ImportXlsxTest::testGetColumnTypes() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -123,7 +123,7 @@ void ImportXlsxTest::testGetColumnCount_data()
     ImportCommon::prepareDataForGetColumnCountTest();
 }
 
-void ImportXlsxTest::testGetColumnCount()
+void ImportXlsxTest::testGetColumnCount() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -135,7 +135,7 @@ void ImportXlsxTest::testGetRowCount_data()
     ImportCommon::prepareDataForGetRowCountTest();
 }
 
-void ImportXlsxTest::testGetRowCount()
+void ImportXlsxTest::testGetRowCount() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -147,7 +147,7 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes_data()
     ImportCommon::prepareDataForGetRowAndColumnCountViaGetColumnTypes();
 }
 
-void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
+void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -155,7 +155,7 @@ void ImportXlsxTest::testGetRowAndColumnCountViaGetColumnTypes()
 }
 
 QVector<QVector<QVariant>> ImportXlsxTest::convertDataToUseSharedStrings(
-    const QVector<QVector<QVariant>>& inputData)
+    const QVector<QVector<QVariant>>& inputData) const
 {
     QVector<QVector<QVariant>> outputData{inputData};
     for (auto& row : outputData)
@@ -182,7 +182,7 @@ void ImportXlsxTest::testGetData_data()
     }
 }
 
-void ImportXlsxTest::testGetData()
+void ImportXlsxTest::testGetData() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -224,7 +224,7 @@ void ImportXlsxTest::testGetDataLimitRows_data()
         << sheetName << rowLimit << expectedValues;
 }
 
-void ImportXlsxTest::testGetDataLimitRows()
+void ImportXlsxTest::testGetDataLimitRows() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -251,14 +251,14 @@ void ImportXlsxTest::testGetDataExcludeColumns_data()
         << ImportCommon::getDataWithoutColumns(sheetData, {2, 0});
 }
 
-void ImportXlsxTest::testGetDataExcludeColumns()
+void ImportXlsxTest::testGetDataExcludeColumns() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
     ImportCommon::checkGetDataExcludeColumns(importXlsx);
 }
 
-void ImportXlsxTest::testGetDataExcludeInvalidColumn()
+void ImportXlsxTest::testGetDataExcludeInvalidColumn() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -290,14 +290,14 @@ void ImportXlsxTest::benchmarkGetData()
     QBENCHMARK { importXlsx.getData(sheetNames.front(), {}); }
 }
 
-void ImportXlsxTest::testEmittingProgressPercentChangedEmptyFile()
+void ImportXlsxTest::testEmittingProgressPercentChangedEmptyFile() const
 {
     QFile testFile(templateFileName_);
     ImportXlsx importXlsx(testFile);
     ImportCommon::checkEmittingProgressPercentChangedEmptyFile(importXlsx);
 }
 
-void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile()
+void ImportXlsxTest::testEmittingProgressPercentChangedSmallFile() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);
@@ -311,7 +311,7 @@ void ImportXlsxTest::testEmittingProgressPercentChangedBigFile()
     ImportCommon::checkEmittingProgressPercentChangedBigFile(importXlsx);
 }
 
-void ImportXlsxTest::testInvalidSheetName()
+void ImportXlsxTest::testInvalidSheetName() const
 {
     QFile testFile(testFileName_);
     ImportXlsx importXlsx(testFile);

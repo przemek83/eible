@@ -15,59 +15,59 @@ public:
 
     Q_OBJECT
 private Q_SLOTS:
-    void testRetrievingSheetNames();
+    void testRetrievingSheetNames() const;
     static void testRetrievingSheetNamesFromEmptyFile();
 
-    void testGetDateStyles();
-    void testGetDateStylesNoContent();
+    void testGetDateStyles() const;
+    void testGetDateStylesNoContent() const;
 
-    void testGetAllStyles();
-    void testGetAllStylesNoContent();
+    void testGetAllStyles() const;
+    void testGetAllStylesNoContent() const;
 
-    void testGetSharedStrings();
-    void testGetSharedStringsNoContent();
+    void testGetSharedStrings() const;
+    void testGetSharedStringsNoContent() const;
 
     static void testGetColumnList_data();
-    void testGetColumnList();
-    void testSettingEmptyColumnName();
-    void testGetColumnListTwoSheets();
+    void testGetColumnList() const;
+    void testSettingEmptyColumnName() const;
+    void testGetColumnListTwoSheets() const;
 
     static void testGetColumnTypes_data();
-    void testGetColumnTypes();
+    void testGetColumnTypes() const;
 
     static void testGetColumnCount_data();
-    void testGetColumnCount();
+    void testGetColumnCount() const;
 
     static void testGetRowCount_data();
-    void testGetRowCount();
+    void testGetRowCount() const;
 
     static void testGetRowAndColumnCountViaGetColumnTypes_data();
-    void testGetRowAndColumnCountViaGetColumnTypes();
+    void testGetRowAndColumnCountViaGetColumnTypes() const;
 
     void testGetData_data();
-    void testGetData();
+    void testGetData() const;
 
     void testGetDataLimitRows_data();
-    void testGetDataLimitRows();
+    void testGetDataLimitRows() const;
 
     void testGetDataExcludeColumns_data();
-    void testGetDataExcludeColumns();
-    void testGetDataExcludeInvalidColumn();
+    void testGetDataExcludeColumns() const;
+    void testGetDataExcludeInvalidColumn() const;
 
     void benchmarkGetData_data();
     void benchmarkGetData();
 
-    void testEmittingProgressPercentChangedEmptyFile();
-    void testEmittingProgressPercentChangedSmallFile();
+    void testEmittingProgressPercentChangedEmptyFile() const;
+    void testEmittingProgressPercentChangedSmallFile() const;
     static void testEmittingProgressPercentChangedBigFile();
 
-    void testInvalidSheetName();
+    void testInvalidSheetName() const;
 
     static void testDamagedFile();
 
 private:
     QVector<QVector<QVariant>> convertDataToUseSharedStrings(
-        const QVector<QVector<QVariant>>& inputData);
+        const QVector<QVector<QVariant>>& inputData) const;
 
     const QString testFileName_{QStringLiteral(":/testXlsx.xlsx")};
     const QString templateFileName_{QStringLiteral(":/template.xlsx")};

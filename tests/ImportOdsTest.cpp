@@ -10,7 +10,7 @@
 
 ImportOdsTest::ImportOdsTest(QObject* parent) : QObject(parent) {}
 
-void ImportOdsTest::testRetrievingSheetNames()
+void ImportOdsTest::testRetrievingSheetNames() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -30,21 +30,21 @@ void ImportOdsTest::testGetColumnList_data()
     ImportCommon::prepareDataForGetColumnListTest();
 }
 
-void ImportOdsTest::testGetColumnList()
+void ImportOdsTest::testGetColumnList() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
     ImportCommon::checkGetColumnList(importOds);
 }
 
-void ImportOdsTest::testSettingEmptyColumnName()
+void ImportOdsTest::testSettingEmptyColumnName() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
     ImportCommon::checkSettingEmptyColumnName(importOds);
 }
 
-void ImportOdsTest::testGetColumnListTwoSheets()
+void ImportOdsTest::testGetColumnListTwoSheets() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -56,7 +56,7 @@ void ImportOdsTest::testGetColumnTypes_data()
     ImportCommon::prepareDataForGetColumnTypes();
 }
 
-void ImportOdsTest::testGetColumnTypes()
+void ImportOdsTest::testGetColumnTypes() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -68,7 +68,7 @@ void ImportOdsTest::testGetColumnCount_data()
     ImportCommon::prepareDataForGetColumnCountTest();
 }
 
-void ImportOdsTest::testGetColumnCount()
+void ImportOdsTest::testGetColumnCount() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -80,7 +80,7 @@ void ImportOdsTest::testGetRowCount_data()
     ImportCommon::prepareDataForGetRowCountTest();
 }
 
-void ImportOdsTest::testGetRowCount()
+void ImportOdsTest::testGetRowCount() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -92,7 +92,7 @@ void ImportOdsTest::testGetRowAndColumnCountViaGetColumnTypes_data()
     ImportCommon::prepareDataForGetRowAndColumnCountViaGetColumnTypes();
 }
 
-void ImportOdsTest::testGetRowAndColumnCountViaGetColumnTypes()
+void ImportOdsTest::testGetRowAndColumnCountViaGetColumnTypes() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -104,7 +104,7 @@ void ImportOdsTest::testGetData_data()
     ImportCommon::prepareDataForGetData();
 }
 
-void ImportOdsTest::testGetData()
+void ImportOdsTest::testGetData() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -116,7 +116,7 @@ void ImportOdsTest::testGetDataLimitRows_data()
     ImportCommon::prepareDataForGetDataLimitRows();
 }
 
-void ImportOdsTest::testGetDataLimitRows()
+void ImportOdsTest::testGetDataLimitRows() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -128,14 +128,14 @@ void ImportOdsTest::testGetDataExcludeColumns_data()
     ImportCommon::prepareDataForGetGetDataExcludeColumns();
 }
 
-void ImportOdsTest::testGetDataExcludeColumns()
+void ImportOdsTest::testGetDataExcludeColumns() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
     ImportCommon::checkGetDataExcludeColumns(importOds);
 }
 
-void ImportOdsTest::testGetDataExcludeInvalidColumn()
+void ImportOdsTest::testGetDataExcludeInvalidColumn() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -157,14 +157,14 @@ void ImportOdsTest::benchmarkGetData()
     }
 }
 
-void ImportOdsTest::testEmittingProgressPercentChangedEmptyFile()
+void ImportOdsTest::testEmittingProgressPercentChangedEmptyFile() const
 {
     QFile testFile(templateFileName_);
     ImportOds importOds(testFile);
     ImportCommon::checkEmittingProgressPercentChangedEmptyFile(importOds);
 }
 
-void ImportOdsTest::testEmittingProgressPercentChangedSmallFile()
+void ImportOdsTest::testEmittingProgressPercentChangedSmallFile() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
@@ -178,7 +178,7 @@ void ImportOdsTest::testEmittingProgressPercentChangedBigFile()
     ImportCommon::checkEmittingProgressPercentChangedBigFile(importOds);
 }
 
-void ImportOdsTest::testInvalidSheetName()
+void ImportOdsTest::testInvalidSheetName() const
 {
     QFile testFile(testFileName_);
     ImportOds importOds(testFile);
