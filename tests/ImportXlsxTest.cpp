@@ -327,7 +327,7 @@ void ImportXlsxTest::testDamagedFile()
     QCOMPARE(importXlsx.getColumnCount("mySheet").first, false);
     QCOMPARE(importXlsx.getColumnNames("mySheet").first, false);
     QCOMPARE(importXlsx.getSharedStrings().first, false);
-    // QCOMPARE(importXlsx.getDateStyles().first, false);
+    QCOMPARE(importXlsx.getDateStyles().first, false);
     QCOMPARE(importXlsx.getAllStyles().first, false);
     QCOMPARE(importXlsx.getLimitedData("mySheet", {}, 10).first, false);
     QCOMPARE(importXlsx.getData("mySheet", {}).first, false);
