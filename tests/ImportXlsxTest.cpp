@@ -317,3 +317,11 @@ void ImportXlsxTest::testInvalidSheetName()
     ImportXlsx importXlsx(testFile);
     ImportCommon::checkInvalidSheetName(importXlsx);
 }
+
+void ImportXlsxTest::testDamagedFile()
+{
+    QFile testFile(QStringLiteral(":/testXlsx_damaged.xlsx"));
+    ImportXlsx importXlsx(testFile);
+    auto [success, _]{importXlsx.getSheetNames()};
+    QCOMPARE(success, false);
+}

@@ -6,5 +6,7 @@
         <file>mediumFile.ods</file>
         <file>mediumFile.xlsx</file>
         <file>bigFile.ods</file>
+        <file>testOds_damaged.ods</file>
+        <file>testXlsx_damaged.xlsx</file>
     </qresource>
 </RCC>

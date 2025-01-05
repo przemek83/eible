@@ -63,6 +63,8 @@ private Q_SLOTS:
 
     void testInvalidSheetName();
 
+    void testDamagedFile();
+
 private:
     QVector<QVector<QVariant>> convertDataToUseSharedStrings(
         const QVector<QVector<QVariant>>& inputData);
