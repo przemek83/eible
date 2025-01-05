@@ -241,4 +241,8 @@ void ExportDsvTest::benchmark()
     }
 }
 
-void ExportDsvTest::cleanupTestCase() { delete tableModelForBenchmarking_; }
+void ExportDsvTest::cleanupTestCase()
+{
+    if (tableModelForBenchmarking_ != nullptr)
+        delete tableModelForBenchmarking_;
+}
