@@ -15,13 +15,13 @@ public:
 private Q_SLOTS:
     void initTestCase();
 
-    void testExportingEmptyTable();
+    void testExportingEmptyTable() const;
 
-    void testExportingHeadersOnly();
+    void testExportingHeadersOnly() const;
 
-    void testExportingSimpleTable();
+    void testExportingSimpleTable() const;
 
-    void testExportingViewWithMultiSelection();
+    void testExportingViewWithMultiSelection() const;
 
     void benchmark_data();
 

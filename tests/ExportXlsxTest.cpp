@@ -43,7 +43,7 @@ void ExportXlsxTest::exportZip(const QAbstractItemView& view,
 
 void ExportXlsxTest::initTestCase() {}
 
-void ExportXlsxTest::testExportingEmptyTable()
+void ExportXlsxTest::testExportingEmptyTable() const
 {
     TestTableModel model(0, 0);
     QTableView view;
@@ -56,7 +56,7 @@ void ExportXlsxTest::testExportingEmptyTable()
     compareWorkSheets(exportedZip, emptySheetData_);
 }
 
-void ExportXlsxTest::testExportingHeadersOnly()
+void ExportXlsxTest::testExportingHeadersOnly() const
 {
     TestTableModel model(3, 0);
     QTableView view;
@@ -69,7 +69,7 @@ void ExportXlsxTest::testExportingHeadersOnly()
     compareWorkSheets(exportedZip, headersOnlySheetData_);
 }
 
-void ExportXlsxTest::testExportingSimpleTable()
+void ExportXlsxTest::testExportingSimpleTable() const
 {
     TestTableModel model(3, 3);
     QTableView view;
@@ -82,7 +82,7 @@ void ExportXlsxTest::testExportingSimpleTable()
     compareWorkSheets(exportedZip, tableSheetData_);
 }
 
-void ExportXlsxTest::testExportingViewWithMultiSelection()
+void ExportXlsxTest::testExportingViewWithMultiSelection() const
 {
     TestTableModel model(3, 3);
     QTableView view;
