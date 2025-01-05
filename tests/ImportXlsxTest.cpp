@@ -322,6 +322,13 @@ void ImportXlsxTest::testDamagedFile()
 {
     QFile testFile(QStringLiteral(":/testXlsx_damaged.xlsx"));
     ImportXlsx importXlsx(testFile);
-    auto [success, _]{importXlsx.getSheetNames()};
-    QCOMPARE(success, false);
+    QCOMPARE(importXlsx.getSheetNames().first, false);
+    QCOMPARE(importXlsx.getColumnTypes("mySheet").first, false);
+    QCOMPARE(importXlsx.getColumnCount("mySheet").first, false);
+    QCOMPARE(importXlsx.getColumnNames("mySheet").first, false);
+    QCOMPARE(importXlsx.getSharedStrings().first, false);
+    // QCOMPARE(importXlsx.getDateStyles().first, false);
+    QCOMPARE(importXlsx.getAllStyles().first, false);
+    QCOMPARE(importXlsx.getLimitedData("mySheet", {}, 10).first, false);
+    QCOMPARE(importXlsx.getData("mySheet", {}).first, false);
 }
