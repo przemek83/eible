@@ -471,7 +471,10 @@ std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
 
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
-    return {success, allStyles_.value()};
+    if(!success)
+        return {false, {}};
+
+    return {true, allStyles_.value()};
 }
 
 QVariant ImportXlsx::getCurrentValueForStringColumn(
@@ -633,7 +636,10 @@ std::pair<bool, QList<int>> ImportXlsx::getDateStyles()
 
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
-    return {success, dateStyles_.value()};
+    if(!success)
+        return {false, {}};
+
+    return {true, dateStyles_.value()};
 }
 
 QStringList ImportXlsx::createSheetNames() const
