@@ -471,7 +471,7 @@ std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
 
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
-    if(!success)
+    if (!success)
         return {false, {}};
 
     return {true, allStyles_.value()};
@@ -536,7 +536,8 @@ QDate ImportXlsx::getDateFromString(const QString& dateAsString)
 bool ImportXlsx::isDateStyle(const QString& sTagValue) const
 {
     return (!sTagValue.isEmpty()) &&
-           dateStyles_.value().contains(allStyles_.value().at(sTagValue.toInt()));
+           dateStyles_.value().contains(
+               allStyles_.value().at(sTagValue.toInt()));
 }
 
 bool ImportXlsx::isCommonDataOk()
@@ -636,7 +637,7 @@ std::pair<bool, QList<int>> ImportXlsx::getDateStyles()
 
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
-    if(!success)
+    if (!success)
         return {false, {}};
 
     return {true, dateStyles_.value()};
