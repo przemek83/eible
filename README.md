@@ -14,7 +14,6 @@
 - [Usage](#usage)
 - [Classes](#classes)
 
-
 # About project
  This is a library for importing and exporting data. Created as a result of the division of Volbx project code and moving parts of it to an independent library. The library contains classes:  
  + ExportData (base class for exporting)
@@ -24,30 +23,53 @@
  + ImportOds
  + ImportXlsx  
 
-The library is based on Qt 6 and C++17. It uses the Zlib and QuaZip projects.
+The library is based on Qt 6 and uses the Zlib and QuaZip projects for managing archives.
 
-# Building
-Clone and use CMake directly or via Qt Creator. CMake **should**:
-+ configure everything automatically,
-+ compile library and create binaries.
+## Getting Started
+This section describes briefly how to setup the environment and build the project.
 
-**TIP 1**: remember to set properly `CMAKE_PREFIX_PATH` env variable. It should have a Qt installation path to let CMake use `find_package` command.  
+### Prerequisites
+Qt in version 6.5 or greater, C++ compiler with C++17 support as a minimum, and CMake 3.16+. 
 
-**TIP 2**: make sure you install the `Core5Compat` module, which is part of Qt 6 as Quazip needs it.  
+### Building
+Clone and use CMake directly or via any IDE supporting it. CMake should:
+- configure everything automatically,
+- compile and create binaries.
 
-As a result of compilation, a dynamic lib should be created along with a headers' dir.
+As a result of compilation, binary for simulations and binary for testing should be created.
 
-Check out my other project, Volbx to familiarize yourself with how to use it via CMake.
+**TIP**: Remember to set properly the `CMAKE_PREFIX_PATH` env variable. It should have a Qt installation path to let CMake `find_package` command work.  
 
-## Used tools and libs
-| Tool |  Windows | Lubuntu |
+**TIP**: make sure you install the `Core5Compat` module, which is part of Qt 6 as QuaZip needs it.  
+
+### CMake integration
+Use `FetchContent` CMake module in your project:
+```
+include(FetchContent)
+
+FetchContent_Declare(
+   eible
+   GIT_REPOSITORY https://github.com/przemek83/eible
+   GIT_TAG v1.1.0
+)
+
+FetchContent_MakeAvailable(eible)
+```
+From that moment, eible library can be used in the `target_link_libraries` command:
+```
+add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} shared eible)
+```
+Check my other project `Volbx` for real world CMake integration.
+
+## Built with
+| Tool |  Windows | Ubuntu |
 | --- | --- | --- |
-| OS version | 10 22H2 | 22.04 |
-| GCC | 11.2.0 | 11.3.0 |
-| CMake | 3.25.0 | 3.25.0 |
-| Git | 2.38.1 | 2.34.1 |
+| OS version | 10 22H2 | 24.04 |
+| GCC | 13.1.0 | 13.2.0 |
+| CMake | 3.30.2 | 3.28.3 |
+| Git | 2.46.0 | 2.43.0 |
 | Qt | 6.5.2 | 6.5.2 |
-| Qt Creator | 10.0.2 | 10.0.2 |
 | Zlib | 1.3.1 | 1.3.1 |
 | QuaZip | 1.4 | 1.4 |
 
