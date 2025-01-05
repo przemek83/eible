@@ -47,7 +47,7 @@ private Q_SLOTS:
 
     void testInvalidSheetName();
 
-    void testDamagedFile();
+    static void testDamagedFile();
 
 private:
     const QString testFileName_{QStringLiteral(":/testOds.ods")};

@@ -63,7 +63,7 @@ private Q_SLOTS:
 
     void testInvalidSheetName();
 
-    void testDamagedFile();
+    static void testDamagedFile();
 
 private:
     QVector<QVector<QVariant>> convertDataToUseSharedStrings(
