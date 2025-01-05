@@ -23,7 +23,7 @@ ImportXlsx::ImportXlsx(QIODevice& ioDevice)
 
 std::pair<bool, QStringList> ImportXlsx::getSheetNames()
 {
-    if (!sheets_)
+    if (!sheets_.has_value())
     {
         auto [success,
               sheetIdToUserFriendlyNameMap]{getSheetIdToUserFriendlyNameMap()};
@@ -131,7 +131,7 @@ ImportXlsx::getStyles()
 
 std::pair<bool, QString> ImportXlsx::getSheetPath(const QString& sheetName)
 {
-    for (const auto& [currentSheetName, sheetPath] : *sheets_)
+    for (const auto& [currentSheetName, sheetPath] : sheets_.value())
         if (currentSheetName == sheetName)
             return {true, sheetPath};
 
@@ -143,8 +143,8 @@ std::pair<bool, QString> ImportXlsx::getSheetPath(const QString& sheetName)
 
 std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
 {
-    if (sharedStrings_)
-        return {true, *sharedStrings_};
+    if (sharedStrings_.has_value())
+        return {true, sharedStrings_.value()};
 
     if (!openZip())
         return {false, {}};
@@ -169,7 +169,7 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
     }
 
     sharedStrings_ = std::move(sharedStrings);
-    return {true, *sharedStrings_};
+    return {true, sharedStrings_.value()};
 }
 
 std::pair<bool, QVector<ColumnType>> ImportXlsx::getColumnTypes(
@@ -466,12 +466,12 @@ ImportXlsx::retrieveSheets(
 
 std::pair<bool, QList<int>> ImportXlsx::getAllStyles()
 {
-    if (allStyles_)
-        return {true, *allStyles_};
+    if (allStyles_.has_value())
+        return {true, allStyles_.value()};
 
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
-    return {success, *allStyles_};
+    return {success, allStyles_.value()};
 }
 
 QVariant ImportXlsx::getCurrentValueForStringColumn(
@@ -533,15 +533,15 @@ QDate ImportXlsx::getDateFromString(const QString& dateAsString)
 bool ImportXlsx::isDateStyle(const QString& sTagValue) const
 {
     return (!sTagValue.isEmpty()) &&
-           dateStyles_->contains(allStyles_->at(sTagValue.toInt()));
+           dateStyles_.value().contains(allStyles_.value().at(sTagValue.toInt()));
 }
 
 bool ImportXlsx::isCommonDataOk()
 {
-    if ((!sheets_) && (!getSheetNames().first))
+    if ((!sheets_.has_value()) && (!getSheetNames().first))
         return false;
 
-    if ((!sharedStrings_) && (!getSharedStrings().first))
+    if ((!sharedStrings_.has_value()) && (!getSharedStrings().first))
         return false;
 
     return getDateStyles().first && getAllStyles().first;
@@ -628,19 +628,19 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
 std::pair<bool, QList<int>> ImportXlsx::getDateStyles()
 {
-    if (dateStyles_)
-        return {true, *dateStyles_};
+    if (dateStyles_.has_value())
+        return {true, dateStyles_.value()};
 
     bool success{false};
     std::tie(success, dateStyles_, allStyles_) = getStyles();
-    return {success, *dateStyles_};
+    return {success, dateStyles_.value()};
 }
 
 QStringList ImportXlsx::createSheetNames() const
 {
     QStringList sheetNames;
-    sheetNames.reserve(sheets_->size());
-    for (const auto& [sheetName, sheetPath] : *sheets_)
+    sheetNames.reserve(sheets_.value().size());
+    for (const auto& [sheetName, sheetPath] : sheets_.value())
         sheetNames << sheetName;
     return sheetNames;
 }

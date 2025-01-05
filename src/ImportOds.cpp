@@ -15,7 +15,7 @@ ImportOds::ImportOds(QIODevice& ioDevice) : ImportSpreadsheet(ioDevice) {}
 
 std::pair<bool, QStringList> ImportOds::getSheetNames()
 {
-    if (sheetNames_)
+    if (sheetNames_.has_value())
         return {true, sheetNames_.value()};
 
     auto [success, sheetNames]{getSheetNamesFromZipFile()};
@@ -454,10 +454,10 @@ bool ImportOds::isOfficeValueTagEmpty(const QXmlStreamReader& reader) const
 
 bool ImportOds::isSheetAvailable(const QString& sheetName)
 {
-    if ((!sheetNames_) && (!getSheetNames().first))
+    if ((!sheetNames_.has_value()) && (!getSheetNames().first))
         return false;
 
-    return isSheetNameValid(*sheetNames_, sheetName);
+    return isSheetNameValid(sheetNames_.value(), sheetName);
 }
 
 bool ImportOds::initializeColumnTypes(const QString& sheetName)
