@@ -187,13 +187,14 @@ void ImportOdsTest::testInvalidSheetName()
 
 void ImportOdsTest::testDamagedFile()
 {
-    QFile testFile(QStringLiteral(":/testOds_damaged.xlsx"));
+    const QString sheet{QString::fromLatin1("mySheet")};
+    QFile testFile(QString::fromLatin1(":/testOds_damaged.xlsx"));
     ImportOds importOds(testFile);
     QCOMPARE(importOds.getSheetNames().first, false);
-    QCOMPARE(importOds.getColumnTypes("mySheet").first, false);
-    QCOMPARE(importOds.getColumnCount("mySheet").first, false);
-    QCOMPARE(importOds.getColumnNames("mySheet").first, false);
-    QCOMPARE(importOds.getLimitedData("mySheet", {}, 10).first, false);
-    QCOMPARE(importOds.getData("mySheet", {}).first, false);
-    QCOMPARE(importOds.getRowCount("mySheet").first, false);
+    QCOMPARE(importOds.getColumnTypes(sheet).first, false);
+    QCOMPARE(importOds.getColumnCount(sheet).first, false);
+    QCOMPARE(importOds.getColumnNames(sheet).first, false);
+    QCOMPARE(importOds.getLimitedData(sheet, {}, 10).first, false);
+    QCOMPARE(importOds.getData(sheet, {}).first, false);
+    QCOMPARE(importOds.getRowCount(sheet).first, false);
 }

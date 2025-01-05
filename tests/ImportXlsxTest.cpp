@@ -320,16 +320,17 @@ void ImportXlsxTest::testInvalidSheetName()
 
 void ImportXlsxTest::testDamagedFile()
 {
-    QFile testFile(QStringLiteral(":/testXlsx_damaged.xlsx"));
+    const QString sheet{QString::fromLatin1("mySheet")};
+    QFile testFile(QString::fromLatin1(":/testXlsx_damaged.xlsx"));
     ImportXlsx importXlsx(testFile);
     QCOMPARE(importXlsx.getSheetNames().first, false);
-    QCOMPARE(importXlsx.getColumnTypes("mySheet").first, false);
-    QCOMPARE(importXlsx.getColumnCount("mySheet").first, false);
-    QCOMPARE(importXlsx.getColumnNames("mySheet").first, false);
+    QCOMPARE(importXlsx.getColumnTypes(sheet).first, false);
+    QCOMPARE(importXlsx.getColumnCount(sheet).first, false);
+    QCOMPARE(importXlsx.getColumnNames(sheet).first, false);
     QCOMPARE(importXlsx.getSharedStrings().first, false);
     QCOMPARE(importXlsx.getDateStyles().first, false);
     QCOMPARE(importXlsx.getAllStyles().first, false);
-    QCOMPARE(importXlsx.getLimitedData("mySheet", {}, 10).first, false);
-    QCOMPARE(importXlsx.getData("mySheet", {}).first, false);
-    QCOMPARE(importXlsx.getRowCount("mySheet").first, false);
+    QCOMPARE(importXlsx.getLimitedData(sheet, {}, 10).first, false);
+    QCOMPARE(importXlsx.getData(sheet, {}).first, false);
+    QCOMPARE(importXlsx.getRowCount(sheet).first, false);
 }
