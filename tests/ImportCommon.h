@@ -60,7 +60,7 @@ void checkEmittingProgressPercentChangedSmallFile(ImportSpreadsheet& importer);
 
 void checkEmittingProgressPercentChangedBigFile(ImportSpreadsheet& importer);
 
-QStringList& getSheetNames();
+QStringList getSheetNames();
 
 void checkInvalidSheetName(ImportSpreadsheet& importer);
 };  // namespace ImportCommon

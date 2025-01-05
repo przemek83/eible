@@ -341,7 +341,7 @@ void prepareDataForGetColumnListTest()
     const QList<QStringList> testColumnNames{getTestColumnNames()};
     for (int i{0}; i < testColumnNames.size(); ++i)
     {
-        const QString& sheetName{getSheetNames()[i]};
+        const QString sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
             << sheetName << testColumnNames[i];
     }
@@ -365,7 +365,7 @@ void prepareDataForGetColumnTypes()
     const QVector<QVector<ColumnType>> columnTypes{getColumnTypes()};
     for (qsizetype i{0}; i < testColumnNamesSize; ++i)
     {
-        const QString& sheetName{getSheetNames()[i]};
+        const QString sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns types in " + sheetName).toStdString().c_str())
             << sheetName << columnTypes[i];
     }
@@ -421,7 +421,7 @@ void prepareDataForGetColumnCountTest()
     const QList<QStringList> testColumnNames{getTestColumnNames()};
     for (int i{0}; i < testColumnNames.size(); ++i)
     {
-        const QString& sheetName{getSheetNames()[i]};
+        const QString sheetName{getSheetNames()[i]};
         QTest::newRow(("Columns in " + sheetName).toStdString().c_str())
             << sheetName << testColumnNames[i].size();
     }
@@ -445,7 +445,7 @@ void prepareDataForGetRowCountTest()
     QVector<int> expectedRowCounts{getExpectedRowCounts()};
     for (qsizetype i{0}; i < testColumnNamesSize; ++i)
     {
-        const QString& sheetName{getSheetNames()[i]};
+        const QString sheetName{getSheetNames()[i]};
         QTest::newRow(("Rows in " + sheetName).toStdString().c_str())
             << sheetName << expectedRowCounts[i];
     }
@@ -470,7 +470,7 @@ void prepareDataForGetRowAndColumnCountViaGetColumnTypes()
     QVector<int> expectedRowCounts{getExpectedRowCounts()};
     for (int i{0}; i < testColumnNames.size(); ++i)
     {
-        const QString& sheetName{getSheetNames()[i]};
+        const QString sheetName{getSheetNames()[i]};
         QTest::newRow(("Rows and columns via GetColumnTypes() in " + sheetName)
                           .toStdString()
                           .c_str())
@@ -502,7 +502,7 @@ void prepareDataForGetData()
     const QVector<QVector<QVector<QVariant>>> sheetData{getSheetData()};
     for (int i{0}; i < sheetData.size(); ++i)
     {
-        const QString& sheetName{getSheetNames()[i]};
+        const QString sheetName{getSheetNames()[i]};
         QTest::newRow(("Data in " + sheetName).toStdString().c_str())
             << sheetName << sheetData[i];
     }
@@ -610,9 +610,9 @@ QVector<QVector<QVariant>> getDataForSheet(const QString& fileName)
     return sheetData[getSheetNames().indexOf(fileName)];
 }
 
-QStringList& getSheetNames()
+QStringList getSheetNames()
 {
-    static QStringList sheetNames_{
+    QStringList sheetNames_{
         QStringLiteral("Sheet1"),        QStringLiteral("Sheet2"),
         QStringLiteral("Sheet3(empty)"), QStringLiteral("Sheet4"),
         QStringLiteral("Sheet5"),        QStringLiteral("Sheet6"),
