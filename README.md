@@ -77,7 +77,7 @@ target_link_libraries(${PROJECT_NAME} shared eible)
 Check my other project `Volbx` for real world CMake integration.
 
 ## Built with
-| Tool |  Windows | Windows | Ubuntu |
+| |  Windows | Windows | Ubuntu |
 | --- | --- | --- | --- | 
 | OS version | 10 22H2 | 10 22H2 | 24.04 |
 | compiler | GCC 13.1.0 | MSVC 19.29 | GCC 13.2.0 |
