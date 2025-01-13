@@ -12,18 +12,14 @@ class QuaZip;
 class QuaZipFile;
 class QXmlStreamReader;
 
-/**
- * @class ImportXlsx
- * @brief Class analysing content and loading it from xlsx files.
- */
+/// @class ImportXlsx
+/// @brief Class analysing content and loading it from xlsx files.
 class EIBLE_EXPORT ImportXlsx : public ImportSpreadsheet
 {
     Q_OBJECT
 public:
-    /**
-     * @brief Constructor.
-     * @param ioDevice Source of data (QFile, QBuffer, ...).
-     */
+    /// @brief Constructor.
+    /// @param ioDevice Source of data (QFile, QBuffer, ...).
     explicit ImportXlsx(QIODevice& ioDevice);
 
     std::pair<bool, QStringList> getSheetNames() override;
@@ -34,22 +30,16 @@ public:
     std::pair<bool, QStringList> getColumnNames(
         const QString& sheetName) override;
 
-    /**
-     * @brief Get shared strings from xlsx.
-     * @return First value indicating success, second list of shared strings.
-     */
+    /// @brief Get shared strings from xlsx.
+    /// @return First value indicating success, second list of shared strings.
     std::pair<bool, QStringList> getSharedStrings();
 
-    /**
-     * @brief Get date styles from xlsx.
-     * @return First value indicating success, second list of date style ids.
-     */
+    /// @brief Get date styles from xlsx.
+    /// @return First value indicating success, second list of date style ids.
     std::pair<bool, QList<int>> getDateStyles();
 
-    /**
-     * @brief Get all styles from xlsx.
-     * @return First value indicating success, second list of all style ids.
-     */
+    /// @brief Get all styles from xlsx.
+    /// @return First value indicating success, second list of all style ids.
     std::pair<bool, QList<int>> getAllStyles();
 
     std::pair<bool, QVector<QVector<QVariant>>> getLimitedData(
