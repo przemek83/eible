@@ -118,13 +118,13 @@ private:
     std::optional<QList<int>> allStyles_{std::nullopt};
     const QHash<QByteArray, int> excelColNames_;
 
-    static constexpr int DECIMAL_BASE{10};
-    const QString ROW_TAG{QStringLiteral("row")};
-    const QString CELL_TAG{QStringLiteral("c")};
-    const QString SHEET_DATA_TAG{QStringLiteral("sheetData")};
-    const QString S_TAG{QStringLiteral("s")};
-    const QString V_TAG{QStringLiteral("v")};
-    const QString R_TAG{QStringLiteral("r")};
-    const QString T_TAG{QStringLiteral("t")};
-    const QString STR_TAG{QStringLiteral("str")};
+    static constexpr int decimalBase_{10};
+    const QString rowTag_{QStringLiteral("row")};
+    const QString cellTag_{QStringLiteral("c")};
+    const QString sheetDataTag_{QStringLiteral("sheetData")};
+    const QString sTag_{QStringLiteral("s")};
+    const QString vTag_{QStringLiteral("v")};
+    const QString rTag_{QStringLiteral("r")};
+    const QString tTag_{QStringLiteral("t")};
+    const QString strTag_{QStringLiteral("str")};
 };

@@ -164,7 +164,7 @@ std::pair<bool, QStringList> ImportXlsx::getSharedStrings()
     while (!reader.atEnd())
     {
         reader.readNext();
-        if (reader.name() == T_TAG)
+        if (reader.name() == tTag_)
             sharedStrings.append(reader.readElementText());
     }
 
@@ -242,22 +242,22 @@ std::pair<bool, QDomNodeList> ImportXlsx::getSheetNodes(
 
 bool ImportXlsx::isRowStart(const QXmlStreamReader& reader) const
 {
-    return (reader.name() == ROW_TAG) && reader.isStartElement();
+    return (reader.name() == rowTag_) && reader.isStartElement();
 }
 
 bool ImportXlsx::isCellStart(const QXmlStreamReader& reader) const
 {
-    return (reader.name() == CELL_TAG) && reader.isStartElement();
+    return (reader.name() == cellTag_) && reader.isStartElement();
 }
 
 bool ImportXlsx::isCellEnd(const QXmlStreamReader& reader) const
 {
-    return (reader.name() == CELL_TAG) && reader.isEndElement();
+    return (reader.name() == cellTag_) && reader.isEndElement();
 }
 
 bool ImportXlsx::isVTagStart(const QXmlStreamReader& reader) const
 {
-    return (reader.name() == V_TAG) && reader.isStartElement();
+    return (reader.name() == vTag_) && reader.isStartElement();
 }
 
 std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
@@ -279,7 +279,7 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
     QXmlStreamReader::TokenType lastToken{reader.tokenType()};
     QStringList columnNames;
     QString currentColType;
-    while ((!reader.atEnd()) && (reader.name() != ROW_TAG))
+    while ((!reader.atEnd()) && (reader.name() != rowTag_))
     {
         if (isCellStart(reader))
         {
@@ -290,7 +290,7 @@ std::pair<bool, QStringList> ImportXlsx::retrieveColumnNames(
                 columnNames << emptyColName_;
                 ++columnIndex;
             }
-            currentColType = reader.attributes().value(T_TAG).toString();
+            currentColType = reader.attributes().value(tTag_).toString();
         }
 
         if ((!reader.atEnd()) && isVTagStart(reader))
@@ -324,12 +324,12 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
     int maxColumnIndex{NOT_SET_COLUMN};
     int rowCounter{0};
     int rowCountDigitsInXlsx{0};
-    while ((!reader.atEnd()) && (reader.name() != SHEET_DATA_TAG))
+    while ((!reader.atEnd()) && (reader.name() != sheetDataTag_))
     {
         if (isRowStart(reader))
         {
             rowCountDigitsInXlsx =
-                static_cast<int>(reader.attributes().value(R_TAG).size());
+                static_cast<int>(reader.attributes().value(rTag_).size());
             ++rowCounter;
         }
 
@@ -354,7 +354,7 @@ ImportXlsx::retrieveRowCountAndColumnTypes(const QString& sheetName)
 QString ImportXlsx::getColumnName(QXmlStreamReader& reader,
                                   const QString& currentColType) const
 {
-    if (currentColType != S_TAG)
+    if (currentColType != sTag_)
         return reader.readElementText();
 
     const int value{reader.readElementText().toInt()};
@@ -363,7 +363,7 @@ QString ImportXlsx::getColumnName(QXmlStreamReader& reader,
 
 void ImportXlsx::skipToFirstRow(QXmlStreamReader& reader) const
 {
-    while ((!reader.atEnd()) && (reader.name() != SHEET_DATA_TAG))
+    while ((!reader.atEnd()) && (reader.name() != sheetDataTag_))
         reader.readNext();
     reader.readNext();
     reader.readNext();
@@ -372,7 +372,7 @@ void ImportXlsx::skipToFirstRow(QXmlStreamReader& reader) const
 int ImportXlsx::getCurrentColumnNumber(const QXmlStreamReader& reader,
                                        int rowCountDigitsInXlsx) const
 {
-    QString rowNumber{reader.attributes().value(R_TAG).toString()};
+    QString rowNumber{reader.attributes().value(rTag_).toString()};
     rowNumber.chop(rowCountDigitsInXlsx);
     return excelColNames_[rowNumber.toUtf8()];
 }
@@ -384,12 +384,12 @@ ColumnType ImportXlsx::recognizeColumnType(ColumnType currentType,
         return currentType;
 
     const QXmlStreamAttributes attributes{reader.attributes()};
-    if (const QString value{attributes.value(T_TAG).toString()};
-        (value == S_TAG) || (value == STR_TAG))
+    if (const QString value{attributes.value(tTag_).toString()};
+        (value == sTag_) || (value == strTag_))
         return ColumnType::STRING;
 
     ColumnType detectedType{currentType};
-    if (const QString sTagValue{attributes.value(S_TAG).toString()};
+    if (const QString sTagValue{attributes.value(sTag_).toString()};
         isDateStyle(sTagValue))
     {
         if (currentType == ColumnType::UNKNOWN)
@@ -481,7 +481,7 @@ QVariant ImportXlsx::getCurrentValueForStringColumn(
     const QString& currentColType, const QString& actualSTagValue,
     const QString& valueAsString) const
 {
-    if (currentColType == S_TAG)
+    if (currentColType == sTag_)
         return valueAsString.toInt();
 
     if (isDateStyle(actualSTagValue))
@@ -584,12 +584,12 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
 
     QVector<QVariant> currentDataRow(templateDataRow);
     int column{NOT_SET_COLUMN};
-    QString currentColType{S_TAG};
+    QString currentColType{sTag_};
     QString actualSTagValue;
     int rowCounter{0};
     int lastEmittedPercent{0};
     int rowCountDigitsInXlsx{0};
-    while ((!reader.atEnd()) && (reader.name() != SHEET_DATA_TAG) &&
+    while ((!reader.atEnd()) && (reader.name() != sheetDataTag_) &&
            (rowCounter <= rowLimit))
     {
         if (isRowStart(reader))
@@ -601,7 +601,7 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
                 currentDataRow = QVector<QVariant>(templateDataRow);
             }
             rowCountDigitsInXlsx =
-                static_cast<int>(reader.attributes().value(R_TAG).size());
+                static_cast<int>(reader.attributes().value(rTag_).size());
             ++rowCounter;
             updateProgress(rowCounter, rowLimit, lastEmittedPercent);
         }
@@ -609,8 +609,8 @@ std::pair<bool, QVector<QVector<QVariant>>> ImportXlsx::getLimitedData(
         if (isCellStart(reader))
         {
             column = getCurrentColumnNumber(reader, rowCountDigitsInXlsx);
-            currentColType = reader.attributes().value(T_TAG).toString();
-            actualSTagValue = reader.attributes().value(S_TAG).toString();
+            currentColType = reader.attributes().value(tTag_).toString();
+            actualSTagValue = reader.attributes().value(sTag_).toString();
         }
 
         if ((!reader.atEnd()) && isVTagStart(reader) &&
