@@ -116,7 +116,7 @@ protected:
     QIODevice& ioDevice_;
 
     /// If empty column is encountered than insert defined string.
-    QString emptyColName_;
+    QString emptyColName_{QStringLiteral("---")};
 
     static constexpr int NOT_SET_COLUMN{-1};
 
