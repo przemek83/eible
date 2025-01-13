@@ -107,12 +107,12 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
         const QVariant& cell{model.index(row, column).data()};
         if (!cell.isNull())
         {
-            rowContent.append(CELL_START);
+            rowContent.append(cellStart_);
             rowContent.append(columnNames_[column]);
             rowContent.append(rowNumber);
-            rowContent.append(ROW_NUMBER_CLOSE);
+            rowContent.append(rowNumberClose_);
             rowContent.append(getCellTypeTag(cell));
-            rowContent.append(VALUE_START);
+            rowContent.append(valueStart_);
             if ((cell.typeId() == QMetaType::QDate) ||
                 (cell.typeId() == QMetaType::QDateTime))
                 rowContent.append(QByteArray::number(
@@ -120,7 +120,7 @@ QByteArray ExportXlsx::generateRowContent(const QAbstractItemModel& model,
                     cell.toDate().daysTo(utilities::getStartOfExcelWorld())));
             else
                 rowContent.append(cell.toByteArray());
-            rowContent.append(CELL_END);
+            rowContent.append(cellEnd_);
         }
     }
     rowContent.append(QByteArrayLiteral("</row>"));
@@ -138,14 +138,14 @@ const QByteArray& ExportXlsx::getCellTypeTag(const QVariant& cell) const
     {
         case QMetaType::QDate:
         case QMetaType::QDateTime:
-            return DATE_TAG;
+            return dateTag_;
 
         case QMetaType::Int:
         case QMetaType::Double:
-            return NUMERIC_TAG;
+            return numericTag_;
 
         default:
-            return STRING_TAG;
+            return stringTag_;
     }
 }
 

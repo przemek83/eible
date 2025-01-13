@@ -34,13 +34,13 @@ private:
 
     void initColumnNames(int modelColumnCount);
 
-    const QByteArray CELL_START{QByteArrayLiteral("<c r=\"")};
-    const QByteArray ROW_NUMBER_CLOSE{QByteArrayLiteral("\" ")};
-    const QByteArray VALUE_START{QByteArrayLiteral("><v>")};
-    const QByteArray CELL_END{QByteArrayLiteral("</v></c>")};
-    const QByteArray DATE_TAG{QByteArrayLiteral("s=\"3\"")};
-    const QByteArray NUMERIC_TAG{QByteArrayLiteral("s=\"4\"")};
-    const QByteArray STRING_TAG{QByteArrayLiteral("t=\"str\"")};
+    const QByteArray cellStart_{QByteArrayLiteral("<c r=\"")};
+    const QByteArray rowNumberClose_{QByteArrayLiteral("\" ")};
+    const QByteArray valueStart_{QByteArrayLiteral("><v>")};
+    const QByteArray cellEnd_{QByteArrayLiteral("</v></c>")};
+    const QByteArray dateTag_{QByteArrayLiteral("s=\"3\"")};
+    const QByteArray numericTag_{QByteArrayLiteral("s=\"4\"")};
+    const QByteArray stringTag_{QByteArrayLiteral("t=\"str\"")};
 
     QVector<QByteArray> columnNames_{};
 };
