@@ -2,7 +2,7 @@
 
 #include <QMetaType>
 
-enum class ColumnType : char
+enum class ColumnType : signed char
 {
     UNKNOWN = -1,
     STRING,
