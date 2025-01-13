@@ -78,28 +78,28 @@ private:
 
     std::optional<QStringList> sheetNames_{std::nullopt};
 
-    const QString TABLE_TAG{QStringLiteral("table")};
-    const QString TABLE_ROW_TAG{QStringLiteral("table-row")};
-    const QString TABLE_CELL_TAG{QStringLiteral("table-cell")};
-    const QString OFFICE_VALUE_TYPE_TAG{QStringLiteral("office:value-type")};
-    const QString COLUMNS_REPEATED_TAG{
+    const QString tableTag_{QStringLiteral("table")};
+    const QString tableRowTag_{QStringLiteral("table-row")};
+    const QString tableCellTag_{QStringLiteral("table-cell")};
+    const QString officeValueTypeTag_{QStringLiteral("office:value-type")};
+    const QString columnsRepeatedTag_{
         QStringLiteral("table:number-columns-repeated")};
-    const QString STRING_TAG{QStringLiteral("string")};
-    const QString DATE_TAG{QStringLiteral("date")};
-    const QString FLOAT_TAG{QStringLiteral("float")};
-    const QString PERCENTAGE_TAG{QStringLiteral("percentage")};
-    const QString CURRENCY_TAG{QStringLiteral("currency")};
-    const QString TIME_TAG{QStringLiteral("time")};
-    const QString P_TAG{QStringLiteral("p")};
-    const QString OFFICE_DATE_VALUE_TAG{QStringLiteral("office:date-value")};
-    const QString OFFICE_VALUE_TAG{QStringLiteral("office:value")};
-    const QString DATE_FORMAT{QStringLiteral("yyyy-MM-dd")};
-    const QString TABLE_QUALIFIED_NAME{QStringLiteral("table:table")};
-    const QString TABLE_NAME_TAG{QStringLiteral("table:name")};
+    const QString stringTag_{QStringLiteral("string")};
+    const QString dateTag_{QStringLiteral("date")};
+    const QString floatTag_{QStringLiteral("float")};
+    const QString percentageTag_{QStringLiteral("percentage")};
+    const QString currencyTag_{QStringLiteral("currency")};
+    const QString timeTag_{QStringLiteral("time")};
+    const QString pTag_{QStringLiteral("p")};
+    const QString officeDateValueTag_{QStringLiteral("office:date-value")};
+    const QString officeValueTag_{QStringLiteral("office:value")};
+    const QString dateFormat_{QStringLiteral("yyyy-MM-dd")};
+    const QString tableQualifiedName_{QStringLiteral("table:table")};
+    const QString tableNameTag_{QStringLiteral("table:name")};
 
-    const QStringList RECOCNIZED_COLUMN_TYPES{STRING_TAG,   DATE_TAG,
-                                              FLOAT_TAG,    PERCENTAGE_TAG,
-                                              CURRENCY_TAG, TIME_TAG};
+    const QStringList recognizedColumnTypes_{stringTag_,   dateTag_,
+                                             floatTag_,    percentageTag_,
+                                             currencyTag_, timeTag_};
 
-    const int ODS_STRING_DATE_LENGTH{10};
+    const int odsStringDateLength_{10};
 };
