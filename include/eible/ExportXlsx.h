@@ -15,7 +15,8 @@ class EIBLE_EXPORT ExportXlsx : public ExportData
 {
     Q_OBJECT
 public:
-    explicit ExportXlsx(QObject* parent = nullptr);
+    explicit ExportXlsx(QObject* parent);
+    ExportXlsx();
 
 protected:
     bool writeContent(const QByteArray& content, QIODevice& ioDevice) override;

@@ -16,7 +16,8 @@ class EIBLE_EXPORT ExportDsv : public ExportData
 public:
     /// @brief Constructor.
     /// @param separator Separator to be used during export (comma, tab, ...).
-    explicit ExportDsv(char separator, QObject* parent = nullptr);
+    ExportDsv(char separator, QObject* parent);
+    explicit ExportDsv(char separator);
 
     /// @brief Change date format to given one via Qt::DateFormat. (overloaded)
     /// @param format New format for dates as Qt::DateFormat.

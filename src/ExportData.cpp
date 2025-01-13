@@ -5,6 +5,8 @@
 
 ExportData::ExportData(QObject* parent) : QObject(parent) {}
 
+ExportData::ExportData() : ExportData(nullptr) {}
+
 bool ExportData::exportView(const QAbstractItemView& view, QIODevice& ioDevice)
 {
     const QAbstractItemModel* model{view.model()};

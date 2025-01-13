@@ -11,6 +11,8 @@
 
 ExportXlsx::ExportXlsx(QObject* parent) : ExportData(parent) {}
 
+ExportXlsx::ExportXlsx() : ExportXlsx(nullptr) {}
+
 bool ExportXlsx::writeContent(const QByteArray& content, QIODevice& ioDevice)
 {
     QFile xlsxTemplate(QStringLiteral(":/") + utilities::getXlsxTemplateName());
