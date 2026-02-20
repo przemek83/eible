@@ -16,8 +16,8 @@
 
 ImportXlsx::ImportXlsx(QIODevice& ioDevice)
     : ImportSpreadsheet(ioDevice),
-      excelColNames_(
-          utilities::generateExcelColumnNames(utilities::getMaxExcelColumns()))
+      excelColNames_{
+          utilities::generateExcelColumnNames(utilities::getMaxExcelColumns())}
 {
 }
 
